@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal de localización de oficinas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="terminal">
+    <section class="map-frame" aria-label="Mapa interactivo de oficinas">
+      <img
+        id="mapImage"
+        class="map-image"
+        src="Croquis base de la termina.png"
+        alt="Croquis de la terminal con oficinas"
+      >
+
+      <!-- SVG transparente sobre el mapa. El viewBox coincide con la imagen: 1672 x 941. -->
+      <svg id="routeLayer" class="route-layer" viewBox="0 0 1672 941" aria-hidden="true">
+        <defs>
+          <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#0f4257" flood-opacity="0.45" />
+          </filter>
+        </defs>
+
+        <rect id="highlight-contaduria" class="office-highlight" x="70" y="35" width="380" height="320" rx="18" />
+        <rect id="highlight-administracion" class="office-highlight" x="70" y="370" width="350" height="345" rx="18" />
+        <rect id="highlight-sala" class="office-highlight" x="480" y="35" width="690" height="240" rx="18" />
+        <rect id="highlight-rrhh" class="office-highlight" x="1210" y="35" width="375" height="320" rx="18" />
+        <rect id="highlight-gerencia" class="office-highlight" x="1210" y="370" width="375" height="345" rx="18" />
+
+        <path id="routePath" class="route-path" d="" />
+        <circle id="startPoint" class="route-point start" cx="836" cy="825" r="10" />
+        <circle id="endPoint" class="route-point end" cx="836" cy="825" r="11" />
+      </svg>
+
+      <output id="debugOutput" class="debug-output" hidden>Modo depuración</output>
+    </section>
+
+    <section class="controls" aria-label="Seleccionar oficina destino">
+      <button class="office-button contaduria" type="button" data-route="contaduria">Contaduría</button>
+      <button class="office-button administracion" type="button" data-route="administracion">Administración</button>
+      <button class="office-button sala" type="button" data-route="sala">Sala de Reuniones</button>
+      <button class="office-button rrhh" type="button" data-route="rrhh">Recursos Humanos</button>
+      <button class="office-button gerencia" type="button" data-route="gerencia">Gerencia</button>
+
+      <label class="debug-toggle">
+        <input id="debugToggle" type="checkbox">
+        Depuración
+      </label>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

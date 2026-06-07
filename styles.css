@@ -1,0 +1,204 @@
+:root {
+  --route-color: #10a6d8;
+  --route-shadow: #0b3c52;
+  --panel-bg: rgba(255, 255, 255, 0.92);
+  --text: #17212b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background: #d7d0c8;
+}
+
+.terminal {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 12px clamp(10px, 2vw, 28px) 12px;
+}
+
+.map-frame {
+  position: relative;
+  width: min(100%, calc((100vh - 116px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #efece7;
+  box-shadow: 0 12px 34px rgba(20, 20, 20, 0.22);
+}
+
+.map-image,
+.route-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-image {
+  display: block;
+  object-fit: contain;
+  background: #efece7;
+}
+
+.route-layer {
+  pointer-events: auto;
+}
+
+.office-highlight {
+  fill: rgba(255, 213, 74, 0.22);
+  stroke: rgba(255, 187, 0, 0.75);
+  stroke-width: 5;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.office-highlight.active {
+  opacity: 1;
+}
+
+.route-path {
+  fill: none;
+  stroke: var(--route-color);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: url("#routeGlow");
+}
+
+.route-point {
+  fill: #ffffff;
+  stroke-width: 5;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.route-point.visible {
+  opacity: 1;
+}
+
+.route-point.start {
+  stroke: var(--route-shadow);
+}
+
+.route-point.end {
+  stroke: var(--route-color);
+}
+
+.debug-output {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 5;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #ffffff;
+  background: rgba(13, 30, 42, 0.84);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.controls {
+  width: min(100%, 1420px);
+  margin: 0 auto;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(130px, 1fr)) auto;
+  gap: 10px;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--panel-bg);
+  box-shadow: 0 8px 22px rgba(20, 20, 20, 0.16);
+}
+
+.office-button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 7px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.office-button:hover,
+.office-button:focus-visible {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  outline: none;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+}
+
+.office-button.active {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px rgba(16, 166, 216, 0.6);
+}
+
+.contaduria {
+  background: #75982b;
+}
+
+.administracion {
+  background: #158b8f;
+}
+
+.sala {
+  background: #1f4d68;
+}
+
+.rrhh {
+  background: #664099;
+}
+
+.gerencia {
+  background: #c18a14;
+}
+
+.debug-toggle {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-left: 1px solid rgba(0, 0, 0, 0.14);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.debug-toggle input {
+  width: 17px;
+  height: 17px;
+}
+
+@media (max-width: 900px) {
+  .terminal {
+    grid-template-rows: auto auto;
+  }
+
+  .map-frame {
+    width: 100%;
+  }
+
+  .controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .debug-toggle {
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.14);
+    padding-top: 10px;
+  }
+}
