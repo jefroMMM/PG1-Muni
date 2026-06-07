@@ -2,6 +2,8 @@
   --route-color: #10a6d8;
   --route-shadow: #0b3c52;
   --panel-bg: rgba(255, 255, 255, 0.92);
+  --muni-blue: #171a4a;
+  --muni-green: #147a69;
   --text: #17212b;
 }
 
@@ -25,6 +27,15 @@ body {
   padding: 12px clamp(10px, 2vw, 28px);
 }
 
+.main-area {
+  width: min(100%, 1580px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 14px;
+  align-items: center;
+}
+
 .map-frame {
   position: relative;
   width: min(100%, calc((100vh - 116px) * 2));
@@ -34,6 +45,57 @@ body {
   border-radius: 8px;
   background: #efece7;
   box-shadow: 0 12px 34px rgba(20, 20, 20, 0.22);
+}
+
+.welcome-panel {
+  align-self: stretch;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 26px 24px;
+  border-radius: 8px;
+  color: var(--text);
+  border: 1px solid rgba(23, 26, 74, 0.18);
+  background: #f4efe4;
+  box-shadow: 0 10px 24px rgba(45, 40, 32, 0.16);
+}
+
+.municipality-logo {
+  width: 104px;
+  height: auto;
+  align-self: center;
+  margin-bottom: 4px;
+}
+
+.welcome-kicker {
+  margin: 0;
+  color: var(--muni-blue);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.welcome-panel h1 {
+  margin: 0;
+  color: var(--muni-blue);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.welcome-panel p {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.welcome-panel span {
+  color: #4b514c;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .map-image,
@@ -321,8 +383,16 @@ body {
     grid-template-rows: auto auto;
   }
 
+  .main-area {
+    grid-template-columns: 1fr;
+  }
+
   .map-frame {
     width: 100%;
+  }
+
+  .welcome-panel {
+    min-height: auto;
   }
 
   .controls {
