@@ -356,7 +356,7 @@ function showRoutePanel(routeName) {
     welcomeContent.classList.remove("hidden");
     welcomeContent.innerHTML = `
       <p class="welcome-kicker">Ruta a Contadur&iacute;a</p>
-      <p class="route-instruction">Gira a la izquierda, contin&uacute;a hasta el final del pasillo. Luego, gira a la derecha. La oficina de Contadur&iacute;a se encuentra en la primera puerta, a mano izquierda.</p>
+      <p class="route-instruction">Gira a la izquierda, contin&uacute;a hasta el final del pasillo. Luego, gira a la derecha. La oficina de Contadur&iacute;a se encuentra en la segunda puerta, a mano izquierda.</p>
     `;
     return;
   }
