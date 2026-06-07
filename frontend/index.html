@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terminal de localizaci&oacute;n de oficinas</title>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260607-panel-sobrio">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260607-route-exit">
 </head>
 <body>
   <main class="terminal">
@@ -33,8 +33,6 @@
 
           <path id="routePath" class="route-line" d="" />
           <g id="routeFootprints" class="route-footprints"></g>
-          <circle id="startPoint" class="route-point start" cx="1000" cy="877" r="10" />
-          <circle id="endPoint" class="route-point end" cx="1000" cy="877" r="11" />
           <g id="debugMarkers" class="debug-markers"></g>
           <g id="traceLayer" class="trace-layer">
             <line id="traceLine" class="trace-line" x1="0" y1="0" x2="0" y2="0" />
@@ -52,10 +50,12 @@
           src="assets/images/Logo Muni Reu.png"
           alt="Escudo de la Municipalidad de Retalhuleu"
         >
-        <p class="welcome-kicker">Municipalidad de Retalhuleu</p>
-        <h1>Bienvenido</h1>
-        <p>&iquest;Necesitas ayuda para encontrar una oficina?</p>
-        <span>Selecciona una oficina en el panel inferior y sigue la ruta marcada.</span>
+        <div id="welcomeContent" class="welcome-content">
+          <p class="welcome-kicker">Municipalidad de Retalhuleu</p>
+          <h1>Bienvenido</h1>
+          <p>&iquest;Necesitas ayuda para encontrar una oficina?</p>
+          <span>Selecciona una oficina en el panel inferior y sigue la ruta marcada.</span>
+        </div>
       </aside>
     </section>
 
@@ -78,6 +78,6 @@
     </section>
   </main>
 
-  <script src="assets/js/script.js?v=20260607-footprints3"></script>
+  <script src="assets/js/script.js?v=20260607-route-exit2"></script>
 </body>
 </html>

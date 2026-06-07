@@ -63,6 +63,16 @@ body {
   box-shadow: 0 10px 24px rgba(45, 40, 32, 0.16);
 }
 
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.welcome-content.hidden {
+  display: none;
+}
+
 .municipality-logo {
   width: 104px;
   height: auto;
@@ -98,6 +108,14 @@ body {
   line-height: 1.45;
 }
 
+.route-instruction {
+  margin: 0;
+  color: #253140;
+  font-size: 16px;
+  line-height: 1.48;
+  font-weight: 700;
+}
+
 .map-image,
 .route-layer {
   position: absolute;
@@ -129,6 +147,11 @@ body {
   opacity: 1;
 }
 
+.office-highlight.leaving {
+  opacity: 0;
+  transition: opacity 4s ease-in-out;
+}
+
 .route-line {
   fill: none;
   stroke: #0f766e;
@@ -138,6 +161,10 @@ body {
   stroke-dasharray: 12 12;
   opacity: 0.12;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.route-line.leaving {
+  opacity: 0;
 }
 
 .route-footprints {
@@ -164,23 +191,16 @@ body {
   }
 }
 
-.route-point {
-  fill: #ffffff;
-  stroke-width: 5;
-  opacity: 0;
-  transition: opacity 160ms ease;
-}
+@keyframes routeFootprintHide {
+  from {
+    opacity: 0.95;
+    transform: scale(1);
+  }
 
-.route-point.visible {
-  opacity: 1;
-}
-
-.route-point.start {
-  stroke: var(--route-shadow);
-}
-
-.route-point.end {
-  stroke: var(--route-color);
+  to {
+    opacity: 0;
+    transform: scale(0.65);
+  }
 }
 
 .trace-layer {

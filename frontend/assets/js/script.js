@@ -1,12 +1,11 @@
 const routePath = document.getElementById("routePath");
-const startPoint = document.getElementById("startPoint");
-const endPoint = document.getElementById("endPoint");
 const routeLayer = document.getElementById("routeLayer");
 const debugToggle = document.getElementById("debugToggle");
 const traceToggle = document.getElementById("traceToggle");
 const debugOutput = document.getElementById("debugOutput");
 const debugMarkers = document.getElementById("debugMarkers");
 const routeFootprints = document.getElementById("routeFootprints");
+const welcomeContent = document.getElementById("welcomeContent");
 const traceLayer = document.getElementById("traceLayer");
 const traceLine = document.getElementById("traceLine");
 const tracePoints = document.getElementById("tracePoints");
@@ -20,6 +19,15 @@ let activeMarker = null;
 let markerOffset = { x: 0, y: 0 };
 let markerWasDragged = false;
 let suppressNextMapClick = false;
+let routeResetTimer = null;
+
+const defaultWelcomeContent = welcomeContent.innerHTML;
+const routeDuration = 15000;
+const routeAudio = {
+  contaduria: new Audio("assets/Audios/AudioContaduria.mp3")
+};
+
+routeAudio.contaduria.preload = "auto";
 
 // Base SVG: 2000 x 1000. La imagen ocupa toda la base para evitar margenes laterales.
 // El punto inicial es la Entrada y los tramos siguen pasillos visibles.
@@ -40,6 +48,7 @@ const footprintImages = {
 
 const footprintSize = 68;
 const footprintRevealTime = 5000;
+const routeExitDuration = 4000;
 
 function getSvgPoint(event) {
   const point = routeLayer.createSVGPoint();
@@ -218,9 +227,6 @@ function updateRouteFromDebugMarkers(routeName) {
     .join(" ");
 
   routePath.setAttribute("d", routes[routeName]);
-  const end = markers[markers.length - 1];
-  endPoint.setAttribute("cx", end.dataset.x);
-  endPoint.setAttribute("cy", end.dataset.y);
   renderRouteFootprints(routeName);
 }
 
@@ -333,16 +339,104 @@ function setTraceMode(enabled) {
   }
 }
 
+function stopRouteAudio() {
+  Object.values(routeAudio).forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
+
+function showDefaultWelcomeContent() {
+  welcomeContent.classList.remove("hidden");
+  welcomeContent.innerHTML = defaultWelcomeContent;
+}
+
+function showRoutePanel(routeName) {
+  if (routeName === "contaduria") {
+    welcomeContent.classList.remove("hidden");
+    welcomeContent.innerHTML = `
+      <p class="welcome-kicker">Ruta a Contadur&iacute;a</p>
+      <p class="route-instruction">Gira a la izquierda, contin&uacute;a hasta el final del pasillo. Luego, gira a la derecha. La oficina de Contadur&iacute;a se encuentra en la primera puerta, a mano izquierda.</p>
+    `;
+    return;
+  }
+
+  welcomeContent.classList.add("hidden");
+}
+
+function clearRouteDisplay() {
+  routePath.removeAttribute("d");
+  routePath.style.transition = "none";
+  routePath.style.strokeDashoffset = "0";
+  routePath.classList.remove("leaving");
+  routeFootprints.replaceChildren();
+
+  highlights.forEach((highlight) => highlight.classList.remove("active", "leaving"));
+  buttons.forEach((button) => button.classList.remove("active"));
+
+  if (!debugToggle.checked) {
+    debugMarkers.replaceChildren();
+  }
+
+  showDefaultWelcomeContent();
+}
+
+function hideRouteGradually() {
+  const length = routePath.getTotalLength();
+  const footprints = [...routeFootprints.querySelectorAll(".route-footprint")];
+
+  routePath.classList.add("leaving");
+  routePath.style.transition = `stroke-dashoffset ${routeExitDuration}ms ease-in-out, opacity ${routeExitDuration}ms ease-in-out`;
+  routePath.style.strokeDasharray = length;
+  routePath.style.strokeDashoffset = length;
+
+  footprints.forEach((footprint, index) => {
+    const reverseIndex = footprints.length - 1 - index;
+    const delay = footprints.length <= 1 ? 0 : (routeExitDuration / (footprints.length - 1)) * reverseIndex;
+    footprint.style.opacity = "0.95";
+    footprint.style.transform = "scale(1)";
+    footprint.style.animation = `routeFootprintHide 280ms ease-in ${Math.round(delay)}ms both`;
+  });
+
+  highlights.forEach((highlight) => highlight.classList.add("leaving"));
+  buttons.forEach((button) => button.classList.remove("active"));
+
+  window.clearTimeout(routeResetTimer);
+  routeResetTimer = window.setTimeout(() => {
+    clearRouteDisplay();
+  }, routeExitDuration);
+}
+
+function scheduleRouteReset() {
+  window.clearTimeout(routeResetTimer);
+  routeResetTimer = window.setTimeout(() => {
+    hideRouteGradually();
+  }, routeDuration);
+}
+
+function playRouteAudio(routeName) {
+  stopRouteAudio();
+
+  const audio = routeAudio[routeName];
+  if (!audio) {
+    return;
+  }
+
+  audio.play().catch(() => {
+    // El navegador puede bloquear audio si no considera el clic como gesto valido.
+  });
+}
+
 function selectRoute(routeName) {
   const route = routes[routeName];
-  const routePoints = getRoutePoints(route);
-  const end = routePoints[routePoints.length - 1];
 
   activeRouteName = routeName;
+  window.clearTimeout(routeResetTimer);
+  stopRouteAudio();
 
+  routePath.classList.remove("leaving");
+  highlights.forEach((highlight) => highlight.classList.remove("leaving"));
   routePath.setAttribute("d", route);
-  endPoint.setAttribute("cx", end.x);
-  endPoint.setAttribute("cy", end.y);
 
   const length = routePath.getTotalLength();
   routePath.style.transition = "none";
@@ -354,9 +448,6 @@ function selectRoute(routeName) {
   routePath.style.transition = "stroke-dashoffset 1.25s ease-in-out";
   routePath.style.strokeDashoffset = "0";
 
-  startPoint.classList.add("visible");
-  endPoint.classList.add("visible");
-
   highlights.forEach((highlight) => highlight.classList.remove("active"));
   document.getElementById(`highlight-${routeName}`).classList.add("active");
 
@@ -365,7 +456,12 @@ function selectRoute(routeName) {
   });
 
   renderRouteFootprints(routeName);
-  renderRouteDebugMarkers(routeName);
+  if (debugToggle.checked) {
+    renderRouteDebugMarkers(routeName);
+  }
+  showRoutePanel(routeName);
+  playRouteAudio(routeName);
+  scheduleRouteReset();
 }
 
 buttons.forEach((button) => {
@@ -514,5 +610,3 @@ function handleMarkerCoordinateEdit(event) {
 
 routeLayer.addEventListener("input", handleMarkerCoordinateEdit);
 routeLayer.addEventListener("change", handleMarkerCoordinateEdit);
-
-selectRoute("contaduria");
