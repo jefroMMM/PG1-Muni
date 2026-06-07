@@ -7,21 +7,22 @@ const debugOutput = document.getElementById("debugOutput");
 const buttons = document.querySelectorAll(".office-button");
 const highlights = document.querySelectorAll(".office-highlight");
 
-// Coordenadas SVG manuales. El punto inicial es la Entrada y los tramos siguen pasillos visibles.
+// Base SVG: 2000 x 1000. La imagen ocupa toda la base para evitar margenes laterales.
+// El punto inicial es la Entrada y los tramos siguen pasillos visibles.
 const routes = {
-  contaduria: "M 836 825 L 836 760 L 465 760 L 465 445 L 430 445 L 430 335 L 350 300",
-  administracion: "M 836 825 L 836 760 L 465 760 L 465 455 L 430 455 L 430 530 L 325 610",
-  sala: "M 836 825 L 836 760 L 465 760 L 465 445 L 465 295 L 560 270 L 760 245",
-  rrhh: "M 836 825 L 836 760 L 1190 760 L 1190 445 L 1235 445 L 1235 315 L 1355 265",
-  gerencia: "M 836 825 L 836 760 L 1190 760 L 1190 445 L 1235 445 L 1235 520 L 1390 610"
+  contaduria: "M 1000 877 L 1000 808 L 556 808 L 556 473 L 514 473 L 514 356 L 419 319",
+  administracion: "M 1000 877 L 1000 808 L 556 808 L 556 484 L 514 484 L 514 563 L 389 648",
+  sala: "M 1000 877 L 1000 808 L 556 808 L 556 473 L 556 313 L 670 287 L 909 260",
+  rrhh: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 335 L 1621 282",
+  gerencia: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 552 L 1663 648"
 };
 
 const routeEnds = {
-  contaduria: { x: 350, y: 300 },
-  administracion: { x: 325, y: 610 },
-  sala: { x: 760, y: 245 },
-  rrhh: { x: 1355, y: 265 },
-  gerencia: { x: 1390, y: 610 }
+  contaduria: { x: 419, y: 319 },
+  administracion: { x: 389, y: 648 },
+  sala: { x: 909, y: 260 },
+  rrhh: { x: 1621, y: 282 },
+  gerencia: { x: 1663, y: 648 }
 };
 
 function selectRoute(routeName) {
@@ -37,7 +38,7 @@ function selectRoute(routeName) {
   routePath.style.strokeDasharray = length;
   routePath.style.strokeDashoffset = length;
 
-  // Reinicia la animación cada vez que se presiona un botón.
+  // Reinicia la animacion cada vez que se presiona un boton.
   routePath.getBoundingClientRect();
   routePath.style.transition = "stroke-dashoffset 1.25s ease-in-out";
   routePath.style.strokeDashoffset = "0";

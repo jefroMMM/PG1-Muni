@@ -22,13 +22,13 @@ body {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 10px;
-  padding: 12px clamp(10px, 2vw, 28px) 12px;
+  padding: 12px clamp(10px, 2vw, 28px);
 }
 
 .map-frame {
   position: relative;
-  width: min(100%, calc((100vh - 116px) * 16 / 9));
-  aspect-ratio: 16 / 9;
+  width: min(100%, calc((100vh - 116px) * 2));
+  aspect-ratio: 2 / 1;
   margin: 0 auto;
   overflow: hidden;
   border-radius: 8px;
@@ -46,7 +46,8 @@ body {
 
 .map-image {
   display: block;
-  object-fit: contain;
+  object-fit: fill;
+  object-position: center center;
   background: #efece7;
 }
 
@@ -69,7 +70,7 @@ body {
 .route-path {
   fill: none;
   stroke: var(--route-color);
-  stroke-width: 12;
+  stroke-width: 13;
   stroke-linecap: round;
   stroke-linejoin: round;
   filter: url("#routeGlow");

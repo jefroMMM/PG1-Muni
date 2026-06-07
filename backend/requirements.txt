@@ -1,0 +1,2 @@
+# No requiere dependencias de Python.
+# La aplicacion es HTML, CSS y JavaScript puro.

@@ -1,0 +1,9 @@
+services:
+  terminal-muni:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: terminal-muni
+    ports:
+      - "8080:80"
+    restart: unless-stopped
