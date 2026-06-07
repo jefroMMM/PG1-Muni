@@ -33,6 +33,12 @@
         <path id="routePath" class="route-path" d="" />
         <circle id="startPoint" class="route-point start" cx="1000" cy="877" r="10" />
         <circle id="endPoint" class="route-point end" cx="1000" cy="877" r="11" />
+        <g id="debugMarkers" class="debug-markers"></g>
+        <g id="traceLayer" class="trace-layer">
+          <line id="traceLine" class="trace-line" x1="0" y1="0" x2="0" y2="0" />
+          <g id="traceReadouts"></g>
+          <g id="tracePoints"></g>
+        </g>
       </svg>
 
       <output id="debugOutput" class="debug-output" hidden>Modo depuraci&oacute;n</output>
@@ -48,6 +54,11 @@
       <label class="debug-toggle">
         <input id="debugToggle" type="checkbox">
         Depuraci&oacute;n
+      </label>
+
+      <label class="debug-toggle">
+        <input id="traceToggle" type="checkbox">
+        Trazado
       </label>
     </section>
   </main>

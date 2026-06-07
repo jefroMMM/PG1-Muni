@@ -3,31 +3,274 @@ const startPoint = document.getElementById("startPoint");
 const endPoint = document.getElementById("endPoint");
 const routeLayer = document.getElementById("routeLayer");
 const debugToggle = document.getElementById("debugToggle");
+const traceToggle = document.getElementById("traceToggle");
 const debugOutput = document.getElementById("debugOutput");
+const debugMarkers = document.getElementById("debugMarkers");
+const traceLayer = document.getElementById("traceLayer");
+const traceLine = document.getElementById("traceLine");
+const tracePoints = document.getElementById("tracePoints");
+const traceReadouts = document.getElementById("traceReadouts");
 const buttons = document.querySelectorAll(".office-button");
 const highlights = document.querySelectorAll(".office-highlight");
+const svgNamespace = "http://www.w3.org/2000/svg";
+
+let activeRouteName = "contaduria";
+let activeMarker = null;
+let markerOffset = { x: 0, y: 0 };
+let markerWasDragged = false;
+let suppressNextMapClick = false;
 
 // Base SVG: 2000 x 1000. La imagen ocupa toda la base para evitar margenes laterales.
 // El punto inicial es la Entrada y los tramos siguen pasillos visibles.
 const routes = {
-  contaduria: "M 1000 877 L 1000 808 L 556 808 L 556 473 L 514 473 L 514 356 L 419 319",
-  administracion: "M 1000 877 L 1000 808 L 556 808 L 556 484 L 514 484 L 514 563 L 389 648",
-  sala: "M 1000 877 L 1000 808 L 556 808 L 556 473 L 556 313 L 670 287 L 909 260",
+  contaduria: "M 987 737 L 617 737 L 626 347 L 515 345",
+  administracion: "M 987 737 L 617 737 L 624 462 L 515 462",
+  sala: "M 987 737 L 617 737 L 633 291",
   rrhh: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 335 L 1621 282",
   gerencia: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 552 L 1663 648"
 };
 
-const routeEnds = {
-  contaduria: { x: 419, y: 319 },
-  administracion: { x: 389, y: 648 },
-  sala: { x: 909, y: 260 },
-  rrhh: { x: 1621, y: 282 },
-  gerencia: { x: 1663, y: 648 }
-};
+function getSvgPoint(event) {
+  const point = routeLayer.createSVGPoint();
+  point.x = event.clientX;
+  point.y = event.clientY;
+  return point.matrixTransform(routeLayer.getScreenCTM().inverse());
+}
+
+function getRoutePoints(route) {
+  const values = route.match(/[ML]\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g) || [];
+
+  return values.map((value) => {
+    const coordinates = value.match(/-?\d+(?:\.\d+)?/g).map(Number);
+    return { x: coordinates[0], y: coordinates[1] };
+  });
+}
+
+function createSvgElement(tagName, attributes = {}) {
+  const element = document.createElementNS(svgNamespace, tagName);
+
+  Object.entries(attributes).forEach(([name, value]) => {
+    element.setAttribute(name, value);
+  });
+
+  return element;
+}
+
+function updateMarkerPosition(marker, x, y) {
+  marker.dataset.x = Math.round(x);
+  marker.dataset.y = Math.round(y);
+  marker.setAttribute("transform", `translate(${Math.round(x)} ${Math.round(y)})`);
+  marker.querySelector(".marker-x-input").value = Math.round(x);
+  marker.querySelector(".marker-y-input").value = Math.round(y);
+
+  if (marker.classList.contains("trace-marker")) {
+    updateTraceLine();
+  }
+
+  if (marker.classList.contains("debug-marker-route")) {
+    updateRouteFromDebugMarkers(marker.dataset.routeName);
+  }
+}
+
+function addCoordinateMarker(parent, x, y, type = "manual", extraClass = "") {
+  const marker = createSvgElement("g", {
+    class: `debug-marker debug-marker-${type} ${extraClass}`.trim(),
+    transform: `translate(${Math.round(x)} ${Math.round(y)})`
+  });
+
+  marker.dataset.x = Math.round(x);
+  marker.dataset.y = Math.round(y);
+  marker.dataset.type = type;
+
+  const dot = createSvgElement("circle", {
+    class: "debug-marker-dot",
+    cx: 0,
+    cy: 0,
+    r: 9
+  });
+  const editorObject = createSvgElement("foreignObject", {
+    class: "marker-editor-object",
+    x: 14,
+    y: -42,
+    width: 200,
+    height: 42
+  });
+  const editor = document.createElement("div");
+  editor.className = "marker-editor";
+  editor.innerHTML = `
+    <label>x<input class="marker-x-input" type="number" min="0" max="2000" step="1" value="${Math.round(x)}"></label>
+    <label>y<input class="marker-y-input" type="number" min="0" max="1000" step="1" value="${Math.round(y)}"></label>
+    <button class="marker-delete-button" type="button" aria-label="Borrar marca">x</button>
+  `;
+  editorObject.appendChild(editor);
+
+  marker.append(dot, editorObject);
+  parent.appendChild(marker);
+
+  return marker;
+}
+
+function addDebugMarker(x, y, type = "manual") {
+  return addCoordinateMarker(debugMarkers, x, y, type);
+}
+
+function clearRouteDebugMarkers() {
+  debugMarkers
+    .querySelectorAll(".debug-marker-route")
+    .forEach((marker) => marker.remove());
+}
+
+function renderRouteDebugMarkers(routeName) {
+  clearRouteDebugMarkers();
+
+  if (!debugToggle.checked) {
+    return;
+  }
+
+  getRoutePoints(routes[routeName]).forEach((point, index) => {
+    const marker = addDebugMarker(point.x, point.y, "route");
+    marker.dataset.routeName = routeName;
+    marker.dataset.pointIndex = index;
+  });
+}
+
+function updateRouteFromDebugMarkers(routeName) {
+  if (!routeName || routeName !== activeRouteName) {
+    return;
+  }
+
+  const markers = [...debugMarkers.querySelectorAll(`.debug-marker-route[data-route-name="${routeName}"]`)]
+    .sort((first, second) => Number(first.dataset.pointIndex) - Number(second.dataset.pointIndex));
+
+  if (!markers.length) {
+    return;
+  }
+
+  routes[routeName] = markers
+    .map((marker, index) => `${index === 0 ? "M" : "L"} ${marker.dataset.x} ${marker.dataset.y}`)
+    .join(" ");
+
+  routePath.setAttribute("d", routes[routeName]);
+  const end = markers[markers.length - 1];
+  endPoint.setAttribute("cx", end.dataset.x);
+  endPoint.setAttribute("cy", end.dataset.y);
+}
+
+function removeDebugMarkerFromEvent(event) {
+  const deleteButton = event.target.closest(".marker-delete-button");
+  const marker = event.target.closest(".debug-marker");
+
+  if (!deleteButton || !marker) {
+    return false;
+  }
+
+  marker.remove();
+  updateTraceLine();
+  suppressNextMapClick = true;
+  event.stopPropagation();
+  return true;
+}
+
+function getTracePointMarkers() {
+  return [...tracePoints.querySelectorAll(".trace-marker")];
+}
+
+function getTraceAngle() {
+  const markers = getTracePointMarkers();
+
+  if (markers.length !== 2) {
+    return null;
+  }
+
+  const [start, end] = markers;
+  const dx = Number(end.dataset.x) - Number(start.dataset.x);
+  const dy = Number(end.dataset.y) - Number(start.dataset.y);
+  return Math.round(Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI);
+}
+
+function getTraceAngleText() {
+  const angle = getTraceAngle();
+  return angle === null ? "" : `${angle} grados`;
+}
+
+function updateTraceLine() {
+  const markers = getTracePointMarkers();
+  traceReadouts.replaceChildren();
+
+  if (markers.length !== 2) {
+    traceLine.classList.remove("visible");
+    if (traceToggle.checked) {
+      debugOutput.textContent = "Trazado: marca dos puntos para calcular el angulo.";
+    }
+    return;
+  }
+
+  const [start, end] = markers;
+  traceLine.setAttribute("x1", start.dataset.x);
+  traceLine.setAttribute("y1", start.dataset.y);
+  traceLine.setAttribute("x2", end.dataset.x);
+  traceLine.setAttribute("y2", end.dataset.y);
+  traceLine.classList.add("visible");
+
+  if (traceToggle.checked) {
+    debugOutput.textContent = `Angulo entre puntos: ${getTraceAngleText()}`;
+  }
+}
+
+function addTracePoint(x, y) {
+  if (getTracePointMarkers().length >= 2) {
+    return;
+  }
+
+  addCoordinateMarker(tracePoints, x, y, "trace-point", "trace-marker");
+  updateTraceLine();
+}
+
+function addTraceReadout(x, y) {
+  traceReadouts.replaceChildren();
+  const marker = addCoordinateMarker(traceReadouts, x, y, "trace-readout", "trace-readout");
+  const editor = marker.querySelector(".marker-editor");
+  const angle = document.createElement("span");
+  angle.className = "marker-angle";
+  angle.textContent = getTraceAngleText();
+
+  marker.querySelector(".marker-editor-object").setAttribute("width", 265);
+  editor.insertBefore(angle, editor.querySelector(".marker-delete-button"));
+}
+
+function setDebugMode(enabled) {
+  debugToggle.checked = enabled;
+  debugOutput.hidden = !enabled && !traceToggle.checked;
+  debugMarkers.classList.toggle("visible", enabled);
+
+  if (enabled) {
+    debugOutput.textContent = "Haz clic para marcar coordenadas. Arrastra marcas o usa la x para borrar.";
+    renderRouteDebugMarkers(activeRouteName);
+  } else {
+    debugMarkers.replaceChildren();
+  }
+}
+
+function setTraceMode(enabled) {
+  traceToggle.checked = enabled;
+  traceLayer.classList.toggle("visible", enabled);
+  debugOutput.hidden = !enabled && !debugToggle.checked;
+
+  if (enabled) {
+    debugOutput.textContent = "Trazado: marca dos puntos. Toca la linea para ver coordenadas.";
+  } else {
+    tracePoints.replaceChildren();
+    traceReadouts.replaceChildren();
+    traceLine.classList.remove("visible");
+  }
+}
 
 function selectRoute(routeName) {
   const route = routes[routeName];
-  const end = routeEnds[routeName];
+  const routePoints = getRoutePoints(route);
+  const end = routePoints[routePoints.length - 1];
+
+  activeRouteName = routeName;
 
   routePath.setAttribute("d", route);
   endPoint.setAttribute("cx", end.x);
@@ -52,6 +295,8 @@ function selectRoute(routeName) {
   buttons.forEach((button) => {
     button.classList.toggle("active", button.dataset.route === routeName);
   });
+
+  renderRouteDebugMarkers(routeName);
 }
 
 buttons.forEach((button) => {
@@ -59,27 +304,146 @@ buttons.forEach((button) => {
 });
 
 debugToggle.addEventListener("change", () => {
-  debugOutput.hidden = !debugToggle.checked;
-  debugOutput.textContent = debugToggle.checked
-    ? "Haz clic sobre el mapa para ver coordenadas SVG"
-    : "";
+  setDebugMode(debugToggle.checked);
 });
 
-routeLayer.addEventListener("click", (event) => {
-  if (!debugToggle.checked) {
+traceToggle.addEventListener("change", () => {
+  setTraceMode(traceToggle.checked);
+});
+
+routeLayer.addEventListener("pointerdown", (event) => {
+  if (!debugToggle.checked && !traceToggle.checked) {
     return;
   }
 
-  const point = routeLayer.createSVGPoint();
-  point.x = event.clientX;
-  point.y = event.clientY;
+  if (removeDebugMarkerFromEvent(event)) {
+    return;
+  }
 
-  const svgPoint = point.matrixTransform(routeLayer.getScreenCTM().inverse());
+  if (event.target.closest(".marker-x-input, .marker-y-input, .marker-delete-button")) {
+    return;
+  }
+
+  const marker = event.target.closest(".debug-marker");
+
+  if (!marker) {
+    return;
+  }
+
+  const svgPoint = getSvgPoint(event);
+  activeMarker = marker;
+  markerWasDragged = false;
+  markerOffset = {
+    x: svgPoint.x - Number(marker.dataset.x),
+    y: svgPoint.y - Number(marker.dataset.y)
+  };
+
+  marker.classList.add("dragging");
+  marker.setPointerCapture(event.pointerId);
+  event.stopPropagation();
+});
+
+routeLayer.addEventListener("pointermove", (event) => {
+  if (!activeMarker) {
+    return;
+  }
+
+  const svgPoint = getSvgPoint(event);
+  const x = svgPoint.x - markerOffset.x;
+  const y = svgPoint.y - markerOffset.y;
+
+  markerWasDragged = true;
+  updateMarkerPosition(activeMarker, x, y);
+
+  if (!activeMarker.classList.contains("trace-marker") || getTracePointMarkers().length < 2) {
+    debugOutput.textContent = `x: ${Math.round(x)}, y: ${Math.round(y)}`;
+  }
+});
+
+routeLayer.addEventListener("pointerup", (event) => {
+  if (!activeMarker) {
+    return;
+  }
+
+  activeMarker.classList.remove("dragging");
+  activeMarker.releasePointerCapture(event.pointerId);
+  activeMarker = null;
+  event.stopPropagation();
+});
+
+routeLayer.addEventListener("click", (event) => {
+  if (suppressNextMapClick) {
+    suppressNextMapClick = false;
+    return;
+  }
+
+  if ((!debugToggle.checked && !traceToggle.checked) || markerWasDragged) {
+    markerWasDragged = false;
+    return;
+  }
+
+  if (removeDebugMarkerFromEvent(event)) {
+    return;
+  }
+
+  if (event.target.closest(".marker-x-input, .marker-y-input, .marker-delete-button")) {
+    return;
+  }
+
+  if (event.target.closest(".debug-marker")) {
+    return;
+  }
+
+  const svgPoint = getSvgPoint(event);
   const x = Math.round(svgPoint.x);
   const y = Math.round(svgPoint.y);
 
-  debugOutput.textContent = `x: ${x}, y: ${y}`;
-  console.log(`Coordenada SVG: ${x}, ${y}`);
+  if (traceToggle.checked) {
+    if (event.target === traceLine) {
+      debugOutput.textContent = `Linea x: ${x}, y: ${y}, angulo: ${getTraceAngleText()}`;
+      addTraceReadout(x, y);
+      return;
+    }
+
+    if (getTracePointMarkers().length < 2) {
+      addTracePoint(x, y);
+    }
+
+    if (getTracePointMarkers().length < 2) {
+      debugOutput.textContent = `Punto trazado x: ${x}, y: ${y}. Falta el segundo punto.`;
+    }
+  }
+
+  if (debugToggle.checked) {
+    addDebugMarker(x, y, "manual");
+
+    if (!traceToggle.checked || getTracePointMarkers().length < 2) {
+      debugOutput.textContent = `x: ${x}, y: ${y}`;
+    }
+
+    console.log(`Coordenada SVG: ${x}, ${y}`);
+  }
 });
+
+function handleMarkerCoordinateEdit(event) {
+  if (!event.target.matches(".marker-x-input, .marker-y-input")) {
+    return;
+  }
+
+  const marker = event.target.closest(".debug-marker");
+  const xInput = marker.querySelector(".marker-x-input");
+  const yInput = marker.querySelector(".marker-y-input");
+  const x = Math.max(0, Math.min(2000, Number(xInput.value) || 0));
+  const y = Math.max(0, Math.min(1000, Number(yInput.value) || 0));
+
+  updateMarkerPosition(marker, x, y);
+  debugOutput.hidden = false;
+  debugOutput.textContent = marker.classList.contains("trace-marker")
+    ? `Angulo entre puntos: ${getTraceAngleText()}`
+    : `Punto editado x: ${x}, y: ${y}`;
+}
+
+routeLayer.addEventListener("input", handleMarkerCoordinateEdit);
+routeLayer.addEventListener("change", handleMarkerCoordinateEdit);
 
 selectRoute("contaduria");

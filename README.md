@@ -46,15 +46,34 @@ frontend/index.html
 
 ## Modo depuracion
 
-Activa la casilla `Depuracion` y haz clic sobre el croquis. La pagina mostrara coordenadas `x, y` de la base SVG `2000 x 1000`.
+Activa la casilla `Depuracion` y haz clic sobre el croquis. La pagina dejara una marca con las coordenadas `x, y` de la base SVG `2000 x 1000`.
+
+Las marcas se pueden arrastrar para moverlas. Tambien puedes editar directamente los campos `x` y `y` de cada marca. Para borrar una marca, usa el boton `x` de la etiqueta.
+
+Si el modo depuracion esta activo y presionas un boton de oficina, la ruta seleccionada dejara marcas automaticamente en cada punto de recorrido. Esto sirve para ver donde inicia, donde gira y donde termina la linea.
+
+## Modo trazado
+
+Activa la casilla `Trazado` para crear una linea recta temporal entre dos puntos.
+
+1. Haz clic en el primer punto.
+2. Haz clic en el segundo punto.
+3. La pagina dibuja una linea recta entre ambos y muestra automaticamente el angulo entre el primer punto y el segundo.
+4. Toca cualquier parte de la linea para mostrar la coordenada `x, y` exacta de ese punto.
+
+El angulo se calcula desde la horizontal: una linea horizontal marca `0 grados`, una vertical marca `90 grados` y una diagonal perfecta marca `45 grados`.
+
+Los puntos del trazado se pueden arrastrar para ajustar la linea. Tambien puedes editar directamente sus campos `x` y `y`. El angulo se actualiza automaticamente al moverlos o editar sus valores. Tambien se pueden borrar con la `x` de cada etiqueta. Si borras uno de los dos puntos, la linea se oculta hasta que vuelvas a tener dos puntos.
+
+`Depuracion` y `Trazado` pueden estar activos al mismo tiempo. En ese caso, los clics en el mapa pueden crear marcas de depuracion y tambien completar los dos puntos del trazado.
 
 Usa esas coordenadas para ajustar rutas en `frontend/assets/js/script.js`:
 
 ```js
 const routes = {
-  contaduria: "M 1000 877 L 1000 808 L 556 808 L 556 473 L 514 473 L 514 356 L 419 319",
-  administracion: "M 1000 877 L 1000 808 L 556 808 L 556 484 L 514 484 L 514 563 L 389 648",
-  sala: "M 1000 877 L 1000 808 L 556 808 L 556 473 L 556 313 L 670 287 L 909 260",
+  contaduria: "M 987 737 L 617 737 L 617 345 L 515 345",
+  administracion: "M 987 737 L 617 737 L 617 462 L 515 462",
+  sala: "M 987 737 L 617 737 L 633 291",
   rrhh: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 335 L 1621 282",
   gerencia: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 552 L 1663 648"
 };
