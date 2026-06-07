@@ -6,6 +6,7 @@ const debugToggle = document.getElementById("debugToggle");
 const traceToggle = document.getElementById("traceToggle");
 const debugOutput = document.getElementById("debugOutput");
 const debugMarkers = document.getElementById("debugMarkers");
+const routeFootprints = document.getElementById("routeFootprints");
 const traceLayer = document.getElementById("traceLayer");
 const traceLine = document.getElementById("traceLine");
 const tracePoints = document.getElementById("tracePoints");
@@ -23,12 +24,22 @@ let suppressNextMapClick = false;
 // Base SVG: 2000 x 1000. La imagen ocupa toda la base para evitar margenes laterales.
 // El punto inicial es la Entrada y los tramos siguen pasillos visibles.
 const routes = {
-  contaduria: "M 987 737 L 617 737 L 626 347 L 515 345",
-  administracion: "M 987 737 L 617 737 L 624 462 L 515 462",
-  sala: "M 987 737 L 617 737 L 633 291",
-  rrhh: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 335 L 1621 282",
-  gerencia: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 552 L 1663 648"
+  contaduria: "M 1024 714 L 652 714 L 658 332 L 565 331",
+  administracion: "M 1024 714 L 652 714 L 656 448 L 549 447",
+  sala: "M 1024 714 L 675 714 L 680 287",
+  rrhh: "M 1024 714 L 1394 714 L 1386 329 L 1490 329",
+  gerencia: "M 1024 714 L 1394 714 L 1390 449 L 1482 447"
 };
+
+const footprintImages = {
+  up: "assets/images/huellas%20sin%20fondo%20hacia%20arriba.png",
+  down: "assets/images/huellas%20sin%20fondo%20abajo.png",
+  right: "assets/images/huellas%20sin%20fondo%20derecha.png",
+  left: "assets/images/huellas%20sin%20fondo%20izquierda.png"
+};
+
+const footprintSize = 68;
+const footprintRevealTime = 5000;
 
 function getSvgPoint(event) {
   const point = routeLayer.createSVGPoint();
@@ -50,10 +61,66 @@ function createSvgElement(tagName, attributes = {}) {
   const element = document.createElementNS(svgNamespace, tagName);
 
   Object.entries(attributes).forEach(([name, value]) => {
+    if (name === "xlink:href") {
+      element.setAttributeNS("http://www.w3.org/1999/xlink", name, value);
+      return;
+    }
+
     element.setAttribute(name, value);
   });
 
   return element;
+}
+
+function getSegmentDirection(start, end) {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    return dx >= 0 ? "right" : "left";
+  }
+
+  return dy >= 0 ? "down" : "up";
+}
+
+function renderRouteFootprints(routeName) {
+  const points = getRoutePoints(routes[routeName]);
+  const footprints = [];
+
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const start = points[index];
+    const end = points[index + 1];
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const length = Math.hypot(dx, dy);
+    const steps = Math.max(1, Math.floor(length / 46));
+    const direction = getSegmentDirection(start, end);
+
+    for (let step = 1; step <= steps; step += 1) {
+      const ratio = step / (steps + 1);
+      const x = start.x + dx * ratio;
+      const y = start.y + dy * ratio;
+      const footprint = createSvgElement("image", {
+        class: "route-footprint",
+        href: footprintImages[direction],
+        "xlink:href": footprintImages[direction],
+        x: Math.round(x - footprintSize / 2),
+        y: Math.round(y - footprintSize / 2),
+        width: footprintSize,
+        height: footprintSize,
+        preserveAspectRatio: "xMidYMid meet"
+      });
+
+      footprints.push(footprint);
+    }
+  }
+
+  footprints.forEach((footprint, index) => {
+    const delay = footprints.length <= 1 ? 0 : (footprintRevealTime / (footprints.length - 1)) * index;
+    footprint.style.animationDelay = `${Math.round(delay)}ms`;
+  });
+
+  routeFootprints.replaceChildren(...footprints);
 }
 
 function updateMarkerPosition(marker, x, y) {
@@ -154,6 +221,7 @@ function updateRouteFromDebugMarkers(routeName) {
   const end = markers[markers.length - 1];
   endPoint.setAttribute("cx", end.dataset.x);
   endPoint.setAttribute("cy", end.dataset.y);
+  renderRouteFootprints(routeName);
 }
 
 function removeDebugMarkerFromEvent(event) {
@@ -278,10 +346,10 @@ function selectRoute(routeName) {
 
   const length = routePath.getTotalLength();
   routePath.style.transition = "none";
-  routePath.style.strokeDasharray = length;
+  routePath.style.strokeDasharray = "12 12";
   routePath.style.strokeDashoffset = length;
 
-  // Reinicia la animacion cada vez que se presiona un boton.
+  // Reinicia la animacion del trazo cada vez que se presiona un boton.
   routePath.getBoundingClientRect();
   routePath.style.transition = "stroke-dashoffset 1.25s ease-in-out";
   routePath.style.strokeDashoffset = "0";
@@ -296,6 +364,7 @@ function selectRoute(routeName) {
     button.classList.toggle("active", button.dataset.route === routeName);
   });
 
+  renderRouteFootprints(routeName);
   renderRouteDebugMarkers(routeName);
 }
 

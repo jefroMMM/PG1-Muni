@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terminal de localizaci&oacute;n de oficinas</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260607-footprints3">
 </head>
 <body>
   <main class="terminal">
@@ -12,7 +12,7 @@
       <img
         id="mapImage"
         class="map-image"
-        src="assets/images/croquis-terminal-2000x1000.png"
+        src="assets/images/croquis-terminal-2000x1000.png?v=20260607-pasillos-corregidos"
         alt="Croquis de la terminal con oficinas"
       >
 
@@ -30,7 +30,8 @@
         <rect id="highlight-rrhh" class="office-highlight" x="1447" y="37" width="449" height="340" rx="20" />
         <rect id="highlight-gerencia" class="office-highlight" x="1447" y="393" width="449" height="367" rx="20" />
 
-        <path id="routePath" class="route-path" d="" />
+        <path id="routePath" class="route-line" d="" />
+        <g id="routeFootprints" class="route-footprints"></g>
         <circle id="startPoint" class="route-point start" cx="1000" cy="877" r="10" />
         <circle id="endPoint" class="route-point end" cx="1000" cy="877" r="11" />
         <g id="debugMarkers" class="debug-markers"></g>
@@ -63,6 +64,6 @@
     </section>
   </main>
 
-  <script src="assets/js/script.js"></script>
+  <script src="assets/js/script.js?v=20260607-footprints3"></script>
 </body>
 </html>

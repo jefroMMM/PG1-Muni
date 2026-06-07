@@ -67,13 +67,39 @@ body {
   opacity: 1;
 }
 
-.route-path {
+.route-line {
   fill: none;
-  stroke: var(--route-color);
-  stroke-width: 13;
+  stroke: #0f766e;
+  stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: url("#routeGlow");
+  stroke-dasharray: 12 12;
+  opacity: 0.12;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.route-footprints {
+  pointer-events: none;
+}
+
+.route-footprint {
+  opacity: 0;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+  animation: routeFootprintReveal 360ms ease-out forwards;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes routeFootprintReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+
+  to {
+    opacity: 0.95;
+    transform: scale(1);
+  }
 }
 
 .route-point {

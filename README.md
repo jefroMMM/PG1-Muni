@@ -10,6 +10,7 @@ Pagina web interactiva para mostrar rutas desde la Entrada hacia oficinas sobre 
 - La imagen ocupa toda la base del mapa para evitar margenes laterales.
 - Rutas manuales definidas con coordenadas SVG.
 - Animacion con `stroke-dasharray` y `stroke-dashoffset`.
+- Ruta visual con huellas direccionales desde assets: arriba, abajo, derecha e izquierda, colocadas sobre los pasillos.
 - Resaltado visual de la oficina destino.
 - Modo de depuracion para obtener coordenadas al hacer clic sobre el mapa.
 
