@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa Retalhuleu</title>
+  <link rel="stylesheet" href="mapar.css?v=20260608-map-ui">
+</head>
+<body>
+  <main class="mapr-terminal">
+    <section class="mapr-main" aria-label="Mapa de dependencias">
+      <div class="mapr-frame">
+        <img
+          id="maprImage"
+          class="mapr-image"
+          src="Imagenes-MapaR/Mapa-R-2000x1000.png?v=20260608"
+          alt="Mapa de Retalhuleu"
+        >
+
+        <svg id="maprLayer" class="mapr-layer" viewBox="0 0 2000 1000" aria-hidden="true">
+          <g id="mapRouteFootprints" class="map-route-footprints"></g>
+          <g class="map-logo-markers">
+            <image
+              class="map-logo-marker"
+              href="Imagenes-MapaR/Icono%20Renap.png"
+              x="525"
+              y="446"
+              width="60"
+              height="60"
+              preserveAspectRatio="xMidYMid meet"
+            />
+            <image
+              class="map-logo-marker"
+              href="Imagenes-MapaR/PNC%20logo.png"
+              x="1300"
+              y="78"
+              width="50"
+              height="50"
+              preserveAspectRatio="xMidYMid meet"
+            />
+            <image
+              class="map-logo-marker"
+              href="Imagenes-MapaR/Logo%20Muni%20Reu.png"
+              x="1492"
+              y="800"
+              width="50"
+              height="50"
+              preserveAspectRatio="xMidYMid meet"
+            />
+          </g>
+          <line id="traceLine" class="trace-line" x1="0" y1="0" x2="0" y2="0" />
+          <g id="traceReadouts"></g>
+          <g id="tracePoints"></g>
+          <g id="debugMarkers"></g>
+        </svg>
+
+        <output id="debugOutput" class="debug-output" hidden>Modo depuraci&oacute;n</output>
+      </div>
+
+      <aside class="mapr-panel" aria-label="Informaci&oacute;n del mapa">
+        <img src="../assets/images/Logo Muni Reu.png" alt="Escudo de la Municipalidad de Retalhuleu">
+        <div id="maprPanelContent">
+          <p>Municipalidad de Retalhuleu</p>
+          <h1>Mapa</h1>
+          <span>Selecciona una dependencia para preparar el recorrido.</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="mapr-controls" aria-label="Dependencias">
+      <button type="button" data-map-route="municipalidad">Municipalidad de Retalhuleu</button>
+      <button type="button">Polic&iacute;a Municipal de Tr&aacute;nsito</button>
+      <button type="button" data-map-route="pnc">Polic&iacute;a Nacional Civil</button>
+      <button type="button">Registro Nacional de las Personas</button>
+      <button type="button">Instituto Guatemalteco de Seguridad Social</button>
+      <button type="button">Tribunal Supremo Electoral</button>
+
+      <label class="mode-toggle">
+        <input id="debugToggle" type="checkbox">
+        Depuraci&oacute;n
+      </label>
+
+      <label class="mode-toggle">
+        <input id="traceToggle" type="checkbox">
+        Trazado
+      </label>
+    </section>
+  </main>
+
+  <script src="mapar.js?v=20260608-debug-panel-nodes"></script>
+</body>
+</html>
