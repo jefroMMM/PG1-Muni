@@ -24,10 +24,16 @@ let routeResetTimer = null;
 const defaultWelcomeContent = welcomeContent.innerHTML;
 const routeDuration = 15000;
 const routeAudio = {
-  contaduria: new Audio("assets/Audios/AudioContaduria.mp3")
+  contaduria: new Audio("assets/Audios/AudioContaduria.mp3"),
+  administracion: new Audio("assets/Audios/Audio%20Administraci%C3%B3n.mp3"),
+  sala: new Audio("assets/Audios/Sala%20de%20reuniones.mp3"),
+  rrhh: new Audio("assets/Audios/Recursos%20humanos.mp3"),
+  gerencia: new Audio("assets/Audios/Audio%20gerencia.mp3")
 };
 
-routeAudio.contaduria.preload = "auto";
+Object.values(routeAudio).forEach((audio) => {
+  audio.preload = "auto";
+});
 
 // Base SVG: 2000 x 1000. La imagen ocupa toda la base para evitar margenes laterales.
 // El punto inicial es la Entrada y los tramos siguen pasillos visibles.
@@ -357,6 +363,42 @@ function showRoutePanel(routeName) {
     welcomeContent.innerHTML = `
       <p class="welcome-kicker">Ruta a Contadur&iacute;a</p>
       <p class="route-instruction">Gira a la izquierda, contin&uacute;a hasta el final del pasillo. Luego, gira a la derecha. La oficina de Contadur&iacute;a se encuentra en la segunda puerta, a mano izquierda.</p>
+    `;
+    return;
+  }
+
+  if (routeName === "administracion") {
+    welcomeContent.classList.remove("hidden");
+    welcomeContent.innerHTML = `
+      <p class="welcome-kicker">Ruta a Administraci&oacute;n</p>
+      <p class="route-instruction">Gira a la izquierda, contin&uacute;a hasta el final del pasillo. Luego, gira a la derecha. La oficina de Administraci&oacute;n se encuentra en la primera puerta, a mano izquierda.</p>
+    `;
+    return;
+  }
+
+  if (routeName === "sala") {
+    welcomeContent.classList.remove("hidden");
+    welcomeContent.innerHTML = `
+      <p class="welcome-kicker">Ruta a Sala de Reuniones</p>
+      <p class="route-instruction">Gira a la izquierda, contin&uacute;a hasta el final del pasillo. Luego, gira a la derecha. La sala de reuniones se encuentra hasta el final del pasillo, en la puerta del fondo.</p>
+    `;
+    return;
+  }
+
+  if (routeName === "rrhh") {
+    welcomeContent.classList.remove("hidden");
+    welcomeContent.innerHTML = `
+      <p class="welcome-kicker">Ruta a Recursos Humanos</p>
+      <p class="route-instruction">Gira a la derecha, contin&uacute;a hasta el final del pasillo. Luego, gira a la izquierda. La oficina de Recursos Humanos se encuentra en la segunda puerta, a mano derecha.</p>
+    `;
+    return;
+  }
+
+  if (routeName === "gerencia") {
+    welcomeContent.classList.remove("hidden");
+    welcomeContent.innerHTML = `
+      <p class="welcome-kicker">Ruta a Gerencia</p>
+      <p class="route-instruction">Gira a la derecha, contin&uacute;a hasta el final del pasillo. Luego, gira a la izquierda. La oficina de Gerencia se encuentra en la primera puerta, a mano derecha.</p>
     `;
     return;
   }
