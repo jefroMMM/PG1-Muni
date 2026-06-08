@@ -19,6 +19,7 @@ let activeRouteName = null;
 const defaultPanelContent = maprPanelContent.innerHTML;
 const routeNames = {
   municipalidad: "Municipalidad de Retalhuleu",
+  renap: "Registro Nacional de las Personas",
   pnc: "Policía Nacional Civil"
 };
 
@@ -28,27 +29,46 @@ const routeFootprintPoints = {
     { x: 1468, y: 732 },
     { x: 1541, y: 808 }
   ],
-  pnc: [
-    { x: 1521, y: 676 },
-    { x: 1580, y: 605 },
-    { x: 1515, y: 508 },
-    { x: 1446, y: 560 },
-    { x: 1327, y: 412 },
-    { x: 1284, y: 325 },
-    { x: 1258, y: 234 },
-    { x: 1218, y: 107 },
-    { x: 1321, y: 72 }
+  renap: [
+    { x: 1525, y: 671 },
+    { x: 1584, y: 603 },
+    { x: 1519, y: 506 },
+    { x: 1448, y: 557 },
+    { x: 1329, y: 409 },
+    { x: 1286, y: 324 },
+    { x: 1205, y: 342 },
+    { x: 730, y: 398 },
+    { x: 635, y: 443 },
+    { x: 573, y: 497 }
+  ]
+};
+
+const routeSegmentSprites = {
+  renap: [
+    "huellas",
+    "tucUpLeft",
+    "tucLeft",
+    "tucUpRight",
+    "tucUpRight",
+    "tucLeft",
+    "tucLeft",
+    "tucLeft",
+    "tucLeft"
   ]
 };
 
 const footprintImages = {
-  up: "../assets/images/huellas%20sin%20fondo%20hacia%20arriba.png",
-  down: "../assets/images/huellas%20sin%20fondo%20abajo.png",
-  right: "../assets/images/huellas%20sin%20fondo%20derecha.png",
-  left: "../assets/images/huellas%20sin%20fondo%20izquierda.png"
+  up: "Imagenes-MapaR/huellas%20sin%20fondo%20hacia%20arriba.png",
+  down: "Imagenes-MapaR/huellas%20sin%20fondo%20abajo.png",
+  right: "Imagenes-MapaR/huellas%20sin%20fondo%20derecha.png",
+  left: "Imagenes-MapaR/huellas%20sin%20fondo%20izquierda.png",
+  tucUpLeft: "Imagenes-MapaR/tuc%20tuc%20mirando%20arriba%20izquierda.png",
+  tucLeft: "Imagenes-MapaR/tuc%20tuc%20izquierda.png",
+  tucUpRight: "Imagenes-MapaR/tuctuc%20derecha%20arriba.png",
+  tucRight: "Imagenes-MapaR/tuctuc%20derecha.png"
 };
 
-const footprintSize = 50;
+const footprintSize = 40;
 const footprintRevealTime = 5000;
 
 function getSvgPoint(event) {
@@ -86,6 +106,7 @@ function getSegmentDirection(start, end) {
 
 function renderRouteFootprints(routeName) {
   const points = routeFootprintPoints[routeName];
+  const segmentSprites = routeSegmentSprites[routeName] || [];
   const footprints = [];
 
   if (!points) {
@@ -101,6 +122,10 @@ function renderRouteFootprints(routeName) {
     const length = Math.hypot(dx, dy);
     const steps = Math.max(1, Math.floor(length / 40));
     const direction = getSegmentDirection(start, end);
+    const spriteKey = segmentSprites[index];
+    const sprite = spriteKey === "huellas" || !spriteKey
+      ? footprintImages[direction]
+      : footprintImages[spriteKey];
 
     for (let step = 1; step <= steps; step += 1) {
       const ratio = step / (steps + 1);
@@ -108,8 +133,8 @@ function renderRouteFootprints(routeName) {
       const y = start.y + dy * ratio;
       const footprint = createSvgElement("image", {
         class: "map-route-footprint",
-        href: footprintImages[direction],
-        "xlink:href": footprintImages[direction],
+        href: sprite,
+        "xlink:href": sprite,
         x: Math.round(x - footprintSize / 2),
         y: Math.round(y - footprintSize / 2),
         width: footprintSize,
