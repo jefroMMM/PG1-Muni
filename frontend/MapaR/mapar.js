@@ -15,13 +15,43 @@ let markerOffset = { x: 0, y: 0 };
 let markerWasDragged = false;
 let suppressNextMapClick = false;
 let activeRouteName = null;
+let routeExitTimer = null;
+let routeResetTimer = null;
 
 const defaultPanelContent = maprPanelContent.innerHTML;
+const routeRevealTime = 7000;
+const routeVisibleTime = 21500;
+const routeExitDuration = 7000;
 const routeNames = {
   municipalidad: "Municipalidad de Retalhuleu",
   renap: "Registro Nacional de las Personas",
   policiaNacionalCivil: "Policia Nacional Civil",
   pnc: "Policía Nacional Civil"
+};
+
+const routeAudio = {
+  municipalidad: new Audio("Audios/Audio%20municipalidad.mp3"),
+  policiaNacionalCivil: new Audio("Audios/Audio%20Policia%20Nacional%20Civil.mp3"),
+  renap: new Audio("Audios/Audio%20Renap.mp3")
+};
+
+Object.values(routeAudio).forEach((audio) => {
+  audio.preload = "auto";
+});
+
+const routePanelContent = {
+  municipalidad: {
+    title: "Ruta a Municipalidad de Retalhuleu",
+    text: "Saliendo del Palacio, gira a la izquierda. Contin&uacute;a hasta la primera esquina y gira a la izquierda. A mitad de la calle, a mano derecha, encontrar&aacute;s la Municipalidad de Retalhuleu. Que tengas un buen d&iacute;a."
+  },
+  policiaNacionalCivil: {
+    title: "Ruta a Polic&iacute;a Nacional Civil",
+    text: "Saliendo del Palacio, gira a la derecha. Contin&uacute;a hasta el sem&aacute;foro y gira a la izquierda sobre la Quinta Avenida. Avanza hasta la primera calle, a mano derecha. Contin&uacute;a por toda la Quinta Calle hasta llegar al Estadio Doctor &Oacute;scar Monterroso. Luego, gira a la derecha en la primera esquina. Encontrar&aacute;s la comisar&iacute;a de la Polic&iacute;a Nacional Civil. Que tengas un buen d&iacute;a."
+  },
+  renap: {
+    title: "Ruta a RENAP",
+    text: "Saliendo del Palacio, gira a la derecha. Contin&uacute;a hasta el sem&aacute;foro y gira a la izquierda sobre la Quinta Avenida. Avanza hasta la primera calle, a mano derecha, y sigue derecho. En la segunda calle, gira a la izquierda. Contin&uacute;a por toda la Tercera Avenida hasta llegar al kiosco. Al lado derecho encontrar&aacute;s la sede del RENAP. Que tengas un buen d&iacute;a."
+  }
 };
 
 const routeFootprintPoints = {
@@ -112,7 +142,7 @@ const footprintImages = {
 };
 
 const footprintSize = 40;
-const footprintRevealTime = 5000;
+const footprintRevealTime = routeRevealTime;
 
 function getSvgPoint(event) {
   const point = maprLayer.createSVGPoint();
@@ -337,6 +367,94 @@ function renderDefaultPanel() {
   maprPanelContent.innerHTML = defaultPanelContent;
 }
 
+function stopRouteAudio() {
+  Object.values(routeAudio).forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
+
+function renderRoutePanel(routeName) {
+  const content = routePanelContent[routeName];
+
+  if (!content || debugToggle.checked) {
+    return;
+  }
+
+  maprPanelContent.innerHTML = `
+    <p>Indicaciones</p>
+    <h1>${content.title}</h1>
+    <span class="map-route-instruction">${content.text}</span>
+  `;
+}
+
+function clearRouteDisplay() {
+  mapRouteFootprints.replaceChildren();
+  stopRouteAudio();
+
+  if (!debugToggle.checked) {
+    renderDefaultPanel();
+  }
+}
+
+function hideRouteGradually() {
+  const footprints = [...mapRouteFootprints.querySelectorAll(".map-route-footprint")];
+
+  footprints.forEach((footprint, index) => {
+    const reverseIndex = footprints.length - 1 - index;
+    const delay = footprints.length <= 1 ? 0 : (routeExitDuration / (footprints.length - 1)) * reverseIndex;
+    footprint.style.opacity = "0.95";
+    footprint.style.transform = "scale(1)";
+    footprint.style.animation = `mapRouteFootprintHide 320ms ease-in ${Math.round(delay)}ms both`;
+  });
+
+  window.clearTimeout(routeResetTimer);
+  routeResetTimer = window.setTimeout(() => {
+    clearRouteDisplay();
+  }, routeExitDuration);
+}
+
+function scheduleRouteReset() {
+  window.clearTimeout(routeExitTimer);
+  window.clearTimeout(routeResetTimer);
+  routeExitTimer = window.setTimeout(() => {
+    hideRouteGradually();
+  }, routeVisibleTime);
+}
+
+function playRouteAudio(routeName) {
+  stopRouteAudio();
+
+  const audio = routeAudio[routeName];
+
+  if (!audio) {
+    return;
+  }
+
+  audio.play().catch(() => {
+    // El navegador puede bloquear el audio si no reconoce el clic como gesto valido.
+  });
+}
+
+function selectMapRoute(routeName) {
+  activeRouteName = routeName;
+  window.clearTimeout(routeExitTimer);
+  window.clearTimeout(routeResetTimer);
+  stopRouteAudio();
+
+  mapRouteFootprints.replaceChildren();
+  renderRouteFootprints(routeName);
+
+  if (debugToggle.checked) {
+    renderRouteDebugNodes(routeName);
+  } else {
+    renderRoutePanel(routeName);
+  }
+
+  playRouteAudio(routeName);
+  scheduleRouteReset();
+}
+
 function renderDebugPanel(routeName) {
   const points = routeFootprintPoints[routeName] || [];
   const title = routeNames[routeName] || "Ruta sin seleccionar";
@@ -414,7 +532,12 @@ function setDebugMode(enabled) {
     }
   } else {
     debugMarkers.replaceChildren();
-    renderDefaultPanel();
+
+    if (activeRouteName && mapRouteFootprints.children.length) {
+      renderRoutePanel(activeRouteName);
+    } else {
+      renderDefaultPanel();
+    }
   }
 }
 
@@ -563,14 +686,6 @@ maprLayer.addEventListener("change", handleMarkerCoordinateEdit);
 
 document.querySelectorAll("[data-map-route]").forEach((button) => {
   button.addEventListener("click", () => {
-    activeRouteName = button.dataset.mapRoute;
-    mapRouteFootprints.replaceChildren();
-    renderRouteFootprints(activeRouteName);
-
-    if (debugToggle.checked) {
-      renderRouteDebugNodes(activeRouteName);
-    } else {
-      renderDefaultPanel();
-    }
+    selectMapRoute(button.dataset.mapRoute);
   });
 });
