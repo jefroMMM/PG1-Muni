@@ -35,8 +35,7 @@ Object.values(routeAudio).forEach((audio) => {
   audio.preload = "auto";
 });
 
-// Base SVG: 2000 x 1000. La imagen ocupa toda la base para evitar margenes laterales.
-// El punto inicial es la Entrada y los tramos siguen pasillos visibles.
+
 const routes = {
   contaduria: "M 1024 714 L 652 714 L 658 332 L 565 331",
   administracion: "M 1024 714 L 652 714 L 656 448 L 549 447",

@@ -20,6 +20,7 @@ const defaultPanelContent = maprPanelContent.innerHTML;
 const routeNames = {
   municipalidad: "Municipalidad de Retalhuleu",
   renap: "Registro Nacional de las Personas",
+  policiaNacionalCivil: "Policia Nacional Civil",
   pnc: "Policía Nacional Civil"
 };
 
@@ -40,6 +41,28 @@ const routeFootprintPoints = {
     { x: 730, y: 398 },
     { x: 635, y: 443 },
     { x: 573, y: 497 }
+  ],
+  policiaNacionalCivil: [
+    { x: 1521, y: 676 },
+    { x: 1580, y: 605 },
+    { x: 1515, y: 508 },
+    { x: 1446, y: 560 },
+    { x: 1327, y: 412 },
+    { x: 1284, y: 325 },
+    { x: 1258, y: 234 },
+    { x: 1218, y: 107 },
+    { x: 1321, y: 72 }
+  ],
+  pnc: [
+    { x: 1521, y: 676 },
+    { x: 1580, y: 605 },
+    { x: 1515, y: 508 },
+    { x: 1446, y: 560 },
+    { x: 1327, y: 412 },
+    { x: 1284, y: 325 },
+    { x: 1258, y: 234 },
+    { x: 1218, y: 107 },
+    { x: 1321, y: 72 }
   ]
 };
 
@@ -54,6 +77,26 @@ const routeSegmentSprites = {
     "tucLeft",
     "tucLeft",
     "tucLeft"
+  ],
+  policiaNacionalCivil: [
+    "huellas",
+    "tucUpLeft",
+    "tucLeft",
+    "tucUpRight",
+    "tucUpRight",
+    "tucUpRight",
+    "tucUpRight",
+    "tucRight"
+  ],
+  pnc: [
+    "huellas",
+    "tucUpLeft",
+    "tucLeft",
+    "tucUpRight",
+    "tucUpRight",
+    "tucUpRight",
+    "tucUpRight",
+    "tucRight"
   ]
 };
 

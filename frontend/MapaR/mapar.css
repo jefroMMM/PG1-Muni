@@ -178,7 +178,7 @@ body {
   margin: 0 auto;
   padding: 10px;
   display: grid;
-  grid-template-columns: repeat(6, minmax(120px, 1fr)) auto auto;
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto auto;
   gap: 10px;
   align-items: center;
   border-radius: 8px;
@@ -188,38 +188,34 @@ body {
 
 .mapr-controls button {
   min-height: 46px;
-  border: 0;
+  border: 1px solid rgba(85, 72, 54, 0.18);
   border-radius: 7px;
   padding: 10px 12px;
-  color: #ffffff;
-  background: var(--teal);
+  color: #243a3b;
+  background: #cfe3d2;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79, 69, 55, 0.12);
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.mapr-controls button:hover {
+  background: #d9eadf;
+  border-color: rgba(85, 72, 54, 0.28);
+  transform: translateY(-1px);
 }
 
 .mapr-controls button:nth-child(1) {
-  background: #75982b;
+  background: #cfe3d2;
 }
 
 .mapr-controls button:nth-child(2) {
-  background: #158b8f;
+  background: #c9e1e6;
 }
 
 .mapr-controls button:nth-child(3) {
-  background: #1f4d68;
-}
-
-.mapr-controls button:nth-child(4) {
-  background: #664099;
-}
-
-.mapr-controls button:nth-child(5) {
-  background: #c18a14;
-}
-
-.mapr-controls button:nth-child(6) {
-  background: #274a70;
+  background: #d7ead7;
 }
 
 .mode-toggle {
