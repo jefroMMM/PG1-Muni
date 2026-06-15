@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terminal de localizaci&oacute;n de oficinas</title>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260607-route-exit">
+  <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
   <main class="terminal">
@@ -13,44 +13,26 @@
         <img
           id="mapImage"
           class="map-image"
-          src="assets/images/croquis-terminal-2000x1000.png?v=20260607-pasillos-corregidos"
+          src="/assets/images/croquis-terminal-2000x1000.png"
           alt="Croquis de la terminal con oficinas"
         >
 
-        <!-- SVG transparente sobre el mapa. La base de coordenadas es 2000 x 1000. -->
         <svg id="routeLayer" class="route-layer" viewBox="0 0 2000 1000" aria-hidden="true">
-          <defs>
-            <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#0f4257" flood-opacity="0.45" />
-            </filter>
-          </defs>
-
-          <polygon id="highlight-contaduria" class="office-highlight" points="145,67 570,57 553,336 139,332" />
-          <polygon id="highlight-administracion" class="office-highlight" points="133,391 525,392 519,724 115,718" />
-          <polygon id="highlight-sala" class="office-highlight" points="610,57 1441,60 1445,233 606,231" />
-          <polygon id="highlight-rrhh" class="office-highlight" points="1495,57 1856,55 1864,332 1503,341" />
-          <polygon id="highlight-gerencia" class="office-highlight" points="1511,381 1875,382 1896,718 1520,717" />
-
+          <g id="highlightLayer"></g>
           <path id="routePath" class="route-line" d="" />
           <g id="routeFootprints" class="route-footprints"></g>
-          <g id="debugMarkers" class="debug-markers"></g>
-          <g id="traceLayer" class="trace-layer">
-            <line id="traceLine" class="trace-line" x1="0" y1="0" x2="0" y2="0" />
-            <g id="traceReadouts"></g>
-            <g id="tracePoints"></g>
-          </g>
+          <g id="markerLayer" class="map-logo-markers"></g>
         </svg>
-
-        <output id="debugOutput" class="debug-output" hidden>Modo depuraci&oacute;n</output>
       </div>
 
       <aside class="welcome-panel" aria-label="Informaci&oacute;n de bienvenida">
         <img
+          id="panelLogo"
           class="municipality-logo"
-          src="assets/images/Logo Muni Reu.png"
+          src="/assets/images/Logo%20Muni%20Reu.png"
           alt="Escudo de la Municipalidad de Retalhuleu"
         >
-        <div id="welcomeContent" class="welcome-content">
+        <div id="panelContent" class="welcome-content">
           <p class="welcome-kicker">Municipalidad de Retalhuleu</p>
           <h1>Bienvenido</h1>
           <p>&iquest;Necesitas ayuda para encontrar una oficina?</p>
@@ -59,25 +41,9 @@
       </aside>
     </section>
 
-    <section class="controls" aria-label="Seleccionar oficina destino">
-      <button class="office-button contaduria" type="button" data-route="contaduria">Contadur&iacute;a</button>
-      <button class="office-button administracion" type="button" data-route="administracion">Administraci&oacute;n</button>
-      <button class="office-button sala" type="button" data-route="sala">Sala de Reuniones</button>
-      <button class="office-button rrhh" type="button" data-route="rrhh">Recursos Humanos</button>
-      <button class="office-button gerencia" type="button" data-route="gerencia">Gerencia</button>
-
-      <label class="debug-toggle">
-        <input id="debugToggle" type="checkbox">
-        Depuraci&oacute;n
-      </label>
-
-      <label class="debug-toggle">
-        <input id="traceToggle" type="checkbox">
-        Trazado
-      </label>
-    </section>
+    <section id="routeControls" class="controls" aria-label="Seleccionar destino"></section>
   </main>
 
-  <script src="assets/js/script.js?v=20260607-all-audios"></script>
+  <script type="module" src="/assets/js/terminal.js"></script>
 </body>
 </html>

@@ -1,86 +1,58 @@
 # Terminal de localizacion de oficinas
 
-Pagina web interactiva para mostrar rutas desde la Entrada hacia oficinas sobre un croquis.
+Aplicacion web para mostrar rutas sobre dos mapas:
+
+- `/` muestra la terminal/oficinas.
+- `/MapaR/` muestra el mapa de Retalhuleu.
+- `/Conf` permite editar graficamente las rutas de la terminal.
+- `/MapaR/Conf` permite editar graficamente las rutas del mapa de Retalhuleu.
 
 ## Caracteristicas
 
-- Frontend con HTML, CSS y JavaScript puro.
-- Backend de despliegue con Nginx dentro de Docker.
-- Mapa ajustado a una base SVG de `2000 x 1000`.
-- La imagen ocupa toda la base del mapa para evitar margenes laterales.
-- Rutas manuales definidas con coordenadas SVG.
-- Animacion con `stroke-dasharray` y `stroke-dashoffset`.
-- Ruta visual con huellas direccionales desde assets: arriba, abajo, derecha e izquierda, colocadas sobre los pasillos.
-- Resaltado visual de la oficina destino.
-- Modo de depuracion para obtener coordenadas al hacer clic sobre el mapa.
+- Frontend con HTML, CSS y JavaScript modular.
+- Backend pequeno con Flask para servir el frontend y guardar configuracion.
+- Configuracion compartida en `data/routes-config.json`.
+- API JSON:
+  - `GET /api/config`
+  - `PUT /api/config`
+- Rutas generadas desde configuracion, no desde constantes dentro del codigo.
+- Editor grafico para crear, editar, archivar y desarchivar rutas.
+- Nodos arrastrables sobre base SVG `2000 x 1000`.
+- Seleccion de asset por tramo desde catalogo interno.
+- Iconos colocables y movibles sobre el mapa.
+- Audios existentes conservados para las rutas iniciales.
 
-## Estructura
+## Estructura principal
 
 ```text
 .
+|-- backend/
+|   |-- app.py
+|   |-- Dockerfile
+|   `-- requirements.txt
+|-- data/
+|   |-- routes-config.default.json
+|   `-- routes-config.json
 |-- frontend/
 |   |-- index.html
-|   `-- assets/
-|       |-- css/
-|       |   `-- styles.css
-|       |-- js/
-|       |   `-- script.js
-|       `-- images/
-|           `-- croquis-terminal-2000x1000.png
-|-- backend/
-|   |-- Dockerfile
-|   |-- nginx.conf
-|   `-- requirements.txt
-|-- docker-compose.yml
-|-- .dockerignore
-|-- .gitignore
-`-- README.md
+|   |-- conf.html
+|   |-- assets/
+|   |   |-- css/
+|   |   |-- js/
+|   |   |   |-- shared/
+|   |   |   |-- terminal.js
+|   |   |   |-- mapar.js
+|   |   |   `-- route-editor.js
+|   |   |-- images/
+|   |   `-- Audios/
+|   `-- MapaR/
+|       |-- index.html
+|       |-- Imagenes-MapaR/
+|       `-- Audios/
+`-- docker-compose.yml
 ```
 
-## Uso local sin Docker
-
-Abre este archivo directamente en el navegador:
-
-```text
-frontend/index.html
-```
-
-## Modo depuracion
-
-Activa la casilla `Depuracion` y haz clic sobre el croquis. La pagina dejara una marca con las coordenadas `x, y` de la base SVG `2000 x 1000`.
-
-Las marcas se pueden arrastrar para moverlas. Tambien puedes editar directamente los campos `x` y `y` de cada marca. Para borrar una marca, usa el boton `x` de la etiqueta.
-
-Si el modo depuracion esta activo y presionas un boton de oficina, la ruta seleccionada dejara marcas automaticamente en cada punto de recorrido. Esto sirve para ver donde inicia, donde gira y donde termina la linea.
-
-## Modo trazado
-
-Activa la casilla `Trazado` para crear una linea recta temporal entre dos puntos.
-
-1. Haz clic en el primer punto.
-2. Haz clic en el segundo punto.
-3. La pagina dibuja una linea recta entre ambos y muestra automaticamente el angulo entre el primer punto y el segundo.
-4. Toca cualquier parte de la linea para mostrar la coordenada `x, y` exacta de ese punto.
-
-El angulo se calcula desde la horizontal: una linea horizontal marca `0 grados`, una vertical marca `90 grados` y una diagonal perfecta marca `45 grados`.
-
-Los puntos del trazado se pueden arrastrar para ajustar la linea. Tambien puedes editar directamente sus campos `x` y `y`. El angulo se actualiza automaticamente al moverlos o editar sus valores. Tambien se pueden borrar con la `x` de cada etiqueta. Si borras uno de los dos puntos, la linea se oculta hasta que vuelvas a tener dos puntos.
-
-`Depuracion` y `Trazado` pueden estar activos al mismo tiempo. En ese caso, los clics en el mapa pueden crear marcas de depuracion y tambien completar los dos puntos del trazado.
-
-Usa esas coordenadas para ajustar rutas en `frontend/assets/js/script.js`:
-
-```js
-const routes = {
-  contaduria: "M 987 737 L 617 737 L 617 345 L 515 345",
-  administracion: "M 987 737 L 617 737 L 617 462 L 515 462",
-  sala: "M 987 737 L 617 737 L 633 291",
-  rrhh: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 335 L 1621 282",
-  gerencia: "M 1000 877 L 1000 808 L 1423 808 L 1423 473 L 1477 473 L 1477 552 L 1663 648"
-};
-```
-
-## Docker
+## Uso con Docker
 
 Construir y ejecutar:
 
@@ -91,7 +63,10 @@ docker compose up --build
 Abrir:
 
 ```text
-http://localhost:8080
+http://localhost:8080/
+http://localhost:8080/MapaR/
+http://localhost:8080/Conf
+http://localhost:8080/MapaR/Conf
 ```
 
 Detener:
@@ -100,8 +75,41 @@ Detener:
 docker compose down
 ```
 
-## Backend
+`docker-compose.yml` monta `./data:/app/data`, por lo que los cambios hechos desde los editores quedan en `data/routes-config.json` y sobreviven reinicios o reconstrucciones del contenedor.
 
-Por ahora el backend es la capa de servidor web. Nginx sirve los archivos estaticos del frontend desde `/usr/share/nginx/html`.
+## Editor grafico
 
-No hay API ni base de datos todavia. `backend/requirements.txt` queda como marcador para futuras dependencias si despues se agrega un backend real con Python.
+En `/Conf` o `/MapaR/Conf` puedes:
+
+- crear nuevas rutas;
+- cambiar nombre, color e indicaciones;
+- archivar o desarchivar rutas;
+- agregar nodos haciendo clic sobre el mapa;
+- mover nodos arrastrandolos;
+- borrar el ultimo nodo de una ruta;
+- escoger el asset de cada tramo;
+- colocar iconos desde el catalogo interno;
+- mover o borrar iconos;
+- guardar los cambios para que aparezcan en las pantallas normales.
+
+Las rutas archivadas siguen apareciendo en el editor, pero no se muestran como botones en `/` ni en `/MapaR/`.
+
+## Configuracion
+
+La configuracion vive en `data/routes-config.json`. El archivo `data/routes-config.default.json` sirve como semilla inicial si el archivo principal no existe.
+
+Cada mapa contiene:
+
+- `background`: imagen de fondo.
+- `viewBox`: base SVG, actualmente `0 0 2000 1000`.
+- `routes`: rutas visibles o archivadas.
+- `markers`: iconos colocados sobre el mapa.
+
+Cada ruta contiene:
+
+- `id`, `name`, `archived`;
+- `instructions`;
+- `nodes`;
+- `segmentAssets`;
+- `highlightPolygon`, opcional para resaltar oficinas;
+- `audio`, opcional para rutas existentes.

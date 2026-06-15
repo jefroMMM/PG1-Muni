@@ -1,2 +1,1 @@
-# No requiere dependencias de Python.
-# La aplicacion es HTML, CSS y JavaScript puro.
+Flask==3.0.3
