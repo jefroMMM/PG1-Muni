@@ -51,7 +51,12 @@ export function routePathFromNodes(nodes = []) {
 }
 
 export function findAsset(catalog, assetId) {
-  return [...(catalog.routeAssets || []), ...(catalog.markerIcons || []), ...(catalog.backgrounds || [])]
+  return [
+    ...(catalog.routeAssets || []),
+    ...(catalog.markerIcons || []),
+    ...(catalog.decorations || []),
+    ...(catalog.backgrounds || [])
+  ]
     .find((asset) => asset.id === assetId);
 }
 
@@ -75,6 +80,17 @@ export function normalizeSegmentAssets(route, fallbackAssetId) {
   route.segmentAssets = Array.from({ length: segmentCount }, (_, index) => (
     route.segmentAssets?.[index] || fallbackAssetId
   ));
+  route.segmentOptions = Array.from({ length: segmentCount }, (_, index) => ({
+    rotation: Number(route.segmentOptions?.[index]?.rotation) || 0,
+    mirrored: Boolean(route.segmentOptions?.[index]?.mirrored)
+  }));
+}
+
+export function transformAroundCenter({ x, y, width, height, rotation = 0, mirrored = false }) {
+  const centerX = x + width / 2;
+  const centerY = y + height / 2;
+  const scaleX = mirrored ? -1 : 1;
+  return `translate(${centerX} ${centerY}) rotate(${rotation}) scale(${scaleX} 1) translate(${-centerX} ${-centerY})`;
 }
 
 export function renderFootprints({ parent, catalog, route, assetSize, stepDistance, revealTime, className }) {
@@ -94,14 +110,25 @@ export function renderFootprints({ parent, catalog, route, assetSize, stepDistan
       const ratio = step / (steps + 1);
       const x = start.x + dx * ratio;
       const y = start.y + dy * ratio;
+      const imageX = Math.round(x - assetSize / 2);
+      const imageY = Math.round(y - assetSize / 2);
+      const options = route.segmentOptions?.[index] || {};
       footprints.push(createSvgElement("image", {
         class: className,
         href: sprite,
         "xlink:href": sprite,
-        x: Math.round(x - assetSize / 2),
-        y: Math.round(y - assetSize / 2),
+        x: imageX,
+        y: imageY,
         width: assetSize,
         height: assetSize,
+        transform: transformAroundCenter({
+          x: imageX,
+          y: imageY,
+          width: assetSize,
+          height: assetSize,
+          rotation: options.rotation,
+          mirrored: options.mirrored
+        }),
         preserveAspectRatio: "xMidYMid meet"
       }));
     }
@@ -127,7 +154,44 @@ export function renderMapMarkers({ parent, catalog, markers = [], className = "m
       y: marker.y,
       width: marker.width || 50,
       height: marker.height || 50,
+      transform: transformAroundCenter({
+        x: marker.x,
+        y: marker.y,
+        width: marker.width || 50,
+        height: marker.height || 50,
+        rotation: marker.rotation,
+        mirrored: marker.mirrored
+      }),
       "aria-label": marker.label || "",
+      preserveAspectRatio: "xMidYMid meet"
+    });
+  });
+
+  parent.replaceChildren(...elements);
+}
+
+export function renderDecorations({ parent, catalog, decorations = [], className = "map-decoration" }) {
+  const elements = decorations.map((decoration) => {
+    const asset = findAsset(catalog, decoration.assetId);
+    const width = decoration.width || 80;
+    const height = decoration.height || width;
+    return createSvgElement("image", {
+      class: className,
+      href: asset?.src || "",
+      "xlink:href": asset?.src || "",
+      x: decoration.x,
+      y: decoration.y,
+      width,
+      height,
+      transform: transformAroundCenter({
+        x: decoration.x,
+        y: decoration.y,
+        width,
+        height,
+        rotation: decoration.rotation,
+        mirrored: decoration.mirrored
+      }),
+      "aria-label": decoration.label || "",
       preserveAspectRatio: "xMidYMid meet"
     });
   });

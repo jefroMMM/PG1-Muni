@@ -5,6 +5,8 @@
   --muni-blue: #171a4a;
   --muni-green: #147a69;
   --text: #17212b;
+  --font-body: Georgia, "Times New Roman", Times, serif;
+  --font-title: "Palatino Linotype", Palatino, Georgia, "Times New Roman", Times, serif;
 }
 
 * {
@@ -14,7 +16,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   color: var(--text);
   background: #d7d0c8;
 }
@@ -24,27 +26,27 @@ body {
   height: 100vh;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: 10px;
-  padding: 12px clamp(10px, 2vw, 28px);
+  gap: 8px;
+  padding: 10px clamp(4px, 0.7vw, 12px);
   overflow: hidden;
 }
 
 .main-area {
-  width: min(100%, 1580px);
+  width: 100%;
   min-height: 0;
-  margin: 0 auto;
+  margin: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) clamp(420px, 24vw, 520px);
+  gap: 8px;
   align-items: center;
 }
 
 .map-frame {
   position: relative;
-  width: min(100%, calc((100vh - 116px) * 2));
+  width: min(100%, calc((100vh - 112px) * 2));
   max-height: calc(100vh - 122px);
   aspect-ratio: 2 / 1;
-  margin: 0 auto;
+  margin: 0 auto 0 0;
   overflow: hidden;
   border-radius: 8px;
   background: #efece7;
@@ -52,21 +54,28 @@ body {
 }
 
 .welcome-panel {
-  align-self: stretch;
+  align-self: center;
+  height: min(calc((100vw - clamp(8px, 1.4vw, 24px) - clamp(420px, 24vw, 520px)) / 2), calc(100vh - 122px));
   min-height: 0;
-  min-height: 260px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: 12px;
-  padding: 26px 24px;
+  padding: 24px 30px;
   border-radius: 8px;
   color: var(--text);
   border: 1px solid rgba(23, 26, 74, 0.18);
   background: #f4efe4;
   box-shadow: 0 10px 24px rgba(45, 40, 32, 0.16);
   overflow: hidden;
+  transition: padding 450ms ease, gap 450ms ease;
+}
+
+.terminal.route-active .welcome-panel {
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 16px 28px;
 }
 
 .welcome-content {
@@ -74,7 +83,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow: auto;
+  overflow: hidden;
+}
+
+.route-content {
+  width: 100%;
+  gap: 10px;
 }
 
 .welcome-content.hidden {
@@ -83,14 +97,26 @@ body {
 
 .municipality-logo {
   width: 104px;
+  max-height: 130px;
   height: auto;
   align-self: center;
   margin-bottom: 4px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1500ms ease, max-height 1500ms ease, margin 1500ms ease, transform 1500ms ease;
+}
+
+.terminal.route-active .municipality-logo {
+  max-height: 0;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 .welcome-kicker {
   margin: 0;
   color: var(--muni-blue);
+  font-family: var(--font-title);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -99,8 +125,13 @@ body {
 .welcome-panel h1 {
   margin: 0;
   color: var(--muni-blue);
+  font-family: var(--font-title);
   font-size: 32px;
   line-height: 1;
+}
+
+.terminal.route-active .welcome-panel h1 {
+  font-size: clamp(26px, 2.1vw, 38px);
 }
 
 .welcome-panel p {
@@ -122,7 +153,48 @@ body {
   font-size: 16px;
   line-height: 1.48;
   font-weight: 700;
-  overflow: auto;
+  overflow: hidden;
+}
+
+.route-instruction-list {
+  width: 100%;
+  margin: 0;
+  padding: 0 0 0 30px;
+  display: grid;
+  gap: 10px;
+  overflow: hidden;
+  color: #253140;
+  font-size: 17px;
+  line-height: 1.32;
+  font-weight: 800;
+}
+
+.route-steps-compact .route-instruction-list {
+  gap: 7px;
+  padding-left: 28px;
+  font-size: 15px;
+  line-height: 1.22;
+}
+
+.route-steps-dense .route-instruction-list {
+  gap: 5px;
+  padding-left: 26px;
+  font-size: 13px;
+  line-height: 1.14;
+}
+
+.route-steps-compact h1,
+.route-steps-dense h1 {
+  font-size: clamp(24px, 1.8vw, 32px);
+}
+
+.route-instruction-list li {
+  padding-left: 2px;
+}
+
+.route-instruction-list li::marker {
+  color: var(--muni-green);
+  font-weight: 900;
 }
 
 .map-image,
@@ -333,9 +405,9 @@ body {
 }
 
 .controls {
-  width: min(100%, 1420px);
+  width: 100%;
   max-height: 84px;
-  margin: 0 auto;
+  margin: 0;
   padding: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -344,7 +416,23 @@ body {
   border-radius: 8px;
   background: var(--panel-bg);
   box-shadow: 0 8px 22px rgba(20, 20, 20, 0.16);
-  overflow: auto;
+  overflow: hidden;
+}
+
+.welcome-content,
+.route-instruction-list,
+.controls,
+.config-panel,
+.route-list {
+  scrollbar-width: none;
+}
+
+.welcome-content::-webkit-scrollbar,
+.route-instruction-list::-webkit-scrollbar,
+.controls::-webkit-scrollbar,
+.config-panel::-webkit-scrollbar,
+.route-list::-webkit-scrollbar {
+  display: none;
 }
 
 .office-button {
@@ -353,6 +441,7 @@ body {
   border-radius: 7px;
   padding: 10px 14px;
   color: #ffffff;
+  font-family: var(--font-title);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -392,11 +481,14 @@ body {
 }
 
 .map-logo-markers,
-.map-logo-marker {
+.map-logo-marker,
+.map-decorations,
+.map-decoration {
   pointer-events: none;
 }
 
-.map-logo-marker {
+.map-logo-marker,
+.map-decoration {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.32));
 }
 
@@ -407,7 +499,7 @@ body {
   padding: 24px;
   color: #ffffff;
   background: #17212b;
-  font: 700 18px Arial, Helvetica, sans-serif;
+  font: 700 18px Georgia, "Times New Roman", Times, serif;
 }
 
 .config-app {
@@ -423,17 +515,49 @@ body {
 .config-map-area {
   min-width: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 10px;
 }
 
 .config-topbar,
+.route-inspector,
 .editor-tools,
 .config-panel {
   border: 1px solid rgba(23, 26, 74, 0.16);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 8px 22px rgba(20, 20, 20, 0.12);
+}
+
+.route-inspector {
+  min-height: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 9px 12px;
+}
+
+.route-inspector strong {
+  color: var(--muni-blue);
+  font-family: var(--font-title);
+  font-size: 15px;
+}
+
+.route-inspector span,
+.route-inspector em {
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #243a3b;
+  background: #e7eee9;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.route-inspector em {
+  color: #ffffff;
+  background: #147a69;
 }
 
 .config-topbar {
@@ -463,8 +587,8 @@ body {
 }
 
 .config-map-frame {
-  width: min(100%, calc((100vh - 150px) * 2));
-  max-height: calc(100vh - 150px);
+  width: min(100%, calc((100vh - 208px) * 2));
+  max-height: calc(100vh - 208px);
 }
 
 .editor-layer {
@@ -505,6 +629,11 @@ body {
   cursor: move;
 }
 
+.editor-decoration-handle {
+  fill: rgba(20, 122, 105, 0.12);
+  stroke: #147a69;
+}
+
 .editor-tools {
   min-height: 58px;
   display: flex;
@@ -521,6 +650,7 @@ body {
   border: 0;
   border-radius: 7px;
   padding: 9px 13px;
+  font-family: var(--font-title);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -613,6 +743,7 @@ body {
 .section-heading h1,
 .section-heading h2 {
   margin: 0;
+  font-family: var(--font-title);
   color: var(--muni-blue);
   line-height: 1;
 }
@@ -710,6 +841,10 @@ body {
   gap: 8px;
 }
 
+.route-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .node-list,
 .segment-list,
 .marker-list {
@@ -729,7 +864,7 @@ body {
 
 .marker-row {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 64px auto;
+  grid-template-columns: 36px minmax(0, 1fr) 62px auto auto auto;
   gap: 7px;
   align-items: center;
 }
@@ -748,6 +883,34 @@ body {
   background: #b64646;
   font-weight: 700;
   cursor: pointer;
+}
+
+.asset-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 7px;
+  align-items: end;
+}
+
+.asset-select-field {
+  min-width: 0;
+}
+
+.mini-action {
+  min-height: 36px;
+  border: 0;
+  border-radius: 6px;
+  padding: 7px 9px;
+  color: #243a3b;
+  background: #dfe9e4;
+  font-family: var(--font-title);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mini-action.active {
+  color: #ffffff;
+  background: #147a69;
 }
 
 .debug-toggle {

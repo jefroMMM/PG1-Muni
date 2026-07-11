@@ -54,6 +54,7 @@
         "src": "/MapaR/Imagenes-MapaR/Mapa-R-2000x1000.png"
       }
     ],
+    "decorations": [],
     "markerIcons": [
       {
         "id": "muni-logo",
@@ -123,11 +124,12 @@
   "maps": {
     "mapar": {
       "background": "/MapaR/Imagenes-MapaR/Mapa-R-2000x1000.png",
+      "decorations": [],
       "defaultPanel": {
         "hint": "",
         "kicker": "Municipalidad de Retalhuleu",
-        "text": "Selecciona una dependencia para preparar el recorrido.",
-        "title": "Mapa"
+        "text": "Selecciona una opcion y te mostramos el recorrido paso a paso.",
+        "title": "¿A donde quieres ir?"
       },
       "logo": "/assets/images/Logo%20Muni%20Reu.png",
       "markers": [
@@ -190,10 +192,21 @@
           "segmentAssets": [
             "mapr-footprints-auto",
             "mapr-footprints-auto"
+          ],
+          "segmentOptions": [
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            }
           ]
         },
         {
           "archived": false,
+          "assetSize": 40,
           "audio": "/MapaR/Audios/Audio%20Policia%20Nacional%20Civil.mp3",
           "buttonColor": "#c9e1e6",
           "id": "policiaNacionalCivil",
@@ -247,7 +260,40 @@
             "tuc-up-right",
             "tuc-right"
           ],
-          "assetSize": 40
+          "segmentOptions": [
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": true
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            }
+          ]
         },
         {
           "archived": false,
@@ -278,32 +324,52 @@
               "y": 409
             },
             {
-              "x": 1286,
-              "y": 324
+              "x": 1262,
+              "y": 240
             },
             {
-              "x": 1205,
-              "y": 342
+              "x": 1017,
+              "y": 280
             },
             {
-              "x": 730,
-              "y": 398
+              "x": 1008,
+              "y": 262
             },
             {
-              "x": 635,
-              "y": 443
+              "x": 813,
+              "y": 286
             },
             {
-              "x": 573,
-              "y": 497
+              "x": 834,
+              "y": 387
+            },
+            {
+              "x": 738,
+              "y": 401
+            },
+            {
+              "x": 714,
+              "y": 421
+            },
+            {
+              "x": 638,
+              "y": 439
+            },
+            {
+              "x": 572,
+              "y": 493
             }
           ],
           "segmentAssets": [
             "mapr-footprints-auto",
             "tuc-up-left",
             "tuc-left",
-            "tuc-up-right",
-            "tuc-up-right",
+            "tuc-up-left",
+            "tuc-up-left",
+            "tuc-left",
+            "tuc-left",
+            "tuc-left",
+            "tuc-left",
             "tuc-left",
             "tuc-left",
             "tuc-left",
@@ -316,6 +382,7 @@
     },
     "terminal": {
       "background": "/assets/images/croquis-terminal-2000x1000.png",
+      "decorations": [],
       "defaultPanel": {
         "hint": "Selecciona una oficina en el panel inferior y sigue la ruta marcada.",
         "kicker": "Municipalidad de Retalhuleu",

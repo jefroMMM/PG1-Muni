@@ -40,8 +40,15 @@ def save_config(config):
 
 
 def upload_subdir(kind):
-    if kind in {"route-asset", "icon", "audio"}:
-        return kind
+    folders = {
+        "route-asset": "assets-ruta",
+        "icon": "iconos",
+        "audio": "audios",
+        "map": "mapas",
+        "decoration": "decoraciones",
+    }
+    if kind in folders:
+        return folders[kind]
     return "misc"
 
 

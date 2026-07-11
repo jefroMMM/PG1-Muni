@@ -6,6 +6,7 @@ import {
   generateId,
   getSvgPoint,
   normalizeSegmentAssets,
+  renderDecorations,
   renderFootprints,
   renderMapMarkers,
   routePathFromNodes
@@ -18,32 +19,43 @@ const elements = {
   backLink: document.getElementById("backLink"),
   editorTitle: document.getElementById("editorTitle"),
   saveStatus: document.getElementById("saveStatus"),
+  routeInspector: document.getElementById("routeInspector"),
   mapImage: document.getElementById("editorMapImage"),
   layer: document.getElementById("editorLayer"),
   highlightLayer: document.getElementById("editorHighlightLayer"),
   routePath: document.getElementById("editorRoutePath"),
   footprints: document.getElementById("editorFootprints"),
   markerLayer: document.getElementById("editorMarkerLayer"),
+  decorationLayer: document.getElementById("editorDecorationLayer"),
   nodeLayer: document.getElementById("editorNodeLayer"),
   placedIconLayer: document.getElementById("editorPlacedIconLayer"),
+  placedDecorationLayer: document.getElementById("editorPlacedDecorationLayer"),
   routeList: document.getElementById("routeList"),
   nodeList: document.getElementById("nodeList"),
   segmentAssetList: document.getElementById("segmentAssetList"),
   markerList: document.getElementById("markerList"),
+  decorationList: document.getElementById("decorationList"),
   routeNameInput: document.getElementById("routeNameInput"),
   routeColorInput: document.getElementById("routeColorInput"),
   routeInstructionsInput: document.getElementById("routeInstructionsInput"),
   routeAudioSelect: document.getElementById("routeAudioSelect"),
   routeAssetSizeInput: document.getElementById("routeAssetSizeInput"),
   markerAssetSelect: document.getElementById("markerAssetSelect"),
+  decorationAssetSelect: document.getElementById("decorationAssetSelect"),
+  backgroundSelect: document.getElementById("backgroundSelect"),
   routeAssetUploadInput: document.getElementById("routeAssetUploadInput"),
   iconUploadInput: document.getElementById("iconUploadInput"),
+  decorationUploadInput: document.getElementById("decorationUploadInput"),
+  backgroundUploadInput: document.getElementById("backgroundUploadInput"),
   audioUploadInput: document.getElementById("audioUploadInput"),
   newRouteButton: document.getElementById("newRouteButton"),
   archiveRouteButton: document.getElementById("archiveRouteButton"),
+  duplicateRouteButton: document.getElementById("duplicateRouteButton"),
+  deleteRouteButton: document.getElementById("deleteRouteButton"),
   addNodeButton: document.getElementById("addNodeButton"),
   deleteNodeButton: document.getElementById("deleteNodeButton"),
   addIconButton: document.getElementById("addIconButton"),
+  addDecorationButton: document.getElementById("addDecorationButton"),
   nodeToolButton: document.getElementById("nodeToolButton"),
   iconToolButton: document.getElementById("iconToolButton"),
   saveButton: document.getElementById("saveButton")
@@ -56,6 +68,7 @@ let activeTool = "node";
 let activeMode = "routes";
 let pendingNodeClick = false;
 let pendingIconClick = false;
+let pendingDecorationClick = false;
 let dragState = null;
 let hasUnsavedChanges = false;
 
@@ -130,6 +143,10 @@ function syncRouteAudio() {
   setDirty();
 }
 
+function rotate45(value = 0) {
+  return (Number(value) + 45) % 360;
+}
+
 function setMode(mode) {
   activeMode = mode;
   document.querySelectorAll("[data-mode]").forEach((button) => {
@@ -159,11 +176,60 @@ function renderRouteList() {
   elements.routeList.replaceChildren(...items);
 }
 
+function routeLength(nodes = []) {
+  return nodes.reduce((total, point, index) => {
+    if (index === 0) {
+      return total;
+    }
+
+    const previous = nodes[index - 1];
+    return total + Math.hypot(point.x - previous.x, point.y - previous.y);
+  }, 0);
+}
+
+function renderRouteInspector() {
+  const route = activeRoute();
+
+  if (!route) {
+    elements.routeInspector.innerHTML = `
+      <strong>Sin ruta seleccionada</strong>
+      <span>Crea una ruta para comenzar.</span>
+    `;
+    return;
+  }
+
+  const nodes = route.nodes || [];
+  const segmentCount = Math.max(0, nodes.length - 1);
+  const warnings = [];
+
+  if (nodes.length < 2) {
+    warnings.push("faltan nodos");
+  }
+
+  if ((route.segmentAssets || []).length !== segmentCount) {
+    warnings.push("tramos sin asset");
+  }
+
+  if (!route.instructions?.trim()) {
+    warnings.push("sin indicaciones");
+  }
+
+  elements.routeInspector.innerHTML = `
+    <strong>${route.name || "Ruta sin nombre"}</strong>
+    <span>${route.archived ? "Archivada" : "Visible"}</span>
+    <span>${nodes.length} nodos</span>
+    <span>${segmentCount} tramos</span>
+    <span>${Math.round(routeLength(nodes))} px</span>
+    <span>${route.audio ? "Con audio" : "Sin audio"}</span>
+    ${warnings.length ? `<em>${warnings.join(" · ")}</em>` : "<em>Lista para usar</em>"}
+  `;
+}
+
 function renderForm() {
   const route = activeRoute();
   const hasRoute = Boolean(route);
 
-  [elements.routeNameInput, elements.routeColorInput, elements.routeInstructionsInput, elements.routeAudioSelect, elements.routeAssetSizeInput, elements.archiveRouteButton, elements.addNodeButton, elements.deleteNodeButton]
+  [elements.routeNameInput, elements.routeColorInput, elements.routeInstructionsInput, elements.routeAudioSelect, elements.routeAssetSizeInput, elements.archiveRouteButton, elements.duplicateRouteButton, elements.deleteRouteButton, elements.addNodeButton, elements.deleteNodeButton]
     .forEach((control) => {
       control.disabled = !hasRoute;
     });
@@ -242,10 +308,13 @@ function renderNodes() {
 function renderSegments() {
   const route = activeRoute();
   const segments = route?.segmentAssets || [];
+  const segmentOptions = route?.segmentOptions || [];
   const routeAssets = config.catalog.routeAssets || [];
   const rows = segments.map((assetId, index) => {
+    const row = document.createElement("div");
+    row.className = "asset-row";
     const label = document.createElement("label");
-    label.className = "field-label compact-field";
+    label.className = "field-label compact-field asset-select-field";
     const select = document.createElement("select");
     select.dataset.segmentIndex = String(index);
 
@@ -258,7 +327,21 @@ function renderSegments() {
     });
 
     label.append(`Tramo ${index + 1}`, select);
-    return label;
+    const options = segmentOptions[index] || {};
+    const mirrorButton = document.createElement("button");
+    mirrorButton.type = "button";
+    mirrorButton.className = `mini-action ${options.mirrored ? "active" : ""}`;
+    mirrorButton.dataset.segmentMirror = String(index);
+    mirrorButton.textContent = "Espejo";
+
+    const rotateButton = document.createElement("button");
+    rotateButton.type = "button";
+    rotateButton.className = "mini-action";
+    rotateButton.dataset.segmentRotate = String(index);
+    rotateButton.textContent = `${Number(options.rotation) || 0} deg`;
+
+    row.append(label, mirrorButton, rotateButton);
+    return row;
   });
 
   elements.segmentAssetList.replaceChildren(...rows);
@@ -313,12 +396,52 @@ function renderMarkerControls() {
       <img src="${asset?.src || ""}" alt="">
       <input type="text" value="${marker.label || ""}" data-marker-id="${marker.id}" data-field="label">
       <input type="number" min="16" max="180" value="${marker.width || 50}" data-marker-id="${marker.id}" data-field="width" title="Tamano">
+      <button type="button" data-marker-mirror="${marker.id}">${marker.mirrored ? "Sin espejo" : "Espejo"}</button>
+      <button type="button" data-marker-rotate="${marker.id}">${Number(marker.rotation) || 0} deg</button>
       <button type="button" data-delete-marker="${marker.id}">Borrar</button>
     `;
     return row;
   });
 
   elements.markerList.replaceChildren(...rows);
+}
+
+function renderDecorationControls() {
+  const decorationAssets = config.catalog.decorations || [];
+  elements.decorationAssetSelect.replaceChildren(...decorationAssets.map((asset) => {
+    const option = document.createElement("option");
+    option.value = asset.id;
+    option.textContent = asset.name;
+    return option;
+  }));
+
+  const rows = (mapConfig.decorations || []).map((decoration) => {
+    const asset = findAsset(config.catalog, decoration.assetId);
+    const row = document.createElement("div");
+    row.className = "marker-row decoration-row";
+    row.innerHTML = `
+      <img src="${asset?.src || ""}" alt="">
+      <input type="text" value="${decoration.label || ""}" data-decoration-id="${decoration.id}" data-field="label">
+      <input type="number" min="16" max="260" value="${decoration.width || 80}" data-decoration-id="${decoration.id}" data-field="width" title="Tamano">
+      <button type="button" data-decoration-mirror="${decoration.id}">${decoration.mirrored ? "Sin espejo" : "Espejo"}</button>
+      <button type="button" data-decoration-rotate="${decoration.id}">${Number(decoration.rotation) || 0} deg</button>
+      <button type="button" data-delete-decoration="${decoration.id}">Borrar</button>
+    `;
+    return row;
+  });
+
+  elements.decorationList.replaceChildren(...rows);
+}
+
+function renderBackgroundControls() {
+  const backgrounds = config.catalog.backgrounds || [];
+  elements.backgroundSelect.replaceChildren(...backgrounds.map((background) => {
+    const option = document.createElement("option");
+    option.value = background.src;
+    option.textContent = background.name;
+    option.selected = background.src === mapConfig.background;
+    return option;
+  }));
 }
 
 function renderPlacedIconHandles() {
@@ -337,19 +460,45 @@ function renderPlacedIconHandles() {
   elements.placedIconLayer.replaceChildren(...handles);
 }
 
+function renderPlacedDecorationHandles() {
+  const handles = (mapConfig.decorations || []).map((decoration) => createSvgElement("rect", {
+    class: "editor-icon-handle editor-decoration-handle",
+    x: decoration.x,
+    y: decoration.y,
+    width: decoration.width || 80,
+    height: decoration.height || decoration.width || 80,
+    "data-decoration-id": decoration.id
+  }));
+
+  elements.placedDecorationLayer.replaceChildren(...handles);
+}
+
 function renderMarkers() {
   renderMapMarkers({ parent: elements.markerLayer, catalog: config.catalog, markers: mapConfig.markers || [] });
   renderPlacedIconHandles();
   renderMarkerControls();
 }
 
+function renderDecorationsLayer() {
+  renderDecorations({
+    parent: elements.decorationLayer,
+    catalog: config.catalog,
+    decorations: mapConfig.decorations || []
+  });
+  renderPlacedDecorationHandles();
+  renderDecorationControls();
+}
+
 function renderAll() {
   renderRouteList();
+  renderRouteInspector();
   renderForm();
   renderRouteGraphics();
   renderNodes();
   renderSegments();
   renderMarkers();
+  renderDecorationsLayer();
+  renderBackgroundControls();
 }
 
 function addRoute() {
@@ -370,6 +519,48 @@ function addRoute() {
 
   mapConfig.routes.push(route);
   activeRouteId = route.id;
+  setDirty();
+  renderAll();
+}
+
+function duplicateRoute() {
+  const route = activeRoute();
+
+  if (!route) {
+    return;
+  }
+
+  const copy = JSON.parse(JSON.stringify(route));
+  copy.id = generateId("ruta");
+  copy.name = `${route.name || "Ruta"} copia`;
+  copy.archived = true;
+  copy.nodes = (copy.nodes || []).map((point) => ({
+    x: Math.min(2000, point.x + 24),
+    y: Math.min(1000, point.y + 24)
+  }));
+
+  mapConfig.routes.push(copy);
+  activeRouteId = copy.id;
+  setDirty();
+  renderAll();
+}
+
+function deleteActiveRoute() {
+  const route = activeRoute();
+
+  if (!route || mapConfig.routes.length <= 1) {
+    elements.saveStatus.textContent = "Debe quedar al menos una ruta";
+    elements.saveStatus.classList.add("dirty");
+    return;
+  }
+
+  const shouldDelete = window.confirm(`Borrar la ruta "${route.name}"?`);
+  if (!shouldDelete) {
+    return;
+  }
+
+  mapConfig.routes = mapConfig.routes.filter((item) => item.id !== route.id);
+  activeRouteId = mapConfig.routes[0]?.id || "";
   setDirty();
   renderAll();
 }
@@ -419,6 +610,32 @@ function addIconAt(point) {
   renderMarkers();
 }
 
+function addDecorationAt(point) {
+  const assetId = elements.decorationAssetSelect.value;
+  const size = 90;
+
+  if (!assetId) {
+    return;
+  }
+
+  mapConfig.decorations = mapConfig.decorations || [];
+  mapConfig.decorations.push({
+    id: generateId("decoracion"),
+    assetId,
+    x: Math.round(point.x - size / 2),
+    y: Math.round(point.y - size / 2),
+    width: size,
+    height: size,
+    rotation: 0,
+    mirrored: false,
+    label: findAsset(config.catalog, assetId)?.name || "Decoracion"
+  });
+  pendingDecorationClick = false;
+  elements.addDecorationButton.classList.remove("active");
+  setDirty();
+  renderDecorationsLayer();
+}
+
 function setTool(tool) {
   activeTool = tool;
   elements.nodeToolButton.classList.toggle("active", tool === "node");
@@ -445,6 +662,27 @@ async function handleRouteAssetUpload(event) {
   renderSegments();
 }
 
+async function handleBackgroundUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) {
+    return;
+  }
+
+  elements.saveStatus.textContent = "Subiendo mapa...";
+  const uploaded = await uploadFile(file, "map");
+  config.catalog.backgrounds = config.catalog.backgrounds || [];
+  config.catalog.backgrounds.push({
+    id: generateId("mapa"),
+    name: uploaded.name,
+    src: uploaded.src
+  });
+  mapConfig.background = uploaded.src;
+  elements.mapImage.src = mapConfig.background;
+  event.target.value = "";
+  setDirty();
+  renderBackgroundControls();
+}
+
 async function handleIconUpload(event) {
   const file = event.target.files?.[0];
   if (!file) {
@@ -462,6 +700,25 @@ async function handleIconUpload(event) {
   event.target.value = "";
   setDirty();
   renderMarkerControls();
+}
+
+async function handleDecorationUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) {
+    return;
+  }
+
+  elements.saveStatus.textContent = "Subiendo decoracion...";
+  const uploaded = await uploadFile(file, "decoration");
+  config.catalog.decorations = config.catalog.decorations || [];
+  config.catalog.decorations.push({
+    id: generateId("decoracion-asset"),
+    name: uploaded.name,
+    src: uploaded.src
+  });
+  event.target.value = "";
+  setDirty();
+  renderDecorationControls();
 }
 
 async function handleAudioUpload(event) {
@@ -516,6 +773,32 @@ function updateSegmentAsset(event) {
   renderRouteGraphics();
 }
 
+function updateSegmentTransform(event) {
+  const mirrorButton = event.target.closest("[data-segment-mirror]");
+  const rotateButton = event.target.closest("[data-segment-rotate]");
+  const route = activeRoute();
+
+  if (!route || (!mirrorButton && !rotateButton)) {
+    return;
+  }
+
+  normalizeSegmentAssets(route, fallbackRouteAssetId());
+  const index = Number((mirrorButton || rotateButton).dataset.segmentMirror ?? (mirrorButton || rotateButton).dataset.segmentRotate);
+  route.segmentOptions[index] = route.segmentOptions[index] || { rotation: 0, mirrored: false };
+
+  if (mirrorButton) {
+    route.segmentOptions[index].mirrored = !route.segmentOptions[index].mirrored;
+  }
+
+  if (rotateButton) {
+    route.segmentOptions[index].rotation = rotate45(route.segmentOptions[index].rotation);
+  }
+
+  setDirty();
+  renderSegments();
+  renderRouteGraphics();
+}
+
 function updateMarkerField(event) {
   const input = event.target.closest("[data-marker-id]");
   if (!input) {
@@ -539,21 +822,99 @@ function updateMarkerField(event) {
 }
 
 function deleteMarkerFromEvent(event) {
-  const button = event.target.closest("[data-delete-marker]");
-  if (!button) {
+  const deleteButton = event.target.closest("[data-delete-marker]");
+  const mirrorButton = event.target.closest("[data-marker-mirror]");
+  const rotateButton = event.target.closest("[data-marker-rotate]");
+
+  if (deleteButton) {
+    mapConfig.markers = mapConfig.markers.filter((marker) => marker.id !== deleteButton.dataset.deleteMarker);
+    setDirty();
+    renderMarkers();
+    renderMarkerControls();
     return;
   }
 
-  mapConfig.markers = mapConfig.markers.filter((marker) => marker.id !== button.dataset.deleteMarker);
+  const markerId = mirrorButton?.dataset.markerMirror || rotateButton?.dataset.markerRotate;
+  const marker = mapConfig.markers.find((item) => item.id === markerId);
+
+  if (!marker) {
+    return;
+  }
+
+  if (mirrorButton) {
+    marker.mirrored = !marker.mirrored;
+  }
+
+  if (rotateButton) {
+    marker.rotation = rotate45(marker.rotation);
+  }
+
   setDirty();
   renderMarkers();
+  renderMarkerControls();
+}
+
+function handleDecorationListClick(event) {
+  const deleteButton = event.target.closest("[data-delete-decoration]");
+  const mirrorButton = event.target.closest("[data-decoration-mirror]");
+  const rotateButton = event.target.closest("[data-decoration-rotate]");
+
+  if (deleteButton) {
+    mapConfig.decorations = (mapConfig.decorations || []).filter((item) => item.id !== deleteButton.dataset.deleteDecoration);
+    setDirty();
+    renderDecorationsLayer();
+    renderDecorationControls();
+    return;
+  }
+
+  const decorationId = mirrorButton?.dataset.decorationMirror || rotateButton?.dataset.decorationRotate;
+  const decoration = (mapConfig.decorations || []).find((item) => item.id === decorationId);
+
+  if (!decoration) {
+    return;
+  }
+
+  if (mirrorButton) {
+    decoration.mirrored = !decoration.mirrored;
+  }
+
+  if (rotateButton) {
+    decoration.rotation = rotate45(decoration.rotation);
+  }
+
+  setDirty();
+  renderDecorationsLayer();
+  renderDecorationControls();
+}
+
+function updateDecorationField(event) {
+  const input = event.target.closest("[data-decoration-id]");
+  if (!input) {
+    return;
+  }
+
+  const decoration = (mapConfig.decorations || []).find((item) => item.id === input.dataset.decorationId);
+  if (!decoration) {
+    return;
+  }
+
+  if (input.dataset.field === "width") {
+    decoration.width = Math.max(16, Number(input.value) || 80);
+    decoration.height = decoration.width;
+  } else {
+    decoration[input.dataset.field] = input.value;
+  }
+
+  setDirty();
+  renderDecorationsLayer();
 }
 
 function startDrag(event) {
   const node = event.target.closest(".editor-node");
   const icon = event.target.closest(".editor-icon-handle");
+  const decorationHandle = event.target.closest(".editor-decoration-handle");
 
-  if (!node && !icon) {
+  if (!node && !icon && !decorationHandle) {
     return;
   }
 
@@ -571,7 +932,15 @@ function startDrag(event) {
     };
   }
 
-  if (icon) {
+  if (decorationHandle) {
+    const decoration = (mapConfig.decorations || []).find((item) => item.id === decorationHandle.dataset.decorationId);
+    dragState = {
+      type: "decoration",
+      decorationId: decorationHandle.dataset.decorationId,
+      offsetX: point.x - decoration.x,
+      offsetY: point.y - decoration.y
+    };
+  } else if (icon) {
     const marker = mapConfig.markers.find((item) => item.id === icon.dataset.markerId);
     dragState = {
       type: "icon",
@@ -608,6 +977,13 @@ function moveDrag(event) {
     marker.x = Math.round(point.x - dragState.offsetX);
     marker.y = Math.round(point.y - dragState.offsetY);
     renderMarkers();
+  }
+
+  if (dragState.type === "decoration") {
+    const decoration = (mapConfig.decorations || []).find((item) => item.id === dragState.decorationId);
+    decoration.x = Math.round(point.x - dragState.offsetX);
+    decoration.y = Math.round(point.y - dragState.offsetY);
+    renderDecorationsLayer();
   }
 
   setDirty();
@@ -653,8 +1029,25 @@ async function init() {
       elements.saveStatus.classList.add("dirty");
     });
   });
+  elements.backgroundSelect.addEventListener("change", () => {
+    mapConfig.background = elements.backgroundSelect.value;
+    elements.mapImage.src = mapConfig.background;
+    setDirty();
+  });
+  elements.backgroundUploadInput.addEventListener("change", (event) => {
+    handleBackgroundUpload(event).catch((error) => {
+      elements.saveStatus.textContent = error.message;
+      elements.saveStatus.classList.add("dirty");
+    });
+  });
   elements.iconUploadInput.addEventListener("change", (event) => {
     handleIconUpload(event).catch((error) => {
+      elements.saveStatus.textContent = error.message;
+      elements.saveStatus.classList.add("dirty");
+    });
+  });
+  elements.decorationUploadInput.addEventListener("change", (event) => {
+    handleDecorationUpload(event).catch((error) => {
       elements.saveStatus.textContent = error.message;
       elements.saveStatus.classList.add("dirty");
     });
@@ -669,6 +1062,8 @@ async function init() {
     button.addEventListener("click", () => setMode(button.dataset.mode));
   });
   elements.newRouteButton.addEventListener("click", addRoute);
+  elements.duplicateRouteButton.addEventListener("click", duplicateRoute);
+  elements.deleteRouteButton.addEventListener("click", deleteActiveRoute);
   elements.archiveRouteButton.addEventListener("click", () => {
     const route = activeRoute();
     route.archived = !route.archived;
@@ -678,16 +1073,29 @@ async function init() {
   elements.addNodeButton.addEventListener("click", () => {
     pendingNodeClick = true;
     pendingIconClick = false;
+    pendingDecorationClick = false;
     setTool("node");
     elements.addNodeButton.classList.add("active");
     elements.addIconButton.classList.remove("active");
+    elements.addDecorationButton.classList.remove("active");
   });
   elements.deleteNodeButton.addEventListener("click", deleteLastNode);
   elements.addIconButton.addEventListener("click", () => {
     pendingIconClick = true;
     pendingNodeClick = false;
+    pendingDecorationClick = false;
     setTool("icon");
     elements.addIconButton.classList.add("active");
+    elements.addNodeButton.classList.remove("active");
+    elements.addDecorationButton.classList.remove("active");
+  });
+  elements.addDecorationButton.addEventListener("click", () => {
+    pendingDecorationClick = true;
+    pendingIconClick = false;
+    pendingNodeClick = false;
+    setTool("icon");
+    elements.addDecorationButton.classList.add("active");
+    elements.addIconButton.classList.remove("active");
     elements.addNodeButton.classList.remove("active");
   });
   elements.nodeToolButton.addEventListener("click", () => setTool("node"));
@@ -695,8 +1103,11 @@ async function init() {
   elements.saveButton.addEventListener("click", saveAll);
   elements.nodeList.addEventListener("change", updateNodeInput);
   elements.segmentAssetList.addEventListener("change", updateSegmentAsset);
+  elements.segmentAssetList.addEventListener("click", updateSegmentTransform);
   elements.markerList.addEventListener("change", updateMarkerField);
   elements.markerList.addEventListener("click", deleteMarkerFromEvent);
+  elements.decorationList.addEventListener("change", updateDecorationField);
+  elements.decorationList.addEventListener("click", handleDecorationListClick);
   elements.layer.addEventListener("pointerdown", startDrag);
   elements.layer.addEventListener("pointermove", moveDrag);
   elements.layer.addEventListener("pointerup", endDrag);
@@ -714,6 +1125,10 @@ async function init() {
 
     if (pendingIconClick && activeTool === "icon") {
       addIconAt(point);
+    }
+
+    if (pendingDecorationClick && activeTool === "icon") {
+      addDecorationAt(point);
     }
   });
 

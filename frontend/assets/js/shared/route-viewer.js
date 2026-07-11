@@ -1,6 +1,7 @@
 import { loadRouteConfig } from "./config-api.js";
 import {
   createSvgElement,
+  renderDecorations,
   renderFootprints,
   renderMapMarkers,
   routePathFromNodes
@@ -16,10 +17,12 @@ export async function initRouteViewer(mapKey) {
   const routePath = document.getElementById("routePath");
   const routeFootprints = document.getElementById("routeFootprints");
   const markerLayer = document.getElementById("markerLayer");
+  const decorationLayer = document.getElementById("decorationLayer");
   const highlightLayer = document.getElementById("highlightLayer");
   const controls = document.getElementById("routeControls");
   const panelLogo = document.getElementById("panelLogo");
   const panelContent = document.getElementById("panelContent");
+  const terminal = document.querySelector(".terminal");
 
   let activeAudio = null;
   let exitTimer = null;
@@ -29,6 +32,25 @@ export async function initRouteViewer(mapKey) {
   mapImage.src = mapConfig.background;
   panelLogo.src = mapConfig.logo;
   routeLayer.setAttribute("viewBox", mapConfig.viewBox);
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  function getInstructionSteps(instructions = "") {
+    const cleaned = instructions
+      .replace(/\r/g, "\n")
+      .split(/\n+|(?<=\.)\s+|(?<=;)\s+/)
+      .map((step) => step.replace(/^\s*\d+[\).\-\s]+/, "").trim())
+      .map((step) => step.replace(/\.$/, ""))
+      .filter(Boolean);
+
+    return cleaned.length ? cleaned : ["Ruta sin indicaciones escritas"];
+  }
 
   function stopAudio() {
     if (!activeAudio) {
@@ -42,6 +64,8 @@ export async function initRouteViewer(mapKey) {
 
   function showDefaultPanel() {
     const content = mapConfig.defaultPanel;
+    terminal?.classList.remove("route-active");
+    panelContent.className = "welcome-content";
     panelContent.innerHTML = `
       <p class="welcome-kicker">${content.kicker}</p>
       <h1>${content.title}</h1>
@@ -51,10 +75,16 @@ export async function initRouteViewer(mapKey) {
   }
 
   function showRoutePanel(route) {
+    const steps = getInstructionSteps(route.instructions);
+    const density = steps.length >= 8 ? "dense" : steps.length >= 5 ? "compact" : "normal";
+    terminal?.classList.add("route-active");
+    panelContent.className = `welcome-content route-content route-steps-${density}`;
     panelContent.innerHTML = `
       <p class="welcome-kicker">Indicaciones</p>
-      <h1>${route.name}</h1>
-      <p class="route-instruction">${route.instructions || "Ruta sin indicaciones escritas."}</p>
+      <h1>${escapeHtml(route.name)}</h1>
+      <ol class="route-instruction-list">
+        ${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
+      </ol>
     `;
   }
 
@@ -187,6 +217,7 @@ export async function initRouteViewer(mapKey) {
 
   renderButtons();
   renderHighlights();
+  renderDecorations({ parent: decorationLayer, catalog, decorations: mapConfig.decorations || [] });
   renderMapMarkers({ parent: markerLayer, catalog, markers: mapConfig.markers });
   showDefaultPanel();
 }

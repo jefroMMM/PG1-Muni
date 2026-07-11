@@ -15,15 +15,19 @@
         <span id="saveStatus" class="save-status">Sin cambios</span>
       </div>
 
+      <div id="routeInspector" class="route-inspector" aria-live="polite"></div>
+
       <div class="map-frame config-map-frame">
         <img id="editorMapImage" class="map-image" src="" alt="Mapa editable">
         <svg id="editorLayer" class="route-layer editor-layer" viewBox="0 0 2000 1000" aria-label="Capa de edicion">
           <g id="editorHighlightLayer"></g>
           <path id="editorRoutePath" class="route-line editor-route-path" d=""></path>
           <g id="editorFootprints" class="route-footprints"></g>
+          <g id="editorDecorationLayer" class="map-decorations"></g>
           <g id="editorMarkerLayer" class="map-logo-markers"></g>
           <g id="editorNodeLayer"></g>
           <g id="editorPlacedIconLayer"></g>
+          <g id="editorPlacedDecorationLayer"></g>
         </svg>
       </div>
 
@@ -44,6 +48,8 @@
           <button class="mode-card" type="button" data-mode="nodes">Nodos</button>
           <button class="mode-card" type="button" data-mode="assets">Assets</button>
           <button class="mode-card" type="button" data-mode="icons">Iconos</button>
+          <button class="mode-card" type="button" data-mode="map">Mapa</button>
+          <button class="mode-card" type="button" data-mode="decorations">Decoraciones</button>
           <button class="mode-card" type="button" data-mode="text-audio">Texto y audio</button>
         </div>
       </section>
@@ -54,7 +60,11 @@
           <button id="newRouteButton" class="small-button" type="button">Nueva</button>
         </div>
         <div id="routeList" class="route-list"></div>
-        <button id="archiveRouteButton" class="small-button" type="button">Archivar</button>
+        <div class="form-grid route-actions">
+          <button id="archiveRouteButton" class="small-button" type="button">Archivar</button>
+          <button id="duplicateRouteButton" class="small-button" type="button">Duplicar</button>
+          <button id="deleteRouteButton" class="small-button danger-button" type="button">Borrar</button>
+        </div>
       </section>
 
       <section class="panel-section editor-panel-block" data-panel="nodes" hidden>
@@ -83,6 +93,20 @@
         </label>
       </section>
 
+      <section class="panel-section editor-panel-block" data-panel="map" hidden>
+        <div class="section-heading">
+          <h2>Mapa de fondo</h2>
+        </div>
+        <label class="field-label">
+          Fondo actual
+          <select id="backgroundSelect"></select>
+        </label>
+        <label class="field-label upload-field">
+          Subir nuevo mapa
+          <input id="backgroundUploadInput" type="file" accept="image/*">
+        </label>
+      </section>
+
       <section class="panel-section editor-panel-block" data-panel="icons" hidden>
         <div class="section-heading">
           <h2>Iconos del mapa</h2>
@@ -97,6 +121,22 @@
           <input id="iconUploadInput" type="file" accept="image/*">
         </label>
         <div id="markerList" class="marker-list"></div>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="decorations" hidden>
+        <div class="section-heading">
+          <h2>Decoraciones</h2>
+          <button id="addDecorationButton" class="small-button" type="button">Colocar</button>
+        </div>
+        <label class="field-label">
+          Decoracion
+          <select id="decorationAssetSelect"></select>
+        </label>
+        <label class="field-label upload-field">
+          Subir decoracion
+          <input id="decorationUploadInput" type="file" accept="image/*">
+        </label>
+        <div id="decorationList" class="marker-list"></div>
       </section>
 
       <section class="panel-section editor-panel-block" data-panel="text-audio" hidden>

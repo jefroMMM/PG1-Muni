@@ -119,7 +119,8 @@
         "name": "Audio Renap",
         "src": "/MapaR/Audios/Audio%20Renap.mp3"
       }
-    ]
+    ],
+    "decorations": []
   },
   "maps": {
     "terminal": {
@@ -296,7 +297,8 @@
           "audio": "/assets/Audios/Audio%20gerencia.mp3"
         }
       ],
-      "markers": []
+      "markers": [],
+      "decorations": []
     },
     "mapar": {
       "title": "Mapa Retalhuleu",
@@ -311,8 +313,8 @@
       "routeExitDuration": 7000,
       "defaultPanel": {
         "kicker": "Municipalidad de Retalhuleu",
-        "title": "Mapa",
-        "text": "Selecciona una dependencia para preparar el recorrido.",
+        "title": "¿A donde quieres ir?",
+        "text": "Selecciona una opcion y te mostramos el recorrido paso a paso.",
         "hint": ""
       },
       "routes": [
@@ -488,7 +490,8 @@
           "height": 50,
           "label": "Municipalidad"
         }
-      ]
+      ],
+      "decorations": []
     }
   }
 }
