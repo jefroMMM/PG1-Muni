@@ -117,6 +117,36 @@ def mapar_config():
     return send_from_directory(FRONTEND_DIR, "conf.html")
 
 
+THEME_FOLDERS = {
+    "1": "Clasmorfismo",
+    "2": "Glaymorfismo",
+    "3": "Minimalismo",
+    "4": "LiquidGlass",
+}
+
+
+@app.get("/fork-core/<path:path>")
+def fork_core_files(path):
+    return send_from_directory(BASE_DIR / "fork-core", path)
+
+
+@app.get("/<theme>/<path:path>")
+def theme_files(theme, path):
+    folder = THEME_FOLDERS.get(theme)
+    if folder is None:
+        return static_files(f"{theme}/{path}")
+    return send_from_directory(BASE_DIR / folder, path)
+
+
+@app.get("/<theme>")
+@app.get("/<theme>/")
+def theme_preview(theme):
+    folder = THEME_FOLDERS.get(theme)
+    if folder is None:
+        return static_files(theme)
+    return send_from_directory(BASE_DIR / folder, "index.html")
+
+
 @app.get("/uploads/<path:path>")
 def uploaded_files(path):
     return send_from_directory(UPLOAD_DIR, path)

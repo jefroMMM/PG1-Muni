@@ -8,6 +8,11 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend/ /app/backend/
 COPY frontend/ /app/frontend/
 COPY data/ /app/data/
+COPY Clasmorfismo/ /app/Clasmorfismo/
+COPY Glaymorfismo/ /app/Glaymorfismo/
+COPY Minimalismo/ /app/Minimalismo/
+COPY LiquidGlass/ /app/LiquidGlass/
+COPY fork-core/ /app/fork-core/
 
 ENV PORT=80
 ENV ROUTES_CONFIG_PATH=/app/data/routes-config.json
