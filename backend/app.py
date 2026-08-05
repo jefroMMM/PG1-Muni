@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
+from urllib.parse import urlparse
 from uuid import uuid4
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -54,7 +55,14 @@ def upload_subdir(kind):
 
 @app.get("/api/config")
 def get_config():
-    return jsonify(load_config())
+    config = load_config()
+    referer_path = urlparse(request.referrer or "").path.strip("/")
+    route = referer_path.split("/", 1)[0]
+
+    if route in {"1", "2", "3", "4"}:
+        config["maps"]["terminal"]["background"] = f"/{route}/assets/images/Nuevo%20fondo%20Barroco.png"
+
+    return jsonify(config)
 
 
 @app.put("/api/config")
@@ -118,10 +126,14 @@ def mapar_config():
 
 
 THEME_FOLDERS = {
-    "1": "Clasmorfismo",
-    "2": "Glaymorfismo",
-    "3": "Minimalismo",
-    "4": "LiquidGlass",
+    "1": "Anteriores/Clasmorfismo",
+    "2": "Anteriores/Glaymorfismo",
+    "3": "Anteriores/Minimalismo",
+    "4": "Anteriores/LiquidGlass",
+    "11": "Clasmorfismo",
+    "22": "Glaymorfismo",
+    "33": "Minimalismo",
+    "44": "LiquidGlass",
 }
 
 
