@@ -1,0 +1,11 @@
+@startuml
+title Estados - ciclo de una ruta
+[*] --> Borrador
+Borrador --> Validada : tiene nombre y dos nodos
+Validada --> Visible : guardar y publicar
+Visible --> Archivada : archivar
+Archivada --> Visible : restaurar
+Visible --> Borrador : editar
+Borrador --> Descartada : eliminar
+Descartada --> [*]
+@enduml

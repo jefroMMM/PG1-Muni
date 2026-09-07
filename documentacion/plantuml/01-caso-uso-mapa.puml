@@ -1,0 +1,18 @@
+@startuml
+title Mapa - consulta dentro del terminal
+left to right direction
+actor Visitante
+rectangle "Pantalla Mapa" {
+  usecase "Elegir dependencia" as select
+  usecase "Destacar destino" as highlight
+  usecase "Trazar recorrido interno" as draw
+  usecase "Leer pasos ordenados" as steps
+  usecase "Escuchar indicaciones" as audio
+}
+Visitante --> select
+select .> highlight : <<include>>
+highlight .> draw : <<include>>
+draw .> steps : <<include>>
+audio .> steps : <<extend>>
+Visitante --> audio
+@enduml

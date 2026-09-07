@@ -1,0 +1,18 @@
+@startuml
+title Mapa - mostrar una dependencia
+actor Visitante
+participant "Boton de dependencia" as Button
+participant RouteViewer
+participant SvgRenderer
+participant RoutePanel
+participant Audio
+Visitante -> Button : pulsa una oficina
+Button -> RouteViewer : selectRoute(routeId)
+RouteViewer -> SvgRenderer : dibuja nodos y tramos
+SvgRenderer --> RouteViewer : recorrido listo
+RouteViewer -> RoutePanel : muestra titulo y pasos
+alt la ruta tiene audio
+  RouteViewer -> Audio : play(audioUrl)
+end
+RouteViewer --> Visitante : guia visible
+@enduml

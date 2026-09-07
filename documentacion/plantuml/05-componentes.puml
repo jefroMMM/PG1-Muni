@@ -1,0 +1,20 @@
+@startuml
+title Componentes - entrega de un recorrido
+package "Cliente web" {
+  [Mapa] as mapa
+  [MapaR] as mapar
+  [RouteViewer] as viewer
+  [RoutePanel] as panel
+  [SvgRenderer] as svg
+}
+component "Flask API" as api
+database "routes-config.json" as config
+folder "assets clasificados" as files
+mapa --> viewer
+mapar --> viewer
+viewer --> panel
+viewer --> svg
+viewer --> api : GET /api/config
+api --> config : cargar configuracion
+api --> files : servir recursos
+@enduml

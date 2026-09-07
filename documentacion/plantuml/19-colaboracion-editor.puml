@@ -1,0 +1,15 @@
+@startuml
+title Colaboracion - edicion de nodos en MapaConf
+object Administrador
+object NodeTool
+object RouteEditor
+object DraftRoute
+object SvgPreview
+object SaveButton
+Administrador --> NodeTool : 1 selecciona herramienta
+NodeTool --> RouteEditor : 2 agrega o mueve nodo
+RouteEditor --> DraftRoute : 3 modifica modelo
+RouteEditor --> SvgPreview : 4 actualiza vista
+Administrador --> SaveButton : 5 confirma
+SaveButton --> RouteEditor : 6 persiste borrador
+@enduml

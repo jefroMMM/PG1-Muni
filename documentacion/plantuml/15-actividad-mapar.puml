@@ -1,0 +1,13 @@
+@startuml
+title Actividad - MapaR recorrido urbano
+start
+:Elegir un destino de ciudad;
+:Conservar iconos de puntos de interes;
+:Crear sprites para cada tramo;
+:Aplicar giro y espejo configurados;
+:Animar el avance sobre calles;
+:Abrir panel de instrucciones;
+:Esperar el tiempo de visualizacion;
+:Eliminar sprites temporales;
+stop
+@enduml

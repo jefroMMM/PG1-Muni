@@ -1,0 +1,15 @@
+@startuml
+title Colaboracion - catalogo visual en MapaRConf
+object Administrador
+object AssetPicker
+object UploadDialog
+object UploadAPI
+object AssetCatalog
+object MapCanvas
+Administrador --> AssetPicker : 1 busca recurso
+AssetPicker --> UploadDialog : 2 solicita archivo nuevo
+UploadDialog --> UploadAPI : 3 envia archivo
+UploadAPI --> AssetCatalog : 4 registra asset
+AssetCatalog --> AssetPicker : 5 devuelve assetId
+AssetPicker --> MapCanvas : 6 coloca y transforma
+@enduml

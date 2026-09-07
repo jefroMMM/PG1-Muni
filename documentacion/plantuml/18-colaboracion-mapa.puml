@@ -1,0 +1,14 @@
+@startuml
+title Colaboracion - guia interna en Mapa
+object Visitante
+object RouteButton
+object RouteViewer
+object RouteData
+object SvgRenderer
+object InstructionList
+Visitante --> RouteButton : 1 pulsa
+RouteButton --> RouteViewer : 2 routeId
+RouteViewer --> RouteData : 3 obtiene ruta
+RouteViewer --> SvgRenderer : 4 dibuja ruta
+RouteViewer --> InstructionList : 5 ordena pasos
+@enduml

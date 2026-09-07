@@ -1,0 +1,17 @@
+@startuml
+title MapaR - recorrido urbano
+left to right direction
+actor Ciudadano
+rectangle "Pantalla MapaR" {
+  usecase "Escoger destino urbano" as destination
+  usecase "Ubicar punto de interes" as marker
+  usecase "Animar tramos de calle" as animate
+  usecase "Mostrar iconos del mapa" as icons
+  usecase "Cerrar guia y limpiar mapa" as reset
+}
+Ciudadano --> destination
+destination .> marker : <<include>>
+marker .> animate : <<include>>
+animate .> icons : <<include>>
+Ciudadano --> reset
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+title Estados - elemento visual del editor
+[*] --> EnCatalogo
+EnCatalogo --> Seleccionado : elegir asset
+Seleccionado --> Colocando : pulsar colocar
+Colocando --> Ajustando : soltar en el mapa
+Ajustando --> Ajustando : mover, girar o espejar
+Ajustando --> Guardado : confirmar
+Guardado --> EnUso : guardar configuracion
+EnUso --> Seleccionado : volver a editar
+Seleccionado --> EnCatalogo : cancelar
+@enduml

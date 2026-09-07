@@ -1,0 +1,18 @@
+@startuml
+title MapaConf - guardar una ruta editada
+actor Administrador
+participant "Formulario de ruta" as Form
+participant RouteEditor
+participant "Vista SVG" as Preview
+participant "Config API" as API
+database Config
+Administrador -> Form : cambia pasos y nodos
+Form -> RouteEditor : updateDraft(data)
+RouteEditor -> Preview : renderDraft()
+Administrador -> RouteEditor : guardar
+RouteEditor -> RouteEditor : valida nodos y tramos
+RouteEditor -> API : PUT /api/config
+API -> Config : reemplazo atomico
+Config --> API : guardado
+API --> RouteEditor : 200 OK
+@enduml

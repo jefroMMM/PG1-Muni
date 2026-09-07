@@ -1,0 +1,18 @@
+@startuml
+title Actividad - personalizar MapaRConf
+start
+:Elegir modo fondo, icono o decoracion;
+if (El asset ya existe?) then (si)
+  :Seleccionar desde el catalogo;
+else (no)
+  :Subir archivo y clasificarlo;
+endif
+:Colocar el elemento sobre el mapa;
+:Ajustar posicion y tamano;
+:Girar en incrementos de 45 grados;
+if (Debe verse al reves?) then (si)
+  :Activar modo espejo;
+endif
+:Guardar composicion;
+stop
+@enduml

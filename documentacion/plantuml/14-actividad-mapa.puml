@@ -1,0 +1,15 @@
+@startuml
+title Actividad - Mapa dentro del terminal
+start
+:Pulsar una dependencia;
+:Resolver la ruta activa;
+:Resaltar destino final;
+:Dibujar cada tramo en SVG;
+:Convertir indicaciones en lista numerada;
+if (Existe audio?) then (si)
+  :Iniciar narracion;
+endif
+:Mantener la guia visible;
+:Ocultar el recorrido al finalizar;
+stop
+@enduml

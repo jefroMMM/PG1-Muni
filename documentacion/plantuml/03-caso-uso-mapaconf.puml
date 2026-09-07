@@ -1,0 +1,19 @@
+@startuml
+title MapaConf - autor de rutas internas
+left to right direction
+actor Administrador
+rectangle "Editor MapaConf" {
+  usecase "Crear ruta interna" as create
+  usecase "Editar nombre e indicaciones" as copy
+  usecase "Definir nodos del recorrido" as nodes
+  usecase "Asignar asset a cada tramo" as segment
+  usecase "Vincular audio" as audio
+  usecase "Publicar o archivar ruta" as publish
+}
+Administrador --> create
+Administrador --> copy
+Administrador --> nodes
+nodes .> segment : <<include>>
+Administrador --> audio
+create .> publish : <<include>>
+@enduml

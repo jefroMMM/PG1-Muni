@@ -1,0 +1,16 @@
+@startuml
+title Actividad - crear ruta en MapaConf
+start
+:Crear borrador;
+:Escribir nombre y pasos;
+repeat
+  :Pulsar sobre el mapa para agregar nodo;
+  :Elegir asset del siguiente tramo;
+repeat while (Faltan tramos?) is (si)
+if (Se necesita audio?) then (si)
+  :Seleccionar o subir audio;
+endif
+:Validar la ruta;
+:Guardar y habilitar boton;
+stop
+@enduml

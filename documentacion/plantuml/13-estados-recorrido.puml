@@ -1,0 +1,11 @@
+@startuml
+title Estados - audio de indicaciones
+[*] --> SinAudio
+SinAudio --> Disponible : se vincula archivo
+Disponible --> Reproduciendo : usuario inicia guia
+Reproduciendo --> Pausado : pausar
+Pausado --> Reproduciendo : continuar
+Reproduciendo --> Finalizado : termina archivo
+Finalizado --> Disponible : reiniciar
+Disponible --> SinAudio : quitar audio
+@enduml

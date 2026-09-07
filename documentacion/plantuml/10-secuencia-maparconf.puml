@@ -1,0 +1,17 @@
+@startuml
+title MapaRConf - reemplazar fondo
+actor Administrador
+participant "Selector de mapas" as Picker
+participant "Upload API" as Upload
+folder "uploads/maps" as Maps
+participant RouteEditor
+participant "Config API" as ConfigApi
+Administrador -> Picker : elige archivo de mapa
+Picker -> Upload : POST /api/upload/maps
+Upload -> Maps : almacena archivo
+Maps --> Upload : ruta publica
+Upload --> Picker : assetId y src
+Picker -> RouteEditor : setBackground(assetId)
+RouteEditor -> ConfigApi : PUT /api/config
+ConfigApi --> Administrador : fondo publicado
+@enduml

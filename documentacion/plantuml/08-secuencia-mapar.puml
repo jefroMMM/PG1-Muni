@@ -1,0 +1,17 @@
+@startuml
+title MapaR - animar una ruta urbana
+actor Ciudadano
+participant "Boton de destino" as Button
+participant MapaR
+participant "Capa de rutas" as Layer
+participant "Capa de iconos" as Icons
+participant Temporizador
+Ciudadano -> Button : selecciona destino
+Button -> MapaR : activateDestination(id)
+MapaR -> Layer : crea assets por segmento
+Layer -> Layer : anima recorrido
+MapaR -> Icons : mantiene marcadores urbanos
+MapaR -> Temporizador : programa salida
+Temporizador -> MapaR : limpiar ruta al terminar
+MapaR --> Ciudadano : vuelve al mapa base
+@enduml

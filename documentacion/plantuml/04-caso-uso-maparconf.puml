@@ -1,0 +1,18 @@
+@startuml
+title MapaRConf - compositor de mapa urbano
+left to right direction
+actor Administrador
+rectangle "Editor MapaRConf" {
+  usecase "Reemplazar fondo del mapa" as background
+  usecase "Subir mapa, icono o decoracion" as upload
+  usecase "Colocar elemento visual" as place
+  usecase "Cambiar tamano, giro o espejo" as transform
+  usecase "Guardar catalogo visual" as save
+}
+Administrador --> background
+Administrador --> upload
+upload .> place : <<include>>
+place .> transform : <<include>>
+background .> save : <<include>>
+transform .> save : <<include>>
+@enduml

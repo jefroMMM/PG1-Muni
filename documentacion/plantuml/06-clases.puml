@@ -1,0 +1,44 @@
+@startuml
+title Clases - configuracion persistente
+class MapConfig {
+  background
+  viewBox
+}
+class Route {
+  id
+  name
+  archived
+  instructions
+  audio
+}
+class RouteNode {
+  x
+  y
+}
+class SegmentAsset {
+  assetId
+  rotation
+  mirrored
+}
+class MapMarker {
+  assetId
+  x
+  y
+  width
+}
+class Decoration {
+  assetId
+  rotation
+}
+class AssetCatalog {
+  find(assetId)
+}
+MapConfig "1" *-- "many" Route
+MapConfig "1" *-- "many" MapMarker
+MapConfig "1" *-- "many" Decoration
+Route "1" *-- "many" RouteNode
+Route "1" *-- "many" SegmentAsset
+SegmentAsset --> AssetCatalog
+MapMarker --> AssetCatalog
+Decoration --> AssetCatalog
+@enduml
