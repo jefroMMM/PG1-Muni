@@ -215,7 +215,29 @@ export async function initRouteViewer(mapKey) {
     controls.replaceChildren(...buttons);
   }
 
+  function keyboardRouteControl(event) {
+    const buttons = [...controls.querySelectorAll("button")];
+    if (!buttons.length || event.defaultPrevented) {
+      return;
+    }
+
+    const currentIndex = Math.max(0, buttons.indexOf(document.activeElement));
+    const movement = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
+
+    if (movement) {
+      event.preventDefault();
+      buttons[(currentIndex + movement + buttons.length) % buttons.length].focus();
+      return;
+    }
+
+    if (/^[D-Zd-z1-9]$/.test(event.key)) {
+      event.preventDefault();
+      buttons[currentIndex].click();
+    }
+  }
+
   renderButtons();
+  document.addEventListener("keydown", keyboardRouteControl);
   renderHighlights();
   renderDecorations({ parent: decorationLayer, catalog, decorations: mapConfig.decorations || [] });
   renderMapMarkers({ parent: markerLayer, catalog, markers: mapConfig.markers });

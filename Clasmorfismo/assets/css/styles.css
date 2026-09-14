@@ -1007,3 +1007,6 @@ body { background: linear-gradient(145deg,#e3dcff 0%,#f6f4ff 48%,#d7ceff 100%); 
 
 /* Paleta municipal aplicada al volumen clay. */
 body { background:linear-gradient(145deg,#d9e5db 0%,#f8fbf7 48%,#c9ddec 100%); }.map-frame,.welcome-panel,.controls { background:#edf4ed; box-shadow:18px 18px 34px #b5c4b8,-15px -15px 30px #fff,inset 3px 3px 5px rgba(255,255,255,.95); }.welcome-panel { color:#222f70; }.welcome-panel h1 { color:#252d70; }.welcome-kicker { color:#55933f; }.controls { background:#e4eee6; }.office-button { background:linear-gradient(145deg,color-mix(in srgb,var(--route-color),#6aa64c 18%),var(--route-color)); box-shadow:9px 9px 17px rgba(38,48,107,.22),-6px -6px 12px #fff,inset 2px 2px 3px rgba(255,255,255,.45); }
+
+/* Marca amarilla al desplazarse con teclado. */
+.office-button:focus-visible { outline:3px solid #f4cf4a; outline-offset:4px; box-shadow:0 0 0 7px rgba(244,207,74,.24),10px 10px 17px rgba(80,98,78,.3),-4px -4px 8px #fff; }

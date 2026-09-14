@@ -981,3 +981,10 @@ body {
     margin-left: 0;
   }
 }
+
+/* Marca amarilla al desplazarse con teclado. */
+.office-button:focus-visible {
+  outline: 3px solid #f4cf4a;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 7px rgba(244, 207, 74, 0.24);
+}
