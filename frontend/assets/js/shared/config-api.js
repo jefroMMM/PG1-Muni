@@ -20,3 +20,17 @@ export async function saveRouteConfig(config) {
 
   return response.json();
 }
+
+export async function saveEditorScope(mapKey, routeId, payload) {
+  const endpoint = routeId
+    ? `/api/maps/${encodeURIComponent(mapKey)}/routes/${encodeURIComponent(routeId)}`
+    : `/api/maps/${encodeURIComponent(mapKey)}`;
+  const response = await fetch(endpoint, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "No se pudieron guardar los cambios");
+  return result;
+}

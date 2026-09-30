@@ -1,4 +1,4 @@
-import { loadRouteConfig, saveRouteConfig } from "./shared/config-api.js";
+import { loadRouteConfig, saveRouteConfig, saveEditorScope } from "./shared/config-api.js";
 import {
   clampPoint,
   createSvgElement,
@@ -14,6 +14,15 @@ import {
 
 const mapKey = window.location.pathname.toLowerCase().startsWith("/mapar") ? "mapar" : "terminal";
 const mapHome = mapKey === "mapar" ? "/MapaR/" : "/";
+const editorParams = new URLSearchParams(window.location.search);
+const editorScope = editorParams.get("scope");
+const selectedRouteId = editorParams.get("route");
+const isRouteEditor = editorScope === "route";
+const isMapEditor = editorScope === "map";
+const isScopedEditor = isRouteEditor || isMapEditor;
+const allowedModes = isRouteEditor
+  ? ["nodes", "assets", "text-audio"]
+  : isMapEditor ? ["map", "icons", "decorations"] : null;
 
 const elements = {
   backLink: document.getElementById("backLink"),
@@ -73,6 +82,8 @@ let dragState = null;
 let hasUnsavedChanges = false;
 
 function activeRoute() {
+  if (isMapEditor) return undefined;
+  if (isRouteEditor) return mapConfig.routes.find((route) => route.id === selectedRouteId);
   return mapConfig.routes.find((route) => route.id === activeRouteId) || mapConfig.routes[0];
 }
 
@@ -115,7 +126,7 @@ function syncActiveRouteFromInputs() {
     return;
   }
 
-  route.name = elements.routeNameInput.value.trim() || "Ruta sin nombre";
+  route.name = elements.routeNameInput.value.trim();
   route.buttonColor = elements.routeColorInput.value || "#147a69";
   route.instructions = elements.routeInstructionsInput.value.trim();
   setDirty();
@@ -148,6 +159,7 @@ function rotate45(value = 0) {
 }
 
 function setMode(mode) {
+  if (allowedModes && !allowedModes.includes(mode)) return;
   activeMode = mode;
   document.querySelectorAll("[data-mode]").forEach((button) => {
     button.classList.toggle("active", button.dataset.mode === mode);
@@ -158,14 +170,16 @@ function setMode(mode) {
 }
 
 function renderRouteList() {
-  const items = mapConfig.routes.map((route) => {
+  const routes = isMapEditor ? [] : isRouteEditor ? [activeRoute()] : mapConfig.routes;
+  const items = routes.filter(Boolean).map((route) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `route-list-item ${route.id === activeRouteId ? "active" : ""}`;
-    button.innerHTML = `
-      <span>${route.name}</span>
-      <small>${route.archived ? "Archivada" : "Visible"}</small>
-    `;
+    const name = document.createElement("span");
+    name.textContent = route.name;
+    const status = document.createElement("small");
+    status.textContent = route.archived ? "Archivada" : "Visible";
+    button.append(name, status);
     button.addEventListener("click", () => {
       activeRouteId = route.id;
       renderAll();
@@ -188,6 +202,13 @@ function routeLength(nodes = []) {
 }
 
 function renderRouteInspector() {
+  if (isMapEditor) {
+    elements.routeInspector.replaceChildren();
+    const message = document.createElement("strong");
+    message.textContent = "Configuración del mapa: imagen de fondo, iconos y decoraciones";
+    elements.routeInspector.append(message);
+    return;
+  }
   const route = activeRoute();
 
   if (!route) {
@@ -215,7 +236,7 @@ function renderRouteInspector() {
   }
 
   elements.routeInspector.innerHTML = `
-    <strong>${route.name || "Ruta sin nombre"}</strong>
+    <strong></strong>
     <span>${route.archived ? "Archivada" : "Visible"}</span>
     <span>${nodes.length} nodos</span>
     <span>${segmentCount} tramos</span>
@@ -223,6 +244,7 @@ function renderRouteInspector() {
     <span>${route.audio ? "Con audio" : "Sin audio"}</span>
     ${warnings.length ? `<em>${warnings.join(" · ")}</em>` : "<em>Lista para usar</em>"}
   `;
+  elements.routeInspector.querySelector("strong").textContent = route.name || "Ruta sin nombre";
 }
 
 function renderForm() {
@@ -445,7 +467,7 @@ function renderBackgroundControls() {
 }
 
 function renderPlacedIconHandles() {
-  const handles = (mapConfig.markers || []).map((marker) => {
+  const handles = (isRouteEditor ? [] : mapConfig.markers || []).map((marker) => {
     const handle = createSvgElement("rect", {
       class: "editor-icon-handle",
       x: marker.x,
@@ -461,7 +483,7 @@ function renderPlacedIconHandles() {
 }
 
 function renderPlacedDecorationHandles() {
-  const handles = (mapConfig.decorations || []).map((decoration) => createSvgElement("rect", {
+  const handles = (isRouteEditor ? [] : mapConfig.decorations || []).map((decoration) => createSvgElement("rect", {
     class: "editor-icon-handle editor-decoration-handle",
     x: decoration.x,
     y: decoration.y,
@@ -502,6 +524,7 @@ function renderAll() {
 }
 
 function addRoute() {
+  if (isScopedEditor) return;
   const route = {
     id: generateId("ruta"),
     name: "Nueva ruta",
@@ -524,6 +547,7 @@ function addRoute() {
 }
 
 function duplicateRoute() {
+  if (isScopedEditor) return;
   const route = activeRoute();
 
   if (!route) {
@@ -546,6 +570,7 @@ function duplicateRoute() {
 }
 
 function deleteActiveRoute() {
+  if (isScopedEditor) return;
   const route = activeRoute();
 
   if (!route || mapConfig.routes.length <= 1) {
@@ -754,7 +779,8 @@ function updateNodeInput(event) {
     return;
   }
 
-  node[input.dataset.axis] = Number(input.value) || 0;
+  const point = clampPoint({ ...node, [input.dataset.axis]: Number(input.value) || 0 });
+  Object.assign(node, point);
   normalizeSegmentAssets(route, fallbackRouteAssetId());
   setDirty();
   renderRouteGraphics();
@@ -917,6 +943,7 @@ function startDrag(event) {
   if (!node && !icon && !decorationHandle) {
     return;
   }
+  if ((isRouteEditor && !node) || (isMapEditor && node)) return;
 
   const point = getSvgPoint(elements.layer, event);
 
@@ -950,7 +977,7 @@ function startDrag(event) {
     };
   }
 
-  event.target.setPointerCapture(event.pointerId);
+  elements.layer.setPointerCapture(event.pointerId);
   event.preventDefault();
 }
 
@@ -998,7 +1025,19 @@ async function saveAll() {
   elements.saveStatus.textContent = "Guardando...";
 
   try {
-    await saveRouteConfig(config);
+    if (isRouteEditor) {
+      await saveEditorScope(mapKey, selectedRouteId, {
+        route: activeRoute(),
+        catalog: { routeAssets: config.catalog.routeAssets, audios: config.catalog.audios }
+      });
+    } else if (isMapEditor) {
+      await saveEditorScope(mapKey, null, {
+        map: { background: mapConfig.background, markers: mapConfig.markers, decorations: mapConfig.decorations },
+        catalog: { backgrounds: config.catalog.backgrounds, markerIcons: config.catalog.markerIcons, decorations: config.catalog.decorations }
+      });
+    } else {
+      await saveRouteConfig(config);
+    }
     setSaved();
   } catch (error) {
     elements.saveStatus.textContent = error.message;
@@ -1012,11 +1051,32 @@ async function init() {
   config = await loadRouteConfig();
   mapConfig = config.maps[mapKey];
 
-  elements.backLink.href = mapHome;
-  elements.editorTitle.textContent = mapKey === "mapar" ? "Configurar MapaR" : "Configurar Terminal";
+  if (isRouteEditor && !activeRoute()) throw new Error("La ruta seleccionada ya no existe. Vuelve al dashboard.");
+  elements.backLink.href = isScopedEditor ? "/dashboard" : mapHome;
+  elements.backLink.textContent = isScopedEditor ? "Volver al dashboard" : "Volver al mapa";
+  const mapLabel = mapKey === "mapar" ? "MapaR" : "Mapa";
+  elements.editorTitle.textContent = isRouteEditor ? `${mapLabel} · ${activeRoute().name}` : `Configurar ${mapLabel}`;
+  document.title = elements.editorTitle.textContent;
   elements.mapImage.src = mapConfig.background;
   elements.layer.setAttribute("viewBox", mapConfig.viewBox);
-  activeRouteId = mapConfig.routes[0]?.id || "";
+  activeRouteId = isRouteEditor ? selectedRouteId : mapConfig.routes[0]?.id || "";
+  if (isScopedEditor) {
+    activeMode = isRouteEditor ? "text-audio" : "map";
+    document.querySelector(".section-heading h1").textContent = isRouteEditor ? "Editar esta ruta" : "Editar este mapa";
+    document.querySelectorAll("[data-mode]").forEach((button) => { button.hidden = !allowedModes.includes(button.dataset.mode); });
+    document.querySelector('[data-panel="routes"]').hidden = true;
+    elements.newRouteButton.hidden = true;
+    elements.duplicateRouteButton.hidden = true;
+    elements.deleteRouteButton.hidden = true;
+    elements.nodeToolButton.hidden = isMapEditor;
+    elements.iconToolButton.hidden = isRouteEditor;
+    if (isRouteEditor) {
+      const statusSection = document.createElement("section");
+      statusSection.className = "panel-section";
+      statusSection.append(elements.archiveRouteButton);
+      document.querySelector(".config-panel").append(statusSection);
+    } else { setTool("icon"); }
+  }
 
   elements.routeNameInput.addEventListener("input", syncActiveRouteFromInputs);
   elements.routeColorInput.addEventListener("input", syncActiveRouteFromInputs);
@@ -1146,5 +1206,8 @@ async function init() {
 }
 
 init().catch((error) => {
-  document.body.innerHTML = `<main class="terminal-error">${error.message}</main>`;
+  const message = document.createElement("main");
+  message.className = "terminal-error";
+  message.textContent = error.message;
+  document.body.replaceChildren(message);
 });

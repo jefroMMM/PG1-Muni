@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import tempfile
+from threading import RLock
 from pathlib import Path
 from urllib.parse import urlparse
 from uuid import uuid4
@@ -17,6 +18,7 @@ CONFIG_PATH = Path(os.environ.get("ROUTES_CONFIG_PATH", BASE_DIR / "data" / "rou
 UPLOAD_DIR = CONFIG_PATH.parent / "uploads"
 
 app = Flask(__name__, static_folder=None)
+config_lock = RLock()
 
 
 def ensure_config_file():
@@ -77,8 +79,77 @@ def put_config():
     if not isinstance(config, dict) or "maps" not in config or "catalog" not in config:
         return jsonify({"error": "Configuracion invalida"}), 400
 
-    save_config(config)
+    with config_lock:
+        save_config(config)
     return jsonify({"ok": True})
+
+
+def merge_new_assets(config, catalog, groups):
+    """Keep assets saved by other windows; only append newly uploaded assets."""
+    for group in groups:
+        existing = config["catalog"].setdefault(group, [])
+        known = {asset["id"] for asset in existing}
+        for asset in catalog.get(group, []):
+            if isinstance(asset, dict) and asset.get("id") and asset["id"] not in known:
+                existing.append(asset)
+                known.add(asset["id"])
+
+
+@app.patch("/api/maps/<map_key>/routes/<route_id>")
+def update_route(map_key, route_id):
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict) or not isinstance(payload.get("route"), dict):
+        return jsonify({"error": "Ruta invalida"}), 400
+    route = payload["route"]
+    catalog = payload.get("catalog", {})
+    if not isinstance(catalog, dict) or any(not isinstance(catalog.get(key, []), list) for key in ("routeAssets", "audios")):
+        return jsonify({"error": "Catalogo invalido"}), 400
+    nodes = route.get("nodes")
+    if (route.get("id") != route_id or not isinstance(route.get("name"), str)
+            or not route["name"].strip() or not isinstance(nodes, list) or len(nodes) < 2
+            or any(not isinstance(point, dict) or any(
+                type(point.get(axis)) not in (int, float) or not 0 <= point[axis] <= limit
+                for axis, limit in (("x", 2000), ("y", 1000))) for point in nodes)):
+        return jsonify({"error": "La ruta necesita nombre y al menos dos nodos dentro del mapa"}), 400
+    with config_lock:
+        config = load_config()
+        map_config = config["maps"].get(map_key)
+        if map_config is None:
+            return jsonify({"error": "Mapa no encontrado"}), 404
+        current = next((item for item in map_config["routes"] if item["id"] == route_id), None)
+        if current is None:
+            return jsonify({"error": "Ruta no encontrada"}), 404
+        fields = ("name", "archived", "buttonColor", "instructions", "audio", "assetSize", "nodes", "segmentAssets", "segmentOptions")
+        current.update({key: route[key] for key in fields if key in route})
+        merge_new_assets(config, catalog, ("routeAssets", "audios"))
+        save_config(config)
+    return jsonify({"ok": True})
+
+
+@app.patch("/api/maps/<map_key>")
+def update_map(map_key):
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict) or not isinstance(payload.get("map"), dict):
+        return jsonify({"error": "Mapa invalido"}), 400
+    catalog = payload.get("catalog", {})
+    if not isinstance(catalog, dict) or any(not isinstance(catalog.get(key, []), list) for key in ("backgrounds", "markerIcons", "decorations")):
+        return jsonify({"error": "Catalogo invalido"}), 400
+    with config_lock:
+        config = load_config()
+        current = config["maps"].get(map_key)
+        if current is None:
+            return jsonify({"error": "Mapa no encontrado"}), 404
+        fields = ("background", "markers", "decorations")
+        current.update({key: payload["map"][key] for key in fields if key in payload["map"]})
+        merge_new_assets(config, catalog, ("backgrounds", "markerIcons", "decorations"))
+        save_config(config)
+    return jsonify({"ok": True})
+
+
+@app.get("/dashboard")
+@app.get("/dashboard/")
+def dashboard():
+    return send_from_directory(FRONTEND_DIR, "dashboard.html")
 
 
 @app.post("/api/upload")

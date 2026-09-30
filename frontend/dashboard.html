@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de rutas · Municipalidad de Retalhuleu</title>
+  <link rel="stylesheet" href="/assets/css/dashboard.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <img src="/assets/images/Logo%20Muni%20Reu.png" alt="Municipalidad de Retalhuleu">
+      <div><p class="eyebrow">Municipalidad de Retalhuleu</p><h1>Configuración de rutas</h1>
+        <p>Elige una ruta para editarla en una nueva pestaña. Pulsa el título de un mapa para cambiar su imagen, iconos y decoraciones.</p></div>
+    </header>
+    <p id="dashboardStatus" role="status">Cargando rutas…</p>
+    <div id="mapGroups" class="map-groups"></div>
+    <footer>Los cambios se comparten con todas las versiones visuales del mismo mapa.</footer>
+  </main>
+  <script type="module" src="/assets/js/dashboard.js"></script>
+</body>
+</html>

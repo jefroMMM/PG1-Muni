@@ -1,0 +1,27 @@
+:root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #18244c; background: #f3f6f4; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.dashboard { max-width: 1200px; margin: auto; padding: 42px 24px; }
+.dashboard-header { display: flex; align-items: center; gap: 24px; margin-bottom: 34px; }
+.dashboard-header img { width: 80px; height: 92px; object-fit: contain; }
+.eyebrow { color: #147a69; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+h1 { font-size: clamp(26px, 4vw, 38px); margin: 8px 0 12px; }
+p { line-height: 1.6; margin: 0; }
+.map-groups { display: grid; gap: 28px; }
+.map-group { padding: 28px; border: 1px solid #dce5df; border-radius: 18px; background: white; box-shadow: 0 8px 28px #18244c08; }
+.group-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+h2 { margin: 0; font-size: 28px; }
+.map-title { color: #18244c; text-decoration: none; border-bottom: 2px solid #147a69; }
+.group-hint { color: #64716b; font-size: 13px; margin-top: 8px; }
+.view-map { color: #147a69; text-decoration: none; font-weight: 700; font-size: 14px; }
+.route-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.route-card { display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px solid #e0e7e2; border-left: 5px solid var(--route-color, #147a69); border-radius: 10px; color: #18244c; text-decoration: none; transition: box-shadow .15s, transform .15s; }
+.route-card:hover { box-shadow: 0 6px 18px #18244c12; transform: translateY(-2px); }
+.route-name { font-size: 18px; font-weight: 700; }
+.route-meta { color: #68736d; font-size: 13px; }
+.route-action { color: #147a69; font-size: 14px; font-weight: 700; }
+.archived { border-left-color: #89938c; background: #f7f9f7; }
+a:focus-visible { outline: 3px solid #efc749; outline-offset: 5px; }
+footer { margin-top: 26px; color: #68736d; font-size: 13px; line-height: 1.5; }
+#dashboardStatus { margin-bottom: 16px; }
+@media (max-width: 600px) { .dashboard { padding: 24px 16px; } .dashboard-header { align-items: flex-start; gap: 14px; } .dashboard-header img { width: 50px; height: 64px; } .map-group { padding: 20px; } .route-grid { grid-template-columns: 1fr; } }
