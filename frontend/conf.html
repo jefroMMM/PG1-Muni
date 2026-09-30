@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Configuracion de rutas</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/css/route-preview.css">
   <style>
     .config-app [hidden] { display: none !important; }
   </style>
@@ -37,6 +38,7 @@
       <div class="editor-tools" role="toolbar" aria-label="Herramientas del editor">
         <button id="nodeToolButton" class="tool-button active" type="button">Mover nodos</button>
         <button id="iconToolButton" class="tool-button" type="button">Mover iconos</button>
+        <button id="previewButton" class="tool-button" type="button">Previsualizar ruta</button>
         <button id="saveButton" class="primary-button" type="button">Guardar</button>
       </div>
     </section>
@@ -170,6 +172,10 @@
     </aside>
   </main>
 
+  <dialog id="previewDialog" class="route-preview-dialog" aria-labelledby="previewTitle">
+    <header class="preview-toolbar"><div><strong id="previewTitle">Previsualización de la ruta</strong><span>Vista del visitante con tus cambios sin guardar. Pulsa la ruta para repetir el recorrido o escuchar su audio.</span></div><button id="closePreviewButton" type="button">Volver a editar</button></header>
+    <iframe id="previewFrame" title="Vista previa del recorrido" src="about:blank"></iframe>
+  </dialog>
   <script type="module" src="/assets/js/route-editor.js"></script>
 </body>
 </html>

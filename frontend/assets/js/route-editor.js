@@ -12,11 +12,13 @@ import {
   routePathFromNodes
 } from "./shared/map-utils.js";
 
-const mapKey = window.location.pathname.toLowerCase().startsWith("/mapar") ? "mapar" : "terminal";
-const mapHome = mapKey === "mapar" ? "/MapaR/" : "/";
+const sectionPath = window.location.pathname.match(/^\/maps\/([^/]+)/);
+const mapKey = sectionPath ? decodeURIComponent(sectionPath[1]) : window.location.pathname.toLowerCase().startsWith("/mapar") ? "mapar" : "terminal";
+const mapHome = sectionPath ? `/maps/${encodeURIComponent(mapKey)}` : mapKey === "mapar" ? "/MapaR/" : "/";
 const editorParams = new URLSearchParams(window.location.search);
 const editorScope = editorParams.get("scope");
-const selectedRouteId = editorParams.get("route");
+let selectedRouteId = editorParams.get("route");
+let isNewRoute = editorScope === "route" && editorParams.get("new") === "1";
 const isRouteEditor = editorScope === "route";
 const isMapEditor = editorScope === "map";
 const isScopedEditor = isRouteEditor || isMapEditor;
@@ -69,6 +71,25 @@ const elements = {
   iconToolButton: document.getElementById("iconToolButton"),
   saveButton: document.getElementById("saveButton")
 };
+const previewDialog = document.getElementById("previewDialog");
+const previewFrame = document.getElementById("previewFrame");
+let previewSnapshot = null;
+
+document.getElementById("previewButton").addEventListener("click", () => {
+  const route = activeRoute();
+  if (!route) return;
+  previewSnapshot = structuredClone(config);
+  // The visitor view receives only this draft. No write request or saved configuration is needed.
+  previewSnapshot.maps[mapKey].routes = [{ ...structuredClone(route), archived: false }];
+  previewFrame.src = "/preview";
+  previewDialog.showModal();
+});
+document.getElementById("closePreviewButton").addEventListener("click", () => previewDialog.close());
+previewDialog.addEventListener("close", () => { previewFrame.src = "about:blank"; previewSnapshot = null; });
+window.addEventListener("message", (event) => {
+  if (event.origin !== window.location.origin || event.source !== previewFrame.contentWindow || event.data?.type !== "route-preview-ready" || !previewSnapshot) return;
+  previewFrame.contentWindow.postMessage({ type: "route-preview-data", config: previewSnapshot, mapKey, routeId: activeRoute()?.id }, window.location.origin);
+});
 
 let config;
 let mapConfig;
@@ -88,7 +109,7 @@ function activeRoute() {
 }
 
 function fallbackRouteAssetId() {
-  return mapKey === "mapar" ? "mapr-footprints-auto" : "footprints-auto";
+  return mapConfig.routeStyle === "assets-only" ? "mapr-footprints-auto" : "footprints-auto";
 }
 
 function setDirty() {
@@ -1029,7 +1050,14 @@ async function saveAll() {
       await saveEditorScope(mapKey, selectedRouteId, {
         route: activeRoute(),
         catalog: { routeAssets: config.catalog.routeAssets, audios: config.catalog.audios }
-      });
+      }, isNewRoute);
+      if (isNewRoute) {
+        isNewRoute = false;
+        const url = new URL(window.location.href);
+        url.searchParams.delete("new");
+        url.searchParams.set("route", selectedRouteId);
+        window.history.replaceState(null, "", url);
+      }
     } else if (isMapEditor) {
       await saveEditorScope(mapKey, null, {
         map: { background: mapConfig.background, markers: mapConfig.markers, decorations: mapConfig.decorations },
@@ -1050,16 +1078,29 @@ async function saveAll() {
 async function init() {
   config = await loadRouteConfig();
   mapConfig = config.maps[mapKey];
+  if (!mapConfig) throw new Error("La sección seleccionada ya no existe.");
+  if (isNewRoute) {
+    selectedRouteId = generateId("ruta");
+    mapConfig.routes.push({ id: selectedRouteId, name: "Nueva ruta", archived: false, buttonColor: "#147a69", instructions: "", audio: "", assetSize: mapConfig.routeAssetSize, nodes: [{ x: 1000, y: 700 }, { x: 1100, y: 700 }], segmentAssets: [fallbackRouteAssetId()], segmentOptions: [{ rotation: 0, mirrored: false }] });
+    setDirty();
+  }
 
   if (isRouteEditor && !activeRoute()) throw new Error("La ruta seleccionada ya no existe. Vuelve al dashboard.");
-  elements.backLink.href = isScopedEditor ? "/dashboard" : mapHome;
+  elements.backLink.href = isScopedEditor
+    ? editorParams.get("dashboard") === "2" ? "/dashboard2" : "/dashboard"
+    : mapHome;
+  const dashboardView = editorParams.get("dashboardView");
+  if (isScopedEditor && editorParams.get("dashboard") === "2" && Object.hasOwn(config.maps, dashboardView)) {
+    elements.backLink.href += `#${encodeURIComponent(dashboardView)}`;
+  }
   elements.backLink.textContent = isScopedEditor ? "Volver al dashboard" : "Volver al mapa";
-  const mapLabel = mapKey === "mapar" ? "MapaR" : "Mapa";
+  const mapLabel = mapConfig.sectionName || (mapKey === "mapar" ? "MapaR" : "Mapa");
   elements.editorTitle.textContent = isRouteEditor ? `${mapLabel} · ${activeRoute().name}` : `Configurar ${mapLabel}`;
   document.title = elements.editorTitle.textContent;
   elements.mapImage.src = mapConfig.background;
   elements.layer.setAttribute("viewBox", mapConfig.viewBox);
   activeRouteId = isRouteEditor ? selectedRouteId : mapConfig.routes[0]?.id || "";
+  document.getElementById("previewButton").hidden = isMapEditor;
   if (isScopedEditor) {
     activeMode = isRouteEditor ? "text-audio" : "map";
     document.querySelector(".section-heading h1").textContent = isRouteEditor ? "Editar esta ruta" : "Editar este mapa";

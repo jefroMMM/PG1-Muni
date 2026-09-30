@@ -7,8 +7,8 @@ import {
   routePathFromNodes
 } from "./map-utils.js";
 
-export async function initRouteViewer(mapKey) {
-  const config = await loadRouteConfig();
+export async function initRouteViewer(mapKey, options = {}) {
+  const config = options.config || await loadRouteConfig();
   const mapConfig = config.maps[mapKey];
   const catalog = config.catalog;
 
@@ -67,10 +67,10 @@ export async function initRouteViewer(mapKey) {
     terminal?.classList.remove("route-active");
     panelContent.className = "welcome-content";
     panelContent.innerHTML = `
-      <p class="welcome-kicker">${content.kicker}</p>
-      <h1>${content.title}</h1>
-      <p>${content.text}</p>
-      ${content.hint ? `<span>${content.hint}</span>` : ""}
+      <p class="welcome-kicker">${escapeHtml(content.kicker)}</p>
+      <h1>${escapeHtml(content.title)}</h1>
+      <p>${escapeHtml(content.text)}</p>
+      ${content.hint ? `<span>${escapeHtml(content.hint)}</span>` : ""}
     `;
   }
 
@@ -242,4 +242,8 @@ export async function initRouteViewer(mapKey) {
   renderDecorations({ parent: decorationLayer, catalog, decorations: mapConfig.decorations || [] });
   renderMapMarkers({ parent: markerLayer, catalog, markers: mapConfig.markers });
   showDefaultPanel();
+  if (options.routeId) {
+    const previewRoute = mapConfig.routes.find((route) => route.id === options.routeId);
+    if (previewRoute) selectRoute(previewRoute);
+  }
 }

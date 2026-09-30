@@ -7,6 +7,9 @@ Aplicacion web para mostrar rutas sobre dos mapas:
 - `/Conf` permite editar graficamente las rutas de la terminal.
 - `/MapaR/Conf` permite editar graficamente las rutas del mapa de Retalhuleu.
 - `/dashboard` agrupa las rutas de Mapa y MapaR. Cada ruta abre su propio editor en una nueva pestana del navegador; los titulos permiten editar el fondo, iconos y decoraciones del mapa.
+- `/dashboard2` ofrece una interfaz administrativa con navegacion lateral, resumen de rutas, busqueda y filtros de estado. Conserva los mismos editores y datos.
+
+En cada seccion, **Nueva ruta** abre un borrador que se publica al guardar. **Nueva seccion** permite indicar un nombre, escoger uno de ocho iconos y elegir un mapa inicial; cada seccion conserva sus rutas por separado. Desde el editor, **Previsualizar ruta** muestra el recorrido animado, las indicaciones y el audio del borrador sin guardar la configuracion. Las nuevas secciones tienen su visor en `/maps/<id>` y su editor en `/maps/<id>/Conf`.
 
 El dashboard esta disponible en `http://localhost:3000/dashboard` y `http://localhost:8080/dashboard` al ejecutar Docker Compose. Las variantes visuales comparten las mismas rutas. Desde el dashboard, el guardado de una ruta solo actualiza esa ruta, y el guardado de un mapa solo actualiza su fondo, iconos y decoraciones.
 

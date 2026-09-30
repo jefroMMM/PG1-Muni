@@ -21,12 +21,12 @@ export async function saveRouteConfig(config) {
   return response.json();
 }
 
-export async function saveEditorScope(mapKey, routeId, payload) {
+export async function saveEditorScope(mapKey, routeId, payload, create = false) {
   const endpoint = routeId
-    ? `/api/maps/${encodeURIComponent(mapKey)}/routes/${encodeURIComponent(routeId)}`
+    ? `/api/maps/${encodeURIComponent(mapKey)}/routes${create ? "" : `/${encodeURIComponent(routeId)}`}`
     : `/api/maps/${encodeURIComponent(mapKey)}`;
   const response = await fetch(endpoint, {
-    method: "PATCH",
+    method: create ? "POST" : "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });

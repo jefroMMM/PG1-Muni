@@ -1,4 +1,5 @@
 import json
+import copy
 import os
 import shutil
 import tempfile
@@ -95,6 +96,60 @@ def merge_new_assets(config, catalog, groups):
                 known.add(asset["id"])
 
 
+def valid_route(route, route_id):
+    nodes = route.get("nodes")
+    return (route.get("id") == route_id and isinstance(route_id, str) and bool(route_id)
+            and isinstance(route.get("name"), str) and bool(route["name"].strip())
+            and isinstance(nodes, list) and len(nodes) >= 2
+            and all(isinstance(point, dict) and all(
+                type(point.get(axis)) in (int, float) and 0 <= point[axis] <= limit
+                for axis, limit in (("x", 2000), ("y", 1000))) for point in nodes))
+
+
+@app.post("/api/maps")
+def create_map():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict) or not isinstance(payload.get("name"), str) or not payload["name"].strip() or len(payload["name"].strip()) > 80:
+        return jsonify({"error": "Escribe un nombre de sección de hasta 80 caracteres"}), 400
+    icon = payload.get("icon", "building")
+    template = payload.get("template", "terminal")
+    if not isinstance(icon, str) or not isinstance(template, str) or icon not in {"building", "map", "pin", "briefcase", "health", "school", "bus", "park"} or template not in {"terminal", "mapar"}:
+        return jsonify({"error": "Selecciona un icono y un mapa inicial válidos"}), 400
+    with config_lock:
+        config = load_config()
+        key = f"seccion-{uuid4().hex[:12]}"
+        new_map = copy.deepcopy(config["maps"][template])
+        name = payload["name"].strip()
+        new_map.update({"sectionName": name, "sectionIcon": icon, "title": name, "routes": [], "markers": [], "decorations": []})
+        new_map["defaultPanel"] = {"title": name, "kicker": "Municipalidad de Retalhuleu", "text": "Selecciona una ruta para consultar el recorrido.", "hint": ""}
+        config["maps"][key] = new_map
+        save_config(config)
+    return jsonify({"ok": True, "mapKey": key}), 201
+
+
+@app.post("/api/maps/<map_key>/routes")
+def create_route(map_key):
+    payload = request.get_json(silent=True)
+    route = payload.get("route") if isinstance(payload, dict) else None
+    if not isinstance(route, dict) or not valid_route(route, route.get("id")):
+        return jsonify({"error": "La ruta necesita nombre y al menos dos nodos dentro del mapa"}), 400
+    catalog = payload.get("catalog", {})
+    if not isinstance(catalog, dict) or any(not isinstance(catalog.get(key, []), list) for key in ("routeAssets", "audios")):
+        return jsonify({"error": "Catalogo invalido"}), 400
+    with config_lock:
+        config = load_config()
+        map_config = config["maps"].get(map_key)
+        if map_config is None:
+            return jsonify({"error": "Mapa no encontrado"}), 404
+        if any(item["id"] == route["id"] for item in map_config["routes"]):
+            return jsonify({"error": "Esta ruta ya existe"}), 409
+        fields = ("id", "name", "archived", "buttonColor", "instructions", "audio", "assetSize", "nodes", "segmentAssets", "segmentOptions")
+        map_config["routes"].append({key: route[key] for key in fields if key in route})
+        merge_new_assets(config, catalog, ("routeAssets", "audios"))
+        save_config(config)
+    return jsonify({"ok": True}), 201
+
+
 @app.patch("/api/maps/<map_key>/routes/<route_id>")
 def update_route(map_key, route_id):
     payload = request.get_json(silent=True)
@@ -104,12 +159,7 @@ def update_route(map_key, route_id):
     catalog = payload.get("catalog", {})
     if not isinstance(catalog, dict) or any(not isinstance(catalog.get(key, []), list) for key in ("routeAssets", "audios")):
         return jsonify({"error": "Catalogo invalido"}), 400
-    nodes = route.get("nodes")
-    if (route.get("id") != route_id or not isinstance(route.get("name"), str)
-            or not route["name"].strip() or not isinstance(nodes, list) or len(nodes) < 2
-            or any(not isinstance(point, dict) or any(
-                type(point.get(axis)) not in (int, float) or not 0 <= point[axis] <= limit
-                for axis, limit in (("x", 2000), ("y", 1000))) for point in nodes)):
+    if not valid_route(route, route_id):
         return jsonify({"error": "La ruta necesita nombre y al menos dos nodos dentro del mapa"}), 400
     with config_lock:
         config = load_config()
@@ -150,6 +200,32 @@ def update_map(map_key):
 @app.get("/dashboard/")
 def dashboard():
     return send_from_directory(FRONTEND_DIR, "dashboard.html")
+
+
+@app.get("/dashboard2")
+@app.get("/dashboard2/")
+def dashboard_professional():
+    return send_from_directory(FRONTEND_DIR, "dashboard2.html")
+
+
+@app.get("/preview")
+def route_preview():
+    return send_from_directory(FRONTEND_DIR, "preview.html")
+
+
+@app.get("/maps/<map_key>")
+@app.get("/maps/<map_key>/")
+def section_viewer(map_key):
+    if map_key not in load_config()["maps"]:
+        return jsonify({"error": "Sección no encontrada"}), 404
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
+
+@app.get("/maps/<map_key>/Conf")
+def section_editor(map_key):
+    if map_key not in load_config()["maps"]:
+        return jsonify({"error": "Sección no encontrada"}), 404
+    return send_from_directory(FRONTEND_DIR, "conf.html")
 
 
 @app.post("/api/upload")

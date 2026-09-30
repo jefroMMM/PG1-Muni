@@ -25,7 +25,7 @@ class DashboardTests(unittest.TestCase):
         return self.client.patch(f"/api/maps/terminal/routes/{route['id']}", json={"route": route, **extra})
 
     def test_dashboard_and_editor_pages(self):
-        for url in ("/dashboard", "/dashboard/", "/Conf?scope=route&route=contaduria", "/MapaR/Conf?scope=map", "/assets/js/dashboard.js", "/assets/css/dashboard.css"):
+        for url in ("/dashboard", "/dashboard/", "/dashboard2", "/preview", "/Conf?scope=route&route=contaduria", "/MapaR/Conf?scope=map", "/assets/js/dashboard.js", "/assets/css/dashboard.css"):
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
 
@@ -78,6 +78,48 @@ class DashboardTests(unittest.TestCase):
                 self.assertEqual(backend.load_config(), self.initial)
         missing = {**route, "id": "missing"}
         self.assertEqual(self.save_route(missing).status_code, 404)
+
+    def test_new_section_starts_empty_and_keeps_existing_maps(self):
+        response = self.client.post("/api/maps", json={"name": "Servicios municipales", "icon": "briefcase", "template": "mapar"})
+        self.assertEqual(response.status_code, 201)
+        key = response.get_json()["mapKey"]
+        saved = backend.load_config()
+        section = saved["maps"][key]
+        self.assertEqual(section["sectionName"], "Servicios municipales")
+        self.assertEqual(section["sectionIcon"], "briefcase")
+        self.assertEqual(section["routes"], [])
+        self.assertEqual(section["markers"], [])
+        self.assertEqual(section["background"], self.initial["maps"]["mapar"]["background"])
+        for map_key in ("terminal", "mapar"):
+            self.assertEqual(saved["maps"][map_key], self.initial["maps"][map_key])
+        for url in (f"/maps/{key}", f"/maps/{key}/Conf"):
+            self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_new_route_is_added_only_to_its_section_and_duplicate_is_rejected(self):
+        response = self.client.post("/api/maps", json={"name": "Nueva sección", "icon": "pin", "template": "terminal"})
+        key = response.get_json()["mapKey"]
+        route = copy.deepcopy(self.initial["maps"]["terminal"]["routes"][0])
+        route.update({"id": "new-route", "name": "Atención al vecino"})
+        response = self.client.post(f"/api/maps/{key}/routes", json={"route": route})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(backend.load_config()["maps"][key]["routes"]), 1)
+        self.assertEqual(backend.load_config()["maps"]["terminal"], self.initial["maps"]["terminal"])
+        self.assertEqual(self.client.post(f"/api/maps/{key}/routes", json={"route": route}).status_code, 409)
+        route["instructions"] = "Pasos nuevos"
+        self.assertEqual(self.client.patch(f"/api/maps/{key}/routes/new-route", json={"route": route}).status_code, 200)
+        self.assertEqual(backend.load_config()["maps"][key]["routes"][0]["instructions"], "Pasos nuevos")
+
+    def test_invalid_section_and_route_creation_preserve_config(self):
+        for payload in ({"name": " "}, {"name": "Test", "icon": "unknown"}, {"name": "Test", "template": "unknown"}, {"name": "Test", "icon": []}):
+            self.assertEqual(self.client.post("/api/maps", json=payload).status_code, 400)
+            self.assertEqual(backend.load_config(), self.initial)
+        self.assertEqual(self.client.post("/api/maps/terminal/routes", json={"route": {"id": "new", "name": "Test", "nodes": []}}).status_code, 400)
+        self.assertEqual(backend.load_config(), self.initial)
+        self.assertEqual(self.client.get("/maps/unknown/Conf").status_code, 404)
+
+    def test_preview_page_does_not_save_anything(self):
+        self.assertEqual(self.client.get("/preview").status_code, 200)
+        self.assertEqual(backend.load_config(), self.initial)
 
 
 if __name__ == "__main__":

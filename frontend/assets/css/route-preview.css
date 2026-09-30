@@ -1,0 +1,9 @@
+.route-preview-dialog { width: calc(100vw - 36px); max-width: 1800px; height: calc(100vh - 36px); max-height: 1100px; border: 1px solid #dce3eb; border-radius: 10px; padding: 0; overflow: hidden; background: #f4f6f8; }
+.route-preview-dialog[open] { display: flex; flex-direction: column; }
+.route-preview-dialog::backdrop { background: #152b4680; }
+.preview-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 14px 20px; background: white; color: #213852; border-bottom: 1px solid #dce3eb; font-family: "Segoe UI", Arial, sans-serif; }
+.preview-toolbar strong { display: block; font-size: 15px; }
+.preview-toolbar span { display: block; font-size: 12px; color: #42576f; margin-top: 5px; line-height: 1.5; }
+.preview-toolbar button { border: 1px solid #177266; border-radius: 5px; padding: 10px 14px; background: #177266; color: white; font-size: 12px; white-space: nowrap; cursor: pointer; }
+#previewFrame { display: block; flex: 1; min-height: 0; width: 100%; border: 0; background: #f4f6f8; }
+@media (max-width: 600px) { .route-preview-dialog { width: calc(100vw - 16px); height: calc(100vh - 16px); } .preview-toolbar { padding: 12px; flex-wrap: wrap; gap: 10px; } }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración de rutas | Municipalidad de Retalhuleu</title>
+  <link rel="stylesheet" href="/assets/css/dashboard2.css">
+</head>
+<body>
+  <aside class="sidebar" aria-label="Navegación principal">
+    <a class="brand" href="/dashboard2" aria-label="Inicio de administración">
+      <img src="/assets/images/Logo%20Muni%20Reu.png" alt="">
+      <span>Municipalidad<span class="brand-location">de Retalhuleu</span></span>
+    </a>
+    <div class="sidebar-label">GESTIÓN MUNICIPAL</div>
+    <nav>
+      <a class="nav-link selected" href="#inicio" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Resumen de rutas</a>
+      <a class="nav-link" href="#terminal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5h16v16M2 21h20M9 21v-6h6v6M8 9h2m4 0h2"/></svg>Mapa de oficinas</a>
+      <a class="nav-link" href="#mapar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16M15 5v16"/></svg>Mapa de Retalhuleu</a>
+    </nav>
+    <button id="newSectionButton" class="new-section-button" type="button">＋ Nueva sección</button>
+    <div class="sidebar-bottom"><span class="sidebar-line"></span><p>Terminal de localización</p><span>Panel de administración</span></div>
+  </aside>
+  <div class="workspace" id="inicio">
+    <header class="topbar"><span>Administración <span class="breadcrumb-separator">/</span> <strong>Rutas y mapas</strong></span><a href="/dashboard">Vista clásica <span aria-hidden="true">↗</span></a></header>
+    <main>
+      <header class="page-heading"><div><p class="eyebrow">RUTAS Y MAPAS</p><h1>Administración de rutas</h1><p class="page-description">Consulta y configura los recorridos de las oficinas y las dependencias de Retalhuleu.</p></div><span class="section-tag">Configuración municipal</span></header>
+      <section class="metrics" aria-label="Resumen de la configuración">
+        <div class="metric"><span class="metric-label">Rutas registradas</span><strong id="totalRoutes">—</strong><span class="metric-note">En ambos mapas</span></div>
+        <div class="metric"><span class="metric-label">Rutas visibles</span><strong id="visibleRoutes">—</strong><span class="metric-note">Disponibles para consulta</span></div>
+        <div class="metric"><span class="metric-label">Rutas con audio</span><strong id="audioRoutes">—</strong><span class="metric-note">Con narración asociada</span></div>
+      </section>
+      <section class="directory" aria-label="Directorio de rutas">
+        <div class="directory-heading"><h2>Directorio de rutas</h2><p>Cada editor se abre en una nueva pestaña.</p></div>
+        <div class="filters">
+          <label class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span class="sr-only">Buscar ruta</span><input id="routeSearch" type="search" placeholder="Buscar por nombre de ruta…" autocomplete="off"></label>
+          <label class="status-filter">Estado<select id="routeFilter"><option value="all">Todas las rutas</option><option value="visible">Visibles</option><option value="archived">Archivadas</option></select></label>
+          <span id="resultCount" class="result-count" aria-live="polite"></span>
+        </div>
+        <p id="dashboardStatus" class="load-status" role="status">Cargando configuración…</p>
+        <div id="mapGroups" class="map-groups"></div>
+      </section>
+      <footer><span>Municipalidad de Retalhuleu</span><p>Pulsa el título de un mapa para configurar su imagen, iconos y decoraciones. Las rutas comparten la configuración con las versiones visuales existentes.</p></footer>
+    </main>
+  </div>
+  <dialog id="sectionDialog" class="section-dialog" aria-labelledby="sectionDialogTitle">
+    <form id="sectionForm">
+      <header class="dialog-heading"><div><p class="eyebrow">DIRECTORIO DE MAPAS</p><h2 id="sectionDialogTitle">Crear nueva sección</h2></div><button id="closeSectionDialog" type="button" class="dialog-close" aria-label="Cerrar">×</button></header>
+      <p class="dialog-description">Cada sección tendrá su propio mapa y sus propias rutas.</p>
+      <label class="dialog-field">Nombre de la sección<input id="sectionName" type="text" required maxlength="80" placeholder="Por ejemplo: Servicios municipales"></label>
+      <fieldset class="icon-fieldset"><legend>Icono de la sección</legend><div id="sectionIconCatalog" class="section-icon-catalog"></div></fieldset>
+      <label class="dialog-field">Mapa inicial<select id="sectionTemplate"><option value="terminal">Mapa de oficinas</option><option value="mapar">Mapa de Retalhuleu</option></select><span>Luego puedes cambiar la imagen desde el título de la sección.</span></label>
+      <p id="sectionFormStatus" class="form-status" role="status"></p>
+      <div class="dialog-actions"><button id="cancelSectionButton" type="button" class="secondary-action">Cancelar</button><button id="createSectionButton" type="submit" class="primary-action">Crear sección</button></div>
+    </form>
+  </dialog>
+  <script type="module" src="/assets/js/dashboard2.js"></script>
+</body>
+</html>

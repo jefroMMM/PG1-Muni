@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Previsualización de ruta</title><link rel="stylesheet" href="/assets/css/styles.css"></head>
+<body>
+  <main class="terminal">
+    <section class="main-area" aria-label="Previsualización del recorrido">
+      <div class="map-frame"><img id="mapImage" class="map-image" alt="Mapa del recorrido">
+        <svg id="routeLayer" class="route-layer" viewBox="0 0 2000 1000" aria-hidden="true"><g id="highlightLayer"></g><path id="routePath" class="route-line" d=""></path><g id="routeFootprints" class="route-footprints"></g><g id="decorationLayer" class="map-decorations"></g><g id="markerLayer" class="map-logo-markers"></g></svg>
+      </div>
+      <aside class="welcome-panel"><img id="panelLogo" class="municipality-logo" alt="Municipalidad"><div id="panelContent" class="welcome-content">Preparando la previsualización…</div></aside>
+    </section>
+    <section id="routeControls" class="controls" aria-label="Repetir el recorrido"></section>
+  </main>
+  <script type="module" src="/assets/js/preview.js"></script>
+</body></html>
