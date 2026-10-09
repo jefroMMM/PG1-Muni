@@ -177,8 +177,8 @@ def browser(ctx, live_server, request):
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-notifications")
     # ChromeDriver crea un perfil temporal nuevo y arranca en data:,.
-    # Con --user-data-dir propio omite esa página y Chrome for Testing puede
-    # cancelar la primera navegación al cargar su página inicial (ERR_ABORTED).
+    # Con --user-data-dir propio omite esa página. Evitamos depender del
+    # arranque de chrome://new-tab-page/ antes de navegar al servidor de prueba.
     options.set_capability("unhandledPromptBehavior", "accept")
     options.set_capability("goog:loggingPrefs", {"browser": "ALL", "performance": "ALL"})
     if os.environ.get("BDD_CHROME_BINARY"):

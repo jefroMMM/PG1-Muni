@@ -11,7 +11,9 @@ permissions:
 jobs:
   bdd:
     name: BDD — 10 escenarios
-    runs-on: windows-latest
+    # Chrome en el runner Windows cancelaba navegaciones y fallaba con
+    # ERR_NO_BUFFER_SPACE; la suite no depende de Windows.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
@@ -63,9 +65,9 @@ jobs:
       - name: Instalar las dependencias documentadas
         run: |
           python -m venv .venv-bdd
-          .\.venv-bdd\Scripts\python.exe -m pip install -r tests/bdd/requirements.txt
+          ./.venv-bdd/bin/python -m pip install -r tests/bdd/requirements.txt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          .\.venv-bdd\Scripts\python.exe -m pip check
+          ./.venv-bdd/bin/python -m pip check
           exit $LASTEXITCODE
 
       - name: Configurar Chrome y ChromeDriver compatibles
@@ -74,6 +76,7 @@ jobs:
         with:
           chrome-version: stable
           install-chromedriver: true
+          install-dependencies: true
 
       - name: Ejecutar los 10 escenarios BDD
         id: bdd
@@ -81,7 +84,7 @@ jobs:
           BDD_CHROME_BINARY: ${{ steps.chrome.outputs.chrome-path }}
           BDD_CHROMEDRIVER: ${{ steps.chrome.outputs.chromedriver-path }}
         run: |
-          .\.venv-bdd\Scripts\python.exe -m pytest -c tests/bdd/pytest.ini tests/bdd -v --junitxml=tests/bdd/reports/junit.xml 2>&1 | Tee-Object -FilePath tests/bdd/reports/pytest.log
+          ./.venv-bdd/bin/python -m pytest -c tests/bdd/pytest.ini tests/bdd -v --junitxml=tests/bdd/reports/junit.xml 2>&1 | Tee-Object -FilePath tests/bdd/reports/pytest.log
           $testExitCode = $LASTEXITCODE
           exit $testExitCode
 

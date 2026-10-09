@@ -59,6 +59,14 @@ python -m venv .venv-bdd
 
 El entorno ya fue creado en esta máquina; basta el tercer comando para repetir las pruebas. No hace falta activar el entorno, iniciar Docker, abrir un navegador manualmente o levantar la aplicación por separado. `requirements.lock.txt` registra también las versiones transitivas utilizadas; para reproducirlas exactamente se puede instalar ese archivo en lugar de `requirements.txt`.
 
+En Linux (el entorno de CI), los mismos comandos usan la ruta del intérprete de ese sistema:
+
+```bash
+python -m venv .venv-bdd
+./.venv-bdd/bin/python -m pip install -r tests/bdd/requirements.txt
+./.venv-bdd/bin/python -m pytest -c tests/bdd/pytest.ini tests/bdd -v --junitxml=tests/bdd/reports/junit.xml
+```
+
 Selenium Manager resuelve el controlador de Chrome cuando no se proporciona uno. En la primera ejecución necesita acceso a Internet para descargar un controlador compatible. Si Chrome o el controlador están en una ruta especial, se admiten estas variables opcionales:
 
 ```powershell
@@ -81,10 +89,19 @@ La ejecución de diagnóstico [37981091037](https://github.com/jefroMMM/PG1-Muni
 mostró que la navegación a `/dashboard2` era cancelada con `net::ERR_ABORTED` mientras
 Chrome permanecía en `chrome://new-tab-page/`. Flask seguía respondiendo HTTP 200,
 la semilla era correcta y solo había una pestaña. Al proporcionar `--user-data-dir`,
-ChromeDriver omite su argumento inicial `data:,`; la página inicial de Chrome for
-Testing podía interferir con la primera navegación. Se retiró únicamente ese
-argumento de la fixture, conservando el aislamiento mediante el perfil temporal
-gestionado por el controlador. Véase el [código de arranque de ChromeDriver](https://chromium.googlesource.com/chromium/src/+/main/chrome/test/chromedriver/chrome_launcher.cc).
+ChromeDriver omite su argumento inicial `data:,`. Se retiró ese argumento de la
+fixture, conservando el aislamiento mediante el perfil temporal gestionado por el
+controlador. Véase el [código de arranque de ChromeDriver](https://chromium.googlesource.com/chromium/src/+/main/chrome/test/chromedriver/chrome_launcher.cc).
+
+La ejecución posterior [37981744884](https://github.com/jefroMMM/PG1-Muni/actions/runs/37981744884)
+confirmó que el perfil no explicaba todo el problema: BDD06 seguía registrando
+`net::ERR_ABORTED`, ahora desde `data:,`, y BDD04 no cargaba `route-viewer.js` por
+`net::ERR_NO_BUFFER_SPACE`. El servidor y la semilla seguían disponibles. El último
+error significa que no hay espacio de búfer de sockets en la red del navegador;
+véase la [definición de Chromium](https://github.com/chromium/chromium/blob/main/net/base/net_error_list.h).
+No se ha aislado qué componente del runner Windows origina esa condición. CI usa
+Ubuntu 24.04 para evitar ese entorno inestable, con los mismos diez escenarios y
+sus aserciones; las pruebas locales en Windows siguen siendo compatibles.
 
 Si falla un escenario se genera `reports/BDDxx-diagnostics.json` con URL, título,
 pestañas, estado del documento, errores de consola, eventos de navegación, estado
@@ -152,7 +169,7 @@ Referencias de las herramientas: [tablas y Gherkin de pytest-bdd](https://pytest
 
 El remoto Git configurado es `https://github.com/jefroMMM/PG1-Muni.git`. El workflow `.github/workflows/bdd.yml` se activa en cada `push` y `pull_request`, sin filtros de rama o archivos. También admite ejecución manual desde Actions cuando esté disponible en la rama predeterminada.
 
-Usa `windows-latest`, Python 3.13 y Chrome estable con un ChromeDriver compatible, cuya ruta se entrega a las fixtures existentes mediante `BDD_CHROME_BINARY` y `BDD_CHROMEDRIVER`. Se instala `tests/bdd/requirements.txt` y se ejecuta exactamente el comando completo documentado arriba. La suite ya configura el navegador headless y los datos temporales. No se necesita Docker, un servidor externo ni secretos del repositorio.
+Usa `ubuntu-24.04`, Python 3.13 y Chrome estable con un ChromeDriver compatible, cuya ruta se entrega a las fixtures existentes mediante `BDD_CHROME_BINARY` y `BDD_CHROMEDRIVER`. La acción prepara también las dependencias del navegador en Linux. Se instala `tests/bdd/requirements.txt` y se ejecuta el comando Linux documentado arriba. La suite ya configura el navegador headless y los datos temporales. No se necesita Docker, un servidor externo ni secretos del repositorio.
 
 El código de salida de pytest determina si el paso aprueba o falla; no se usa `continue-on-error`. `ci_summary.py` comprueba además que estén presentes BDD01–BDD10, que todos aprueben, que la integridad sea satisfactoria y que exista JUnit. Una omisión o ejecución incompleta hace fallar esa comprobación. El resumen se muestra en la página de la ejecución.
 
