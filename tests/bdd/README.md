@@ -103,6 +103,15 @@ No se ha aislado qué componente del runner Windows origina esa condición. CI u
 Ubuntu 24.04 para evitar ese entorno inestable, con los mismos diez escenarios y
 sus aserciones; las pruebas locales en Windows siguen siendo compatibles.
 
+`chrome_startup.py` comprueba antes de pytest que el Chrome de CI pueda arrancar y
+cargar una página inocua, con su propio perfil temporal. Conserva stderr y el código
+de salida en `reports/chrome-startup.json`. Solo cuando Chrome informa explícitamente
+`No usable sandbox`, ejecución como root sin `--no-sandbox` o un fallo al crear el
+namespace, prueba `--no-sandbox` y transmite ese resultado a la fixture mediante
+`BDD_CHROME_NO_SANDBOX=1`. Esa alternativa se limita al navegador del runner efímero
+y sus datos de prueba; no cambia el sandbox de la aplicación ni la configuración
+del sistema. Otros errores hacen fallar la preparación y quedan reportados.
+
 Si falla un escenario se genera `reports/BDDxx-diagnostics.json` con URL, título,
 pestañas, estado del documento, errores de consola, eventos de navegación, estado
 HTTP del servidor y las últimas solicitudes recibidas. Se conserva junto con la

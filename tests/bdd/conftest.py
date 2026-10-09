@@ -176,6 +176,9 @@ def browser(ctx, live_server, request):
     options.add_argument("--headless=new")
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-notifications")
+    if os.environ.get("BDD_CHROME_NO_SANDBOX") == "1":
+        # CI lo activa solo tras diagnosticar una restricción de sandbox del runner.
+        options.add_argument("--no-sandbox")
     # ChromeDriver crea un perfil temporal nuevo y arranca en data:,.
     # Con --user-data-dir propio omite esa página. Evitamos depender del
     # arranque de chrome://new-tab-page/ antes de navegar al servidor de prueba.
@@ -193,6 +196,7 @@ def browser(ctx, live_server, request):
                                "window_handles": driver.window_handles,
                                "chromedriver_version": driver.capabilities.get("chrome", {}).get("chromedriverVersion"),
                                "profile_directory": driver.capabilities.get("chrome", {}).get("userDataDir")}
+        ctx.browser_startup["no_sandbox"] = os.environ.get("BDD_CHROME_NO_SANDBOX") == "1"
         # Comprueba el estado de arranque; no reintenta ni altera pasos Gherkin.
         WebDriverWait(driver, 15).until(lambda d: d.current_url == "data:,"
                                       and d.execute_script("return document.readyState") == "complete")

@@ -52,7 +52,7 @@ jobs:
           $reportDir = Join-Path $env:GITHUB_WORKSPACE 'tests/bdd/reports'
           New-Item -ItemType Directory -Path $reportDir -Force | Out-Null
           # Solo limpia resultados generados en este checkout efímero, sin recursión.
-          $generatedNames = @('junit.xml', 'resultados.md', 'resultados.json', 'pytest.log', 'ci-summary.md', 'workflow-status.json')
+          $generatedNames = @('junit.xml', 'resultados.md', 'resultados.json', 'pytest.log', 'ci-summary.md', 'workflow-status.json', 'chrome-startup.json')
           Get-ChildItem -LiteralPath $reportDir -File | Where-Object {
             $_.Name -in $generatedNames -or $_.Name -like 'BDD*-failure.png' -or $_.Name -like 'BDD*-diagnostics.json'
           } | ForEach-Object { Remove-Item -LiteralPath $_.FullName }
@@ -78,11 +78,18 @@ jobs:
           install-chromedriver: true
           install-dependencies: true
 
+      - name: Comprobar el arranque de Chrome
+        id: chrome-startup
+        env:
+          BDD_CHROME_BINARY: ${{ steps.chrome.outputs.chrome-path }}
+        run: ./.venv-bdd/bin/python tests/bdd/chrome_startup.py
+
       - name: Ejecutar los 10 escenarios BDD
         id: bdd
         env:
           BDD_CHROME_BINARY: ${{ steps.chrome.outputs.chrome-path }}
           BDD_CHROMEDRIVER: ${{ steps.chrome.outputs.chromedriver-path }}
+          BDD_CHROME_NO_SANDBOX: ${{ steps.chrome-startup.outputs.no-sandbox }}
         run: |
           ./.venv-bdd/bin/python -m pytest -c tests/bdd/pytest.ini tests/bdd -v --junitxml=tests/bdd/reports/junit.xml 2>&1 | Tee-Object -FilePath tests/bdd/reports/pytest.log
           $testExitCode = $LASTEXITCODE
@@ -108,5 +115,6 @@ jobs:
             tests/bdd/reports/workflow-status.json
             tests/bdd/reports/BDD*-failure.png
             tests/bdd/reports/BDD*-diagnostics.json
+            tests/bdd/reports/chrome-startup.json
           if-no-files-found: error
           retention-days: 14
