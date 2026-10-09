@@ -1,0 +1,89 @@
+name: Laboratorio BDD
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bdd:
+    name: BDD — 10 escenarios
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      PYTHONUTF8: "1"
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Preparar los reportes de esta ejecución
+        run: |
+          $reportDir = Join-Path $env:GITHUB_WORKSPACE 'tests/bdd/reports'
+          New-Item -ItemType Directory -Path $reportDir -Force | Out-Null
+          # Solo limpia resultados generados en este checkout efímero, sin recursión.
+          $generatedNames = @('junit.xml', 'resultados.md', 'resultados.json', 'pytest.log', 'ci-summary.md', 'workflow-status.json')
+          Get-ChildItem -LiteralPath $reportDir -File | Where-Object {
+            $_.Name -in $generatedNames -or $_.Name -like 'BDD*-failure.png'
+          } | ForEach-Object { Remove-Item -LiteralPath $_.FullName }
+
+      - name: Configurar Python 3.13
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Instalar las dependencias documentadas
+        run: |
+          python -m venv .venv-bdd
+          .\.venv-bdd\Scripts\python.exe -m pip install -r tests/bdd/requirements.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\.venv-bdd\Scripts\python.exe -m pip check
+          exit $LASTEXITCODE
+
+      - name: Configurar Chrome y ChromeDriver compatibles
+        id: chrome
+        uses: browser-actions/setup-chrome@48483d551c22a1fe6154c6a195ccc6d5773dc8c4 # v2
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+
+      - name: Ejecutar los 10 escenarios BDD
+        id: bdd
+        env:
+          BDD_CHROME_BINARY: ${{ steps.chrome.outputs.chrome-path }}
+          BDD_CHROMEDRIVER: ${{ steps.chrome.outputs.chromedriver-path }}
+        run: |
+          .\.venv-bdd\Scripts\python.exe -m pytest -c tests/bdd/pytest.ini tests/bdd -v --junitxml=tests/bdd/reports/junit.xml 2>&1 | Tee-Object -FilePath tests/bdd/reports/pytest.log
+          $testExitCode = $LASTEXITCODE
+          exit $testExitCode
+
+      - name: Publicar el resumen y verificar los 10 resultados
+        if: always()
+        env:
+          BDD_STEP_OUTCOME: ${{ steps.bdd.outcome }}
+        run: python tests/bdd/ci_summary.py
+
+      - name: Conservar evidencia incluso si fallan las pruebas
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: bdd-reportes-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            tests/bdd/reports/junit.xml
+            tests/bdd/reports/resultados.md
+            tests/bdd/reports/resultados.json
+            tests/bdd/reports/pytest.log
+            tests/bdd/reports/ci-summary.md
+            tests/bdd/reports/workflow-status.json
+            tests/bdd/reports/BDD*-failure.png
+          if-no-files-found: error
+          retention-days: 14

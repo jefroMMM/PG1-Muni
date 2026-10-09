@@ -1,0 +1,3 @@
+# Evidencia generada: se conserva localmente o como artifact, no en Git.
+reports/
+.pytest_cache/
