@@ -52,7 +52,7 @@ jobs:
           # Solo limpia resultados generados en este checkout efímero, sin recursión.
           $generatedNames = @('junit.xml', 'resultados.md', 'resultados.json', 'pytest.log', 'ci-summary.md', 'workflow-status.json')
           Get-ChildItem -LiteralPath $reportDir -File | Where-Object {
-            $_.Name -in $generatedNames -or $_.Name -like 'BDD*-failure.png'
+            $_.Name -in $generatedNames -or $_.Name -like 'BDD*-failure.png' -or $_.Name -like 'BDD*-diagnostics.json'
           } | ForEach-Object { Remove-Item -LiteralPath $_.FullName }
 
       - name: Configurar Python 3.13
@@ -104,5 +104,6 @@ jobs:
             tests/bdd/reports/ci-summary.md
             tests/bdd/reports/workflow-status.json
             tests/bdd/reports/BDD*-failure.png
+            tests/bdd/reports/BDD*-diagnostics.json
           if-no-files-found: error
           retention-days: 14
