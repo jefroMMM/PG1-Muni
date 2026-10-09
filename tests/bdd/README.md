@@ -68,6 +68,35 @@ $env:BDD_CHROMEDRIVER = 'C:\ruta\chromedriver.exe'
 
 Las pruebas abren Chrome headless con perfil temporal y ventana de 1920 × 1080. Si falta navegador/controlador o no puede arrancar, el escenario falla con la causa de preparación; no se marca como aprobado ni se omite silenciosamente.
 
+### Arranque de Chrome y diagnóstico de fallos en CI
+
+ChromeDriver crea un perfil temporal nuevo para cada escenario y arranca en `data:,`.
+La fixture comprueba que esa página esté cargada antes de ejecutar los pasos; no
+reintenta navegaciones ni aumenta las esperas originales (15 segundos por condición
+y 30 segundos para cargar una página). El servidor Flask usa un puerto disponible
+asignado por el sistema, comprueba `/api/config` por HTTP antes de abrir Chrome y
+verifica que la ruta de la semilla temporal exista.
+
+La ejecución de diagnóstico [37981091037](https://github.com/jefroMMM/PG1-Muni/actions/runs/37981091037)
+mostró que la navegación a `/dashboard2` era cancelada con `net::ERR_ABORTED` mientras
+Chrome permanecía en `chrome://new-tab-page/`. Flask seguía respondiendo HTTP 200,
+la semilla era correcta y solo había una pestaña. Al proporcionar `--user-data-dir`,
+ChromeDriver omite su argumento inicial `data:,`; la página inicial de Chrome for
+Testing podía interferir con la primera navegación. Se retiró únicamente ese
+argumento de la fixture, conservando el aislamiento mediante el perfil temporal
+gestionado por el controlador. Véase el [código de arranque de ChromeDriver](https://chromium.googlesource.com/chromium/src/+/main/chrome/test/chromedriver/chrome_launcher.cc).
+
+Si falla un escenario se genera `reports/BDDxx-diagnostics.json` con URL, título,
+pestañas, estado del documento, errores de consola, eventos de navegación, estado
+HTTP del servidor y las últimas solicitudes recibidas. Se conserva junto con la
+captura y los reportes en el artifact de Actions. No incluye cuerpos de solicitudes,
+configuraciones completas ni credenciales. `resultados.json` registra además la URL
+inicial, versión de ChromeDriver y directorio temporal del perfil por escenario.
+
+Se comprobaron los diez escenarios en orden normal e inverso con Chrome for
+Testing 155.0.8059.39 en Windows; las fixtures restablecen el estado por escenario.
+El orden de ejecución no se utiliza como solución al fallo.
+
 Para ejecutar solo una perspectiva o un nivel:
 
 ```powershell
@@ -131,10 +160,10 @@ La publicación de evidencia usa `if: always()`: conserva los archivos JUnit, Ma
 
 `tests/bdd/.gitignore` excluye los reportes generados y la caché local de pytest del control de versiones; no elimina esos archivos. La evidencia de CI se descarga desde Actions como artifact.
 
-Las acciones están fijadas a commits verificados y el workflow solo solicita `contents: read`. El checkout no conserva credenciales. No se publica el sitio ni se modifica el repositorio remoto desde el workflow.
+Las acciones están fijadas a commits verificados y el workflow solo solicita `contents: read`. El código se obtiene del archivo del SHA exacto mediante la API de GitHub, sin inicializar el gitlink histórico ni guardar credenciales en Git. No se publica el sitio ni se modifica el repositorio remoto desde el workflow.
 
 Para activarlo, una persona con acceso al repositorio debe revisar y registrar el workflow y los archivos necesarios de la suite: `conftest.py`, `test_edicion_rutas.py`, `pytest.ini`, `requirements.txt`, `ci_summary.py`, el `.feature` original y esta documentación. También deben estar versionados el backend, frontend y semilla que usan las pruebas. Revisar los archivos individualmente: hay cambios locales ajenos a este laboratorio y no corresponde agregarlos todos indiscriminadamente. No hace falta subir `.venv-bdd`, reportes históricos, datos locales modificados ni archivos privados.
 
-Después de subir los cambios a una rama, habilitar GitHub Actions en la configuración del repositorio si está desactivado y permitir las acciones utilizadas. Revisar la ejecución `Laboratorio BDD` en Actions y descargar su artifact. La verificación final requiere una ejecución real de esa revisión en GitHub; una validación local del YAML y una suite local aprobada no demuestran por sí solas que el workflow funcione en el runner remoto. No se hizo push ni se solicitó una ejecución remota de archivos todavía no subidos.
+Después de subir los cambios a una rama, habilitar GitHub Actions en la configuración del repositorio si está desactivado y permitir las acciones utilizadas. Revisar la ejecución `Laboratorio BDD` en Actions y descargar su artifact. La verificación final requiere una ejecución real de esa revisión en GitHub; una validación local del YAML y una suite local aprobada no demuestran por sí solas que el workflow funcione en el runner remoto.
 
 Referencias: [setup-chrome y sus salidas](https://github.com/browser-actions/setup-chrome), [conservación de artifacts](https://github.com/actions/upload-artifact) y [setup-python](https://github.com/actions/setup-python).

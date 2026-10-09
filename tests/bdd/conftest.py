@@ -13,6 +13,7 @@ from urllib.request import urlopen
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
 from werkzeug.serving import make_server
 
 from backend import app as backend
@@ -170,24 +171,44 @@ def live_server(ctx):
 
 
 @pytest.fixture
-def browser(ctx, live_server, tmp_path):
+def browser(ctx, live_server, request):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-notifications")
-    options.add_argument(f"--user-data-dir={tmp_path / 'chrome-profile'}")
+    # ChromeDriver crea un perfil temporal nuevo y arranca en data:,.
+    # Con --user-data-dir propio omite esa página y Chrome for Testing puede
+    # cancelar la primera navegación al cargar su página inicial (ERR_ABORTED).
     options.set_capability("unhandledPromptBehavior", "accept")
     options.set_capability("goog:loggingPrefs", {"browser": "ALL", "performance": "ALL"})
     if os.environ.get("BDD_CHROME_BINARY"):
         options.binary_location = os.environ["BDD_CHROME_BINARY"]
     service = Service(executable_path=os.environ["BDD_CHROMEDRIVER"]) if os.environ.get("BDD_CHROMEDRIVER") else Service()
     driver = webdriver.Chrome(service=service, options=options)
-    driver.set_page_load_timeout(30)
-    ENVIRONMENT["browser"] = driver.capabilities.get("browserName")
-    ENVIRONMENT["browser_version"] = driver.capabilities.get("browserVersion")
     ctx.driver, ctx.base_url = driver, live_server
-    yield driver
-    driver.quit()
+    scenario_id = next((m.name for m in request.node.iter_markers() if m.name.startswith("BDD")), "unknown")
+    try:
+        driver.set_page_load_timeout(30)
+        ctx.browser_startup = {"initial_url": driver.current_url, "title": driver.title,
+                               "window_handles": driver.window_handles,
+                               "chromedriver_version": driver.capabilities.get("chrome", {}).get("chromedriverVersion"),
+                               "profile_directory": driver.capabilities.get("chrome", {}).get("userDataDir")}
+        # Comprueba el estado de arranque; no reintenta ni altera pasos Gherkin.
+        WebDriverWait(driver, 15).until(lambda d: d.current_url == "data:,"
+                                      and d.execute_script("return document.readyState") == "complete")
+        ENVIRONMENT["browser"] = driver.capabilities.get("browserName")
+        ENVIRONMENT["browser_version"] = driver.capabilities.get("browserVersion")
+        ENVIRONMENT.setdefault("browser_startups", {})[scenario_id] = ctx.browser_startup
+        yield driver
+    except Exception as error:
+        try:
+            capture_diagnostics(ctx, scenario_id, f"{type(error).__name__}: {error}")
+            ctx.diagnostics_saved = True
+        except Exception:
+            pass  # Un fallo al generar evidencia no sustituye al error de arranque.
+        raise
+    finally:
+        driver.quit()
 
 
 @pytest.hookimpl(hookwrapper=True)
