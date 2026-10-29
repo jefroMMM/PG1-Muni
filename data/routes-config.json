@@ -428,6 +428,20 @@
             "footprints-auto",
             "footprints-auto",
             "footprints-auto"
+          ],
+          "segmentOptions": [
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            }
           ]
         },
         {
@@ -551,6 +565,20 @@
             "footprints-auto",
             "footprints-auto",
             "footprints-auto"
+          ],
+          "segmentOptions": [
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            },
+            {
+              "rotation": 0,
+              "mirrored": false
+            }
           ]
         }
       ],

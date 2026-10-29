@@ -421,17 +421,13 @@ body {
 
 .welcome-content,
 .route-instruction-list,
-.controls,
-.config-panel,
-.route-list {
+.controls {
   scrollbar-width: none;
 }
 
 .welcome-content::-webkit-scrollbar,
 .route-instruction-list::-webkit-scrollbar,
-.controls::-webkit-scrollbar,
-.config-panel::-webkit-scrollbar,
-.route-list::-webkit-scrollbar {
+.controls::-webkit-scrollbar {
   display: none;
 }
 
@@ -690,7 +686,30 @@ body {
   align-content: start;
   gap: 12px;
   padding: 12px;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #147a69 rgba(20, 122, 105, 0.12);
+}
+
+.config-panel::-webkit-scrollbar,
+.route-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.config-panel::-webkit-scrollbar-track,
+.route-list::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(20, 122, 105, 0.1);
+}
+
+.config-panel::-webkit-scrollbar-thumb,
+.route-list::-webkit-scrollbar-thumb {
+  min-height: 42px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #147a69;
+  background-clip: padding-box;
 }
 
 .editor-mode-grid {
@@ -760,7 +779,11 @@ body {
   display: grid;
   gap: 7px;
   max-height: 220px;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #147a69 rgba(20, 122, 105, 0.12);
 }
 
 .route-list-item {
