@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.608" tests="6" failures="0">
+  <testsuite name="Root Suite" timestamp="2026-10-30T16:37:17" tests="0" file="api.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="API Testing — contratos y persistencia de rutas" timestamp="2026-10-30T16:37:17" tests="6" time="0.606" failures="0">
+    <testcase name="API Testing — contratos y persistencia de rutas API01 crea una ruta en los límites, consulta su contenido y rechaza ID duplicado" time="0.129" classname="API01 crea una ruta en los límites, consulta su contenido y rechaza ID duplicado">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API02 edita una ruta y conserva las otras rutas y mapas" time="0.084" classname="API02 edita una ruta y conserva las otras rutas y mapas">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API03 rechaza nombre vacío, pocos nodos, coordenadas y duración inválidas sin escrituras" time="0.138" classname="API03 rechaza nombre vacío, pocos nodos, coordenadas y duración inválidas sin escrituras">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API04 devuelve 404 para mapa o ruta ausentes sin crearlos" time="0.049" classname="API04 devuelve 404 para mapa o ruta ausentes sin crearlos">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API05 crea sección con nombre de 80 caracteres y rechaza 81" time="0.079" classname="API05 crea sección con nombre de 80 caracteres y rechaza 81">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API06 rechaza cargas sin archivo y catálogos malformados" time="0.041" classname="API06 rechaza cargas sin archivo y catálogos malformados">
+    </testcase>
+  </testsuite>
+</testsuites>

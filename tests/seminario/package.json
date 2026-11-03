@@ -1,0 +1,8 @@
+{
+  "name": "seminario-pruebas-municipales",
+  "version": "1.0.0",
+  "private": true,
+  "description": "E2E y API Testing sobre una instancia temporal del proyecto real",
+  "scripts": { "cypress:run": "cypress run --headless" },
+  "devDependencies": { "cypress": "15.21.1" }
+}

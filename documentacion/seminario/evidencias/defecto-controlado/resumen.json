@@ -1,0 +1,47 @@
+{
+  "cypress": "15.21.1",
+  "browser": "chrome",
+  "browserVersion": "156.0.8078.74",
+  "total": 6,
+  "passed": 5,
+  "failed": 1,
+  "pending": 0,
+  "skipped": 0,
+  "runs": [
+    {
+      "spec": "api.cy.js",
+      "tests": [
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API01 crea una ruta en los límites, consulta su contenido y rechaza ID duplicado",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API02 edita una ruta y conserva las otras rutas y mapas",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API03 rechaza nombre vacío, pocos nodos, coordenadas y duración inválidas sin escrituras",
+          "state": "failed",
+          "error": "AssertionError: {\"name\":\"   \"}: expected 201 to equal 400\n    at Context.eval (webpack://seminario-pruebas-municipales/./api.cy.js:56:60)\n    at getRet (http://127.0.0.1:61525/__cypress/runner/cypress_runner.js:121394:20)\n    at tryCatcher (http://127.0.0.1:61525/__cypress/runner/cypress_runner.js:1780:23)\n    at Promise.attempt.Promise.try (http://127.0.0.1:61525/__cypress/runner/cypress_runner.js:4288:29)\n    at Context.thenFn (http://127.0.0.1:61525/__cypress/runner/cypress_runner.js:121405:66)\n    at Context.then (http://127.0.0.1:61525/__cypress/runner/cypress_runner.js:121656:21)"
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API04 devuelve 404 para mapa o ruta ausentes sin crearlos",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API05 crea sección con nombre de 80 caracteres y rechaza 81",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API06 rechaza cargas sin archivo y catálogos malformados",
+          "state": "passed",
+          "error": null
+        }
+      ]
+    }
+  ]
+}

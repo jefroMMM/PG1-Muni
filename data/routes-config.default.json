@@ -5,12 +5,14 @@
       {
         "id": "terminal-map",
         "name": "Croquis terminal",
-        "src": "/assets/images/croquis-terminal-2000x1000.png"
+        "src": "/recursos/Fondos/croquis-terminal-2000x1000.png",
+        "sectionId": "shared"
       },
       {
         "id": "retalhuleu-map",
         "name": "Mapa Retalhuleu",
-        "src": "/MapaR/Imagenes-MapaR/Mapa-R-2000x1000.png"
+        "src": "/recursos/Fondos/Mapa-R-2000x1000.png",
+        "sectionId": "shared"
       }
     ],
     "routeAssets": [
@@ -19,105 +21,122 @@
         "name": "Huellas segun direccion",
         "type": "directional",
         "directions": {
-          "up": "/assets/images/huellas%20sin%20fondo%20hacia%20arriba.png",
-          "down": "/assets/images/huellas%20sin%20fondo%20abajo.png",
-          "right": "/assets/images/huellas%20sin%20fondo%20derecha.png",
-          "left": "/assets/images/huellas%20sin%20fondo%20izquierda.png"
-        }
+          "up": "/recursos/assets/Mapa/huellas%20sin%20fondo%20hacia%20arriba.png",
+          "down": "/recursos/assets/Mapa/huellas%20sin%20fondo%20abajo.png",
+          "right": "/recursos/assets/Mapa/huellas%20sin%20fondo%20derecha.png",
+          "left": "/recursos/assets/Mapa/huellas%20sin%20fondo%20izquierda.png"
+        },
+        "sectionId": "terminal"
       },
       {
         "id": "mapr-footprints-auto",
         "name": "Huellas MapaR",
         "type": "directional",
         "directions": {
-          "up": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20hacia%20arriba.png",
-          "down": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20abajo.png",
-          "right": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20derecha.png",
-          "left": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20izquierda.png"
-        }
+          "up": "/recursos/assets/MapaR/huellas%20sin%20fondo%20hacia%20arriba.png",
+          "down": "/recursos/assets/MapaR/huellas%20sin%20fondo%20abajo.png",
+          "right": "/recursos/assets/MapaR/huellas%20sin%20fondo%20derecha.png",
+          "left": "/recursos/assets/MapaR/huellas%20sin%20fondo%20izquierda.png"
+        },
+        "sectionId": "mapar"
       },
       {
         "id": "tuc-up-left",
         "name": "Tuc tuc arriba izquierda",
         "type": "single",
-        "src": "/MapaR/Imagenes-MapaR/tuc%20tuc%20mirando%20arriba%20izquierda.png"
+        "src": "/recursos/assets/MapaR/tuc%20tuc%20mirando%20arriba%20izquierda.png",
+        "sectionId": "mapar"
       },
       {
         "id": "tuc-left",
         "name": "Tuc tuc izquierda",
         "type": "single",
-        "src": "/MapaR/Imagenes-MapaR/tuc%20tuc%20izquierda.png"
+        "src": "/recursos/assets/MapaR/tuc%20tuc%20izquierda.png",
+        "sectionId": "mapar"
       },
       {
         "id": "tuc-up-right",
         "name": "Tuc tuc derecha arriba",
         "type": "single",
-        "src": "/MapaR/Imagenes-MapaR/tuctuc%20derecha%20arriba.png"
+        "src": "/recursos/assets/MapaR/tuctuc%20derecha%20arriba.png",
+        "sectionId": "mapar"
       },
       {
         "id": "tuc-right",
         "name": "Tuc tuc derecha",
         "type": "single",
-        "src": "/MapaR/Imagenes-MapaR/tuctuc%20derecha.png"
+        "src": "/recursos/assets/MapaR/tuctuc%20derecha.png",
+        "sectionId": "mapar"
       }
     ],
     "markerIcons": [
       {
         "id": "muni-logo",
         "name": "Logo Municipalidad",
-        "src": "/assets/images/Logo%20Muni%20Reu.png"
+        "src": "/recursos/iconos/Compartidos/Logo%20Muni%20Reu.png",
+        "sectionId": "shared"
       },
       {
         "id": "renap-logo",
         "name": "Icono RENAP",
-        "src": "/MapaR/Imagenes-MapaR/Icono%20Renap.png"
+        "src": "/recursos/iconos/MapaR/Icono%20Renap.png",
+        "sectionId": "mapar"
       },
       {
         "id": "pnc-logo",
         "name": "Logo PNC",
-        "src": "/MapaR/Imagenes-MapaR/PNC%20logo.png"
+        "src": "/recursos/iconos/MapaR/PNC%20logo.png",
+        "sectionId": "mapar"
       }
     ],
     "audios": [
       {
         "id": "audio-contaduria",
         "name": "Audio Contaduria",
-        "src": "/assets/Audios/AudioContaduria.mp3"
+        "src": "/recursos/audios/Mapa/AudioContaduria.mp3",
+        "sectionId": "terminal"
       },
       {
         "id": "audio-administracion",
         "name": "Audio Administracion",
-        "src": "/assets/Audios/Audio%20Administraci%C3%B3n.mp3"
+        "src": "/recursos/audios/Mapa/Audio%20Administraci%C3%B3n.mp3",
+        "sectionId": "terminal"
       },
       {
         "id": "audio-sala",
         "name": "Audio Sala de Reuniones",
-        "src": "/assets/Audios/Sala%20de%20reuniones.mp3"
+        "src": "/recursos/audios/Mapa/Sala%20de%20reuniones.mp3",
+        "sectionId": "terminal"
       },
       {
         "id": "audio-rrhh",
         "name": "Audio Recursos Humanos",
-        "src": "/assets/Audios/Recursos%20humanos.mp3"
+        "src": "/recursos/audios/Mapa/Recursos%20humanos.mp3",
+        "sectionId": "terminal"
       },
       {
         "id": "audio-gerencia",
         "name": "Audio Gerencia",
-        "src": "/assets/Audios/Audio%20gerencia.mp3"
+        "src": "/recursos/audios/Mapa/Audio%20gerencia.mp3",
+        "sectionId": "terminal"
       },
       {
         "id": "audio-municipalidad",
         "name": "Audio Municipalidad",
-        "src": "/MapaR/Audios/Audio%20municipalidad.mp3"
+        "src": "/recursos/audios/MapaR/Audio%20municipalidad.mp3",
+        "sectionId": "mapar"
       },
       {
         "id": "audio-pnc",
         "name": "Audio Policia Nacional Civil",
-        "src": "/MapaR/Audios/Audio%20Policia%20Nacional%20Civil.mp3"
+        "src": "/recursos/audios/MapaR/Audio%20Policia%20Nacional%20Civil.mp3",
+        "sectionId": "mapar"
       },
       {
         "id": "audio-renap",
         "name": "Audio Renap",
-        "src": "/MapaR/Audios/Audio%20Renap.mp3"
+        "src": "/recursos/audios/MapaR/Audio%20Renap.mp3",
+        "sectionId": "mapar"
       }
     ],
     "decorations": []
@@ -126,8 +145,8 @@
     "terminal": {
       "title": "Terminal de localizacion de oficinas",
       "viewBox": "0 0 2000 1000",
-      "background": "/assets/images/croquis-terminal-2000x1000.png",
-      "logo": "/assets/images/Logo%20Muni%20Reu.png",
+      "background": "/recursos/Fondos/croquis-terminal-2000x1000.png",
+      "logo": "/recursos/iconos/Compartidos/Logo%20Muni%20Reu.png",
       "routeStyle": "line-and-assets",
       "routeAssetSize": 68,
       "routeStepDistance": 46,
@@ -171,7 +190,7 @@
             "footprints-auto"
           ],
           "highlightPolygon": "145,67 570,57 553,336 139,332",
-          "audio": "/assets/Audios/AudioContaduria.mp3"
+          "audio": "/recursos/audios/Mapa/AudioContaduria.mp3"
         },
         {
           "id": "administracion",
@@ -203,7 +222,7 @@
             "footprints-auto"
           ],
           "highlightPolygon": "133,391 525,392 519,724 115,718",
-          "audio": "/assets/Audios/Audio%20Administraci%C3%B3n.mp3"
+          "audio": "/recursos/audios/Mapa/Audio%20Administraci%C3%B3n.mp3"
         },
         {
           "id": "sala",
@@ -230,7 +249,7 @@
             "footprints-auto"
           ],
           "highlightPolygon": "610,57 1441,60 1445,233 606,231",
-          "audio": "/assets/Audios/Sala%20de%20reuniones.mp3"
+          "audio": "/recursos/audios/Mapa/Sala%20de%20reuniones.mp3"
         },
         {
           "id": "rrhh",
@@ -262,7 +281,7 @@
             "footprints-auto"
           ],
           "highlightPolygon": "1495,57 1856,55 1864,332 1503,341",
-          "audio": "/assets/Audios/Recursos%20humanos.mp3"
+          "audio": "/recursos/audios/Mapa/Recursos%20humanos.mp3"
         },
         {
           "id": "gerencia",
@@ -294,17 +313,18 @@
             "footprints-auto"
           ],
           "highlightPolygon": "1511,381 1875,382 1896,718 1520,717",
-          "audio": "/assets/Audios/Audio%20gerencia.mp3"
+          "audio": "/recursos/audios/Mapa/Audio%20gerencia.mp3"
         }
       ],
       "markers": [],
-      "decorations": []
+      "decorations": [],
+      "resourceFolder": "Mapa"
     },
     "mapar": {
       "title": "Mapa Retalhuleu",
       "viewBox": "0 0 2000 1000",
-      "background": "/MapaR/Imagenes-MapaR/Mapa-R-2000x1000.png",
-      "logo": "/assets/images/Logo%20Muni%20Reu.png",
+      "background": "/recursos/Fondos/Mapa-R-2000x1000.png",
+      "logo": "/recursos/iconos/Compartidos/Logo%20Muni%20Reu.png",
       "routeStyle": "assets-only",
       "routeAssetSize": 40,
       "routeStepDistance": 40,
@@ -342,7 +362,7 @@
             "mapr-footprints-auto",
             "mapr-footprints-auto"
           ],
-          "audio": "/MapaR/Audios/Audio%20municipalidad.mp3"
+          "audio": "/recursos/audios/MapaR/Audio%20municipalidad.mp3"
         },
         {
           "id": "policiaNacionalCivil",
@@ -398,7 +418,7 @@
             "tuc-up-right",
             "tuc-right"
           ],
-          "audio": "/MapaR/Audios/Audio%20Policia%20Nacional%20Civil.mp3"
+          "audio": "/recursos/audios/MapaR/Audio%20Policia%20Nacional%20Civil.mp3"
         },
         {
           "id": "renap",
@@ -459,7 +479,7 @@
             "tuc-left",
             "tuc-left"
           ],
-          "audio": "/MapaR/Audios/Audio%20Renap.mp3"
+          "audio": "/recursos/audios/MapaR/Audio%20Renap.mp3"
         }
       ],
       "markers": [
@@ -491,7 +511,9 @@
           "label": "Municipalidad"
         }
       ],
-      "decorations": []
+      "decorations": [],
+      "resourceFolder": "MapaR"
     }
-  }
+  },
+  "resourceSchemaVersion": 1
 }

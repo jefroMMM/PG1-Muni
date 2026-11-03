@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="10.980" tests="2" failures="0">
+  <testsuite name="Root Suite" timestamp="2026-10-30T16:37:04" tests="0" file="e2e.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="E2E — configuración municipal desde el navegador" timestamp="2026-10-30T16:37:04" tests="2" time="10.979" failures="0">
+    <testcase name="E2E — configuración municipal desde el navegador E2E01 crea sección, carga croquis y audio, dibuja ruta y conserva su configuración" time="8.560" classname="E2E01 crea sección, carga croquis y audio, dibuja ruta y conserva su configuración">
+    </testcase>
+    <testcase name="E2E — configuración municipal desde el navegador E2E02 rechaza nombre vacío, conserva lo guardado y permite corregir" time="2.370" classname="E2E02 rechaza nombre vacío, conserva lo guardado y permite corregir">
+    </testcase>
+  </testsuite>
+</testsuites>

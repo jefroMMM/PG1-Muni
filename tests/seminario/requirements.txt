@@ -1,0 +1,9 @@
+# El servidor de pruebas utiliza el mismo Flask que la aplicación.
+-r ../../backend/requirements.txt
+# Versiones transitivas utilizadas para reproducir la ejecución documentada.
+blinker==1.9.0
+click==8.5.0
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.4
+Werkzeug==3.1.9

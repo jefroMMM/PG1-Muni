@@ -1,121 +1,215 @@
-# Terminal de localizacion de oficinas
+# Terminal municipal de rutas
 
-Aplicacion web para mostrar rutas sobre dos mapas:
+Aplicacion Flask con frontend JavaScript modular para los mapas y recorridos de
+la Municipalidad de Retalhuleu.
 
-- `/` muestra la terminal/oficinas.
-- `/MapaR/` muestra el mapa de Retalhuleu.
-- `/Conf` permite editar graficamente las rutas de la terminal.
-- `/MapaR/Conf` permite editar graficamente las rutas del mapa de Retalhuleu.
-- `/dashboard` agrupa las rutas de Mapa y MapaR. Cada ruta abre su propio editor en una nueva pestana del navegador; los titulos permiten editar el fondo, iconos y decoraciones del mapa.
-- `/dashboard2` ofrece una interfaz administrativa con navegacion lateral, resumen de rutas, busqueda y filtros de estado. Conserva los mismos editores y datos.
+## Ejecutar
 
-En cada seccion, **Nueva ruta** abre un borrador que se publica al guardar. **Nueva seccion** permite indicar un nombre, escoger uno de ocho iconos y elegir un mapa inicial; cada seccion conserva sus rutas por separado. Desde el editor, **Previsualizar ruta** muestra el recorrido animado, las indicaciones y el audio del borrador sin guardar la configuracion. Las nuevas secciones tienen su visor en `/maps/<id>` y su editor en `/maps/<id>/Conf`.
+```sh
+docker compose up -d --build
+```
 
-El dashboard esta disponible en `http://localhost:3000/dashboard` y `http://localhost:8080/dashboard` al ejecutar Docker Compose. Las variantes visuales comparten las mismas rutas. Desde el dashboard, el guardado de una ruta solo actualiza esa ruta, y el guardado de un mapa solo actualiza su fondo, iconos y decoraciones.
+| Pantalla | URL |
+| --- | --- |
+| Administracion principal | http://localhost:8080/dashboard2 |
+| Administracion clasica | http://localhost:8080/dashboard |
+| Mapa de oficinas | http://localhost:8080/ |
+| Mapa urbano | http://localhost:8080/MapaR/ |
+| Editor de oficinas | http://localhost:8080/Conf |
+| Editor urbano | http://localhost:8080/MapaR/Conf |
 
-## Caracteristicas
+Las secciones creadas desde el dashboard tienen visor en `/maps/<id>` y editor
+en `/maps/<id>/Conf`. Las secciones base conservan sus URLs de la tabla.
+Las antiguas variantes numericas y sus assets ya no se publican.
 
-- Frontend con HTML, CSS y JavaScript modular.
-- Backend pequeno con Flask para servir el frontend y guardar configuracion.
-- Configuracion compartida en `data/routes-config.json`.
-- API JSON:
-  - `GET /api/config`
-  - `PUT /api/config`
-- Rutas generadas desde configuracion, no desde constantes dentro del codigo.
-- Editor grafico para crear, editar, archivar y desarchivar rutas.
-- Nodos arrastrables sobre base SVG `2000 x 1000`.
-- Seleccion de asset por tramo desde catalogo interno.
-- Iconos colocables y movibles sobre el mapa.
-- Audios existentes conservados para las rutas iniciales.
-
-## Estructura principal
+## Estructura activa
 
 ```text
-.
-|-- backend/
-|   |-- app.py
-|   |-- Dockerfile
-|   `-- requirements.txt
-|-- data/
-|   |-- routes-config.default.json
-|   `-- routes-config.json
-|-- frontend/
-|   |-- index.html
-|   |-- conf.html
-|   |-- assets/
-|   |   |-- css/
-|   |   |-- js/
-|   |   |   |-- shared/
-|   |   |   |-- terminal.js
-|   |   |   |-- mapar.js
-|   |   |   `-- route-editor.js
-|   |   |-- images/
-|   |   `-- Audios/
-|   `-- MapaR/
-|       |-- index.html
-|       |-- Imagenes-MapaR/
-|       `-- Audios/
-`-- docker-compose.yml
+backend/
+  app.py                 Arranque, fabrica Flask y compatibilidad con pruebas
+  api.py                 Endpoints JSON de mapas, rutas y archivos
+  pages.py               Pantallas y entrega de archivos publicos
+  validation.py          Reglas compartidas y campos permitidos
+  storage.py             Persistencia atomica y cache de lectura
+  resources.py           Carpetas, propiedad de recursos y URLs compatibles
+  Dockerfile
+  requirements.txt
+frontend/
+  index.html             Visor de oficinas
+  MapaR/index.html        Visor urbano
+  conf.html              Editor compartido
+  dashboard.html         Panel clasico
+  dashboard2.html        Panel principal
+  preview.html           Vista previa de borradores
+  assets/
+    css/
+      styles.css         Estilos compartidos y del visor publico
+      editor.css         Estilos exclusivos del editor
+      route-preview.css  Dialogo de previsualizacion
+      dashboard*.css     Estilos de los paneles
+    js/
+      route-editor.js    Coordinacion del editor y sus herramientas
+      editor/
+        area-editor.js        Seleccion y ajuste de cuatro esquinas
+        instruction-editor.js Pasos de indicaciones
+        placed-items-editor.js Iconos y decoraciones
+        catalog-uploads.js    Cargas y actualizacion de catalogos
+        preview-controller.js Comunicacion con la vista previa
+      shared/
+        config-api.js    Acceso HTTP y tratamiento de errores
+        sections.js      URLs canonicas y metadatos de secciones
+        map-utils.js     Geometria y renderizado SVG
+        route-viewer.js  Visor y reproduccion del recorrido
+        route-timing.js  Distribucion de la duracion total
+        instructions.js Compatibilidad de indicaciones antiguas y nuevas
+        highlight-area.js Validacion de areas
+        resource-catalog.js Filtros y selectores de bibliotecas por seccion
+data/
+  routes-config.json          Configuracion guardada
+  routes-config.default.json  Configuracion inicial
+  recursos/                   Fondos y recursos por seccion
+  resource-aliases.json        Equivalencias de las URLs migradas
+  backups/                    Respaldo local previo a la migracion
+tests/
+  test_*.py              Pruebas de API, persistencia y recursos
+  js/                    Pruebas de funciones JavaScript
+  ui/                    Regresiones visuales y funcionales de ambos editores
+tools/                   Herramientas de generacion de documentos
+descartados/             Versiones, experimentos y recursos retirados
 ```
 
-## Uso con Docker
-
-Construir y ejecutar:
-
-```bash
-docker compose up --build
-```
-
-Abrir:
+## Bibliotecas por seccion
 
 ```text
-http://localhost:8080/
-http://localhost:8080/MapaR/
-http://localhost:8080/Conf
-http://localhost:8080/MapaR/Conf
+data/recursos/
+  Fondos/                 Biblioteca compartida de mapas y croquis
+  assets/
+    Mapa/
+    MapaR/
+    <id-de-seccion>/
+  audios/
+    Mapa/
+    MapaR/
+    <id-de-seccion>/
+  iconos/
+    Compartidos/          Logo municipal
+    Mapa/
+    MapaR/
+    <id-de-seccion>/
+  decoraciones/
+    Mapa/
+    MapaR/
+    <id-de-seccion>/
 ```
 
-Detener:
+Tambien se reservan carpetas Compartidos para recursos sin propietario exclusivo.
+Al crear una seccion desde dashboard2 se crean sus carpetas automaticamente.
+El nombre visible puede cambiar sin modificar su identificador ni sus archivos.
 
-```bash
-docker compose down
+Los selectores de assets, audios, iconos y decoraciones permiten elegir entre
+**Esta seccion y compartidos** y **Todas las secciones**. Los recursos ya asignados
+de otra seccion se conservan en las opciones, identificados como En uso.
+Los fondos son compartidos y siempre estan disponibles para todos los mapas.
+
+En dashboard2, cada fila tiene acciones para archivar/restaurar y borrar rutas.
+El borrado pide confirmacion y conserva los archivos de la biblioteca, incluso
+cuando se borra el ultimo recorrido de una seccion. Las operaciones cambian solo
+la ruta seleccionada y conservan los cambios de otras ventanas.
+
+Junto al titulo de cada seccion, **Subir archivos** permite agregar audios,
+assets, fondos, iconos y decoraciones directamente, incluso varios archivos a la
+vez. Se agregan a la biblioteca; los fondos subidos no reemplazan automaticamente
+el mapa actual. Los iconos de estas acciones son Lucide 1.64.0, distribuidos
+localmente con su licencia en frontend/assets/icons/ui/LICENSE.
+
+Cada entrada del catalogo incluye `sectionId`: terminal, mapar, el identificador
+de una seccion nueva o shared. Los visores utilizan el catalogo completo, de modo
+que una ruta puede combinar recursos de varias secciones sin duplicar archivos.
+La subida envia file, kind y mapKey a POST /api/upload; el servidor devuelve y
+registra id, src, name y sectionId, sin esperar al guardado de la ruta.
+
+Los originales se conservan en descartados/recursos-previos. Las antiguas URLs
+redirigen a /recursos/... mediante resource-aliases.json; tambien se normalizan
+las referencias antiguas que lleguen desde un editor abierto antes de migrar.
+
+## Datos y guardado
+
+Docker monta `./data:/app/data`: los cambios y archivos subidos sobreviven a la
+reconstruccion del contenedor. No es necesario reconstruir para guardar rutas.
+
+`ConfigStore` devuelve copias independientes, conserva un cache invalidado por
+cambios en el archivo y reemplaza el JSON de forma atomica. Un bloqueo protege
+las operaciones de lectura-modificacion-escritura dentro del proceso servidor.
+La fabrica `create_app` permite usar almacenamiento y cargas temporales en pruebas.
+
+El editor individual guarda solo su ruta; el editor de mapa guarda solo fondo,
+iconos y decoraciones. El editor general conserva el guardado completo.
+Las validaciones de rutas y catalogos se comparten entre endpoints.
+
+## Funciones del editor
+
+- Crear, duplicar, archivar y editar rutas desde las pantallas correspondientes.
+- Agregar y arrastrar nodos; seleccionar assets, giro y espejo por tramo.
+- Redactar indicaciones mediante pasos independientes.
+- Definir la duracion total en segundos, incluido el regreso al estado inicial.
+- Marcar cuatro esquinas para resaltar el destino; moverlas o editar coordenadas.
+- Cambiar mapas, colocar iconos y decoraciones y asociar audios.
+- Previsualizar cambios sin publicarlos ni guardar la configuracion.
+
+Los movimientos del puntero se agrupan por fotograma. Los controles de los
+catalogos usan delegacion de eventos y asignan los textos mediante propiedades
+del DOM, conservando correctamente comillas y caracteres especiales.
+
+## API
+
+| Metodo | Endpoint | Funcion |
+| --- | --- | --- |
+| GET | /api/config | Consultar configuracion |
+| PUT | /api/config | Guardar configuracion completa validada |
+| POST | /api/maps | Crear seccion |
+| PATCH | /api/maps/<map_key> | Modificar imagen, iconos y decoraciones |
+| POST | /api/maps/<map_key>/routes | Crear ruta |
+| PATCH | /api/maps/<map_key>/routes/<route_id> | Modificar ruta |
+| PATCH | /api/maps/<map_key>/routes/<route_id>/status | Archivar o restaurar ruta |
+| DELETE | /api/maps/<map_key>/routes/<route_id> | Borrar ruta conservando sus recursos |
+| POST | /api/upload | Subir archivo |
+
+## Desarrollo y pruebas
+
+Con Flask instalado, iniciar desde la raiz con `python -m backend.app`.
+La variable `PORT` selecciona el puerto y `ROUTES_CONFIG_PATH` el JSON persistente.
+
+```sh
+python -m unittest discover -s tests -p "test_*.py"
+node --test tests/js/shared.test.mjs
 ```
 
-`docker-compose.yml` monta `./data:/app/data`, por lo que los cambios hechos desde los editores quedan en `data/routes-config.json` y sobreviven reinicios o reconstrucciones del contenedor.
+Para las pruebas de interfaz vigentes, instalar Flask, pytest y Selenium en un
+entorno virtual y disponer de Chrome; Selenium gestiona ChromeDriver si no se
+proporciona uno explicitamente.
 
-## Editor grafico
+```sh
+python -m pytest tests/ui/test_editor_ui.py -q
+```
 
-En `/Conf` o `/MapaR/Conf` puedes:
+Las pruebas usan datos temporales y verifican que los archivos reales permanezcan
+intactos. Las capturas de escritorio y movil se generan en `tests/ui/reports`.
+Los reportes, entornos virtuales y caches estan excluidos de Git.
 
-- crear nuevas rutas;
-- cambiar nombre, color e indicaciones;
-- archivar o desarchivar rutas;
-- agregar nodos haciendo clic sobre el mapa;
-- mover nodos arrastrandolos;
-- borrar el ultimo nodo de una ruta;
-- escoger el asset de cada tramo;
-- colocar iconos desde el catalogo interno;
-- mover o borrar iconos;
-- guardar los cambios para que aparezcan en las pantallas normales.
+## Aportes de Seminario
 
-Las rutas archivadas siguen apareciendo en el editor, pero no se muestran como botones en `/` ni en `/MapaR/`.
+La verificación con Cypress E2E y API Testing está en `tests/seminario`.
+Su [README](tests/seminario/README.md) explica instalación, ejecución con datos
+temporales y demostración de detección de errores. El informe y sus evidencias
+se conservan en `documentacion/seminario`. No depende del BDD archivado.
 
-## Configuracion
+## Archivos retirados
 
-La configuracion vive en `data/routes-config.json`. El archivo `data/routes-config.default.json` sirve como semilla inicial si el archivo principal no existe.
+`descartados/README.md` describe los traslados. Los archivos historicos se
+conservan y quedan fuera de Flask y del contexto de Docker.
 
-Cada mapa contiene:
-
-- `background`: imagen de fondo.
-- `viewBox`: base SVG, actualmente `0 0 2000 1000`.
-- `routes`: rutas visibles o archivadas.
-- `markers`: iconos colocados sobre el mapa.
-
-Cada ruta contiene:
-
-- `id`, `name`, `archived`;
-- `instructions`;
-- `nodes`;
-- `segmentAssets`;
-- `highlightPolygon`, opcional para resaltar oficinas;
-- `audio`, opcional para rutas existentes.
+El laboratorio BDD, sus reportes, el workflow y su entorno virtual se conservan
+en `descartados/laboratorio-bdd`. La entrega universitaria de dos pruebas esta
+en `descartados/entregas-historicas/entrega_bdd` y los documentos en
+`descartados/documentacion`. El workflow archivado queda fuera de
+`.github/workflows` y no se ejecuta desde esa ubicacion.

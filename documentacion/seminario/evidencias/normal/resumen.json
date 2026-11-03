@@ -1,0 +1,62 @@
+{
+  "cypress": "15.21.1",
+  "browser": "chrome",
+  "browserVersion": "156.0.8078.74",
+  "total": 8,
+  "passed": 8,
+  "failed": 0,
+  "pending": 0,
+  "skipped": 0,
+  "runs": [
+    {
+      "spec": "e2e.cy.js",
+      "tests": [
+        {
+          "title": "E2E — configuración municipal desde el navegador / E2E01 crea sección, carga croquis y audio, dibuja ruta y conserva su configuración",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "E2E — configuración municipal desde el navegador / E2E02 rechaza nombre vacío, conserva lo guardado y permite corregir",
+          "state": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "spec": "api.cy.js",
+      "tests": [
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API01 crea una ruta en los límites, consulta su contenido y rechaza ID duplicado",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API02 edita una ruta y conserva las otras rutas y mapas",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API03 rechaza nombre vacío, pocos nodos, coordenadas y duración inválidas sin escrituras",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API04 devuelve 404 para mapa o ruta ausentes sin crearlos",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API05 crea sección con nombre de 80 caracteres y rechaza 81",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "title": "API Testing — contratos y persistencia de rutas / API06 rechaza cargas sin archivo y catálogos malformados",
+          "state": "passed",
+          "error": null
+        }
+      ]
+    }
+  ]
+}

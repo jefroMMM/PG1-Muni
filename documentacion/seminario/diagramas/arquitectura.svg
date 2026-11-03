@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="516" height="330" preserveAspectRatio="xMinYMin meet" viewBox="0 0 516 330" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="516" height="330"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-330)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="4" y="275" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(89%,94%,92%); fill-rule: evenodd;"/>
+			<text x="61.98876953125" y="302.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,604) scale(1,-1)">Aporte 1</text>
+			<text x="52.740478515625" y="290.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,580) scale(1,-1)">Cypress E2E</text>
+			<rect x="184" y="275" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="240.989013671875" y="302.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,604) scale(1,-1)">Frontend</text>
+			<text x="213.989013671875" y="290.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,580) scale(1,-1)">HTML CSS JavaScript</text>
+			<rect x="364" y="275" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(89%,94%,92%); fill-rule: evenodd;"/>
+			<text x="421.98876953125" y="302.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,604) scale(1,-1)">Aporte 2</text>
+			<text x="415.73974609375" y="290.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,580) scale(1,-1)">API Testing</text>
+			<rect x="184" y="195" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="219.231689453125" y="216.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,432) scale(1,-1)">Flask API y páginas</text>
+			<rect x="4" y="115" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="58.23583984375" y="142.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,284) scale(1,-1)">Validación</text>
+			<text x="40.97851562499999" y="130.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,260) scale(1,-1)">Reglas y catálogos</text>
+			<rect x="184" y="115" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="235.236572265625" y="142.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,284) scale(1,-1)">ConfigStore</text>
+			<text x="213.233154296875" y="130.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,260) scale(1,-1)">JSON atómico y caché</text>
+			<rect x="364" y="115" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="405.986083984375" y="142.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,284) scale(1,-1)">ResourceLibrary</text>
+			<text x="400.2314453125" y="130.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,260) scale(1,-1)">Medios por sección</text>
+			<rect x="184" y="35" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="228.240478515625" y="56.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,112) scale(1,-1)">JSON temporal</text>
+			<rect x="364" y="35" width="150" height="42" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="409.49072265625" y="62.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,124) scale(1,-1)">Croquis y MP3</text>
+			<text x="416.739501953125" y="50.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,100) scale(1,-1)">temporales</text>
+			<path d="M 154,296 L 184,296 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="184 296, 179.4978 298.1748, 179.4978 293.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 259,275 L 259,237 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="259 237, 261.1748 241.5022, 256.8252 241.5022" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 439,275 L 334,216 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="334 216, 338.9904 216.3095, 336.8597 220.1015" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 210,195 L 79,157 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="79 157, 83.92988 156.1656, 82.7181 160.343" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 259,195 L 259,157 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="259 157, 261.1748 161.5022, 256.8252 161.5022" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 309,195 L 439,157 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="439 157, 435.2888 160.3507, 434.0684 156.1757" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 259,115 L 259,77 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="259 77, 261.1748 81.50224, 256.8252 81.50224" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 439,115 L 439,77 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="439 77, 441.1748 81.50224, 436.8252 81.50224" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="4" y="52" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,104) scale(1,-1)">run.py controla servidor y evidencias</text>
+			<text x="4" y="39" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,78) scale(1,-1)">y verifica hashes de los originales.</text>
+			<text x="4" y="7" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,14) scale(1,-1)">Los medios de la semilla se leen del original; las cargas nuevas permanecen en el temporal.</text>
+		</g>
+	</g>
+</svg>

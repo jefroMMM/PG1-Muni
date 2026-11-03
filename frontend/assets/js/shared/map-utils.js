@@ -51,17 +51,14 @@ export function routePathFromNodes(nodes = []) {
 }
 
 export function findAsset(catalog, assetId) {
-  return [
-    ...(catalog.routeAssets || []),
-    ...(catalog.markerIcons || []),
-    ...(catalog.decorations || []),
-    ...(catalog.backgrounds || [])
-  ]
-    .find((asset) => asset.id === assetId);
+  for (const group of ["routeAssets", "markerIcons", "decorations", "backgrounds"]) {
+    const asset = catalog[group]?.find((asset) => asset.id === assetId);
+    if (asset) return asset;
+  }
 }
 
-export function resolveRouteAsset(catalog, assetId, start, end) {
-  const asset = findAsset(catalog, assetId) || catalog.routeAssets?.[0];
+export function resolveRouteAsset(catalog, assetId, start, end, index) {
+  const asset = (index ? index.get(assetId) : findAsset(catalog, assetId)) || catalog.routeAssets?.[0];
 
   if (!asset) {
     return "";
@@ -96,6 +93,13 @@ export function transformAroundCenter({ x, y, width, height, rotation = 0, mirro
 export function renderFootprints({ parent, catalog, route, assetSize, stepDistance, revealTime, className }) {
   const nodes = route.nodes || [];
   const footprints = [];
+  const assetIndex = new Map();
+  for (const group of ["routeAssets", "markerIcons", "decorations", "backgrounds"]) {
+    for (const asset of catalog[group] || []) {
+      if (!assetIndex.has(asset.id)) assetIndex.set(asset.id, asset);
+    }
+  }
+  const spacing = Math.max(1, Number(stepDistance) || 30);
 
   for (let index = 0; index < nodes.length - 1; index += 1) {
     const start = nodes[index];
@@ -103,8 +107,8 @@ export function renderFootprints({ parent, catalog, route, assetSize, stepDistan
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const length = Math.hypot(dx, dy);
-    const steps = Math.max(1, Math.floor(length / stepDistance));
-    const sprite = resolveRouteAsset(catalog, route.segmentAssets?.[index], start, end);
+    const steps = Math.max(1, Math.floor(length / spacing));
+    const sprite = resolveRouteAsset(catalog, route.segmentAssets?.[index], start, end, assetIndex);
 
     for (let step = 1; step <= steps; step += 1) {
       const ratio = step / (steps + 1);

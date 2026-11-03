@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuracion de rutas</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+  <main class="config-app">
+    <section class="config-map-area" aria-label="Editor grafico de rutas">
+      <div class="config-topbar">
+        <a id="backLink" class="ghost-link" href="/">Volver al mapa</a>
+        <strong id="editorTitle">Configuracion</strong>
+        <span id="saveStatus" class="save-status">Sin cambios</span>
+      </div>
+
+      <div id="routeInspector" class="route-inspector" aria-live="polite"></div>
+
+      <div class="map-frame config-map-frame">
+        <img id="editorMapImage" class="map-image" src="" alt="Mapa editable">
+        <svg id="editorLayer" class="route-layer editor-layer" viewBox="0 0 2000 1000" aria-label="Capa de edicion">
+          <g id="editorHighlightLayer"></g>
+          <path id="editorRoutePath" class="route-line editor-route-path" d=""></path>
+          <g id="editorFootprints" class="route-footprints"></g>
+          <g id="editorDecorationLayer" class="map-decorations"></g>
+          <g id="editorMarkerLayer" class="map-logo-markers"></g>
+          <g id="editorNodeLayer"></g>
+          <g id="editorPlacedIconLayer"></g>
+          <g id="editorPlacedDecorationLayer"></g>
+        </svg>
+      </div>
+
+      <div class="editor-tools" role="toolbar" aria-label="Herramientas del editor">
+        <button id="nodeToolButton" class="tool-button active" type="button">Mover nodos</button>
+        <button id="iconToolButton" class="tool-button" type="button">Mover iconos</button>
+        <button id="saveButton" class="primary-button" type="button">Guardar</button>
+      </div>
+    </section>
+
+    <aside class="config-panel" aria-label="Panel de configuracion">
+      <section class="panel-section">
+        <div class="section-heading">
+          <h1>Que quieres hacer</h1>
+        </div>
+        <div class="editor-mode-grid">
+          <button class="mode-card active" type="button" data-mode="routes">Rutas</button>
+          <button class="mode-card" type="button" data-mode="nodes">Nodos</button>
+          <button class="mode-card" type="button" data-mode="assets">Assets</button>
+          <button class="mode-card" type="button" data-mode="icons">Iconos</button>
+          <button class="mode-card" type="button" data-mode="map">Mapa</button>
+          <button class="mode-card" type="button" data-mode="decorations">Decoraciones</button>
+          <button class="mode-card" type="button" data-mode="text-audio">Texto y audio</button>
+        </div>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="routes">
+        <div class="section-heading">
+          <h2>Rutas</h2>
+          <button id="newRouteButton" class="small-button" type="button">Nueva</button>
+        </div>
+        <div id="routeList" class="route-list"></div>
+        <div class="form-grid route-actions">
+          <button id="archiveRouteButton" class="small-button" type="button">Archivar</button>
+          <button id="duplicateRouteButton" class="small-button" type="button">Duplicar</button>
+          <button id="deleteRouteButton" class="small-button danger-button" type="button">Borrar</button>
+        </div>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="nodes" hidden>
+        <div class="section-heading">
+          <h2>Posicion de nodos</h2>
+        </div>
+        <div class="form-grid">
+          <button id="addNodeButton" class="small-button" type="button">Agregar nodo</button>
+          <button id="deleteNodeButton" class="small-button danger-button" type="button">Borrar ultimo</button>
+        </div>
+        <div id="nodeList" class="node-list"></div>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="assets" hidden>
+        <div class="section-heading">
+          <h2>Assets de recorrido</h2>
+        </div>
+        <label class="field-label">
+          Tamano de assets
+          <input id="routeAssetSizeInput" type="number" min="12" max="180" step="1">
+        </label>
+        <div id="segmentAssetList" class="segment-list"></div>
+        <label class="field-label upload-field">
+          Agregar nuevo asset
+          <input id="routeAssetUploadInput" type="file" accept="image/*">
+        </label>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="map" hidden>
+        <div class="section-heading">
+          <h2>Mapa de fondo</h2>
+        </div>
+        <label class="field-label">
+          Fondo actual
+          <select id="backgroundSelect"></select>
+        </label>
+        <label class="field-label upload-field">
+          Subir nuevo mapa
+          <input id="backgroundUploadInput" type="file" accept="image/*">
+        </label>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="icons" hidden>
+        <div class="section-heading">
+          <h2>Iconos del mapa</h2>
+          <button id="addIconButton" class="small-button" type="button">Colocar</button>
+        </div>
+        <label class="field-label">
+          Icono
+          <select id="markerAssetSelect"></select>
+        </label>
+        <label class="field-label upload-field">
+          Subir nuevo icono
+          <input id="iconUploadInput" type="file" accept="image/*">
+        </label>
+        <div id="markerList" class="marker-list"></div>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="decorations" hidden>
+        <div class="section-heading">
+          <h2>Decoraciones</h2>
+          <button id="addDecorationButton" class="small-button" type="button">Colocar</button>
+        </div>
+        <label class="field-label">
+          Decoracion
+          <select id="decorationAssetSelect"></select>
+        </label>
+        <label class="field-label upload-field">
+          Subir decoracion
+          <input id="decorationUploadInput" type="file" accept="image/*">
+        </label>
+        <div id="decorationList" class="marker-list"></div>
+      </section>
+
+      <section class="panel-section editor-panel-block" data-panel="text-audio" hidden>
+        <div class="section-heading">
+          <h2>Texto y audio</h2>
+        </div>
+        <label class="field-label">
+          Nombre
+          <input id="routeNameInput" type="text">
+        </label>
+        <label class="field-label">
+          Color de boton
+          <input id="routeColorInput" type="color">
+        </label>
+        <label class="field-label">
+          Indicaciones
+          <textarea id="routeInstructionsInput" rows="6"></textarea>
+        </label>
+        <label class="field-label">
+          Audio de esta ruta
+          <select id="routeAudioSelect"></select>
+        </label>
+        <label class="field-label upload-field">
+          Subir audio
+          <input id="audioUploadInput" type="file" accept="audio/*">
+        </label>
+      </section>
+    </aside>
+  </main>
+
+  <script type="module" src="/assets/js/route-editor.js"></script>
+</body>
+</html>

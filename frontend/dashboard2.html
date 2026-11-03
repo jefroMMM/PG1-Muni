@@ -9,7 +9,7 @@
 <body>
   <aside class="sidebar" aria-label="Navegación principal">
     <a class="brand" href="/dashboard2" aria-label="Inicio de administración">
-      <img src="/assets/images/Logo%20Muni%20Reu.png" alt="">
+      <img src="/recursos/iconos/Compartidos/Logo%20Muni%20Reu.png" alt="">
       <span>Municipalidad<span class="brand-location">de Retalhuleu</span></span>
     </a>
     <div class="sidebar-label">GESTIÓN MUNICIPAL</div>
@@ -38,6 +38,8 @@
           <span id="resultCount" class="result-count" aria-live="polite"></span>
         </div>
         <p id="dashboardStatus" class="load-status" role="status">Cargando configuración…</p>
+        <p id="dashboardNotice" class="dashboard-notice" role="status" aria-live="polite"></p>
+        <input id="dashboardUploadInput" type="file" multiple hidden>
         <div id="mapGroups" class="map-groups"></div>
       </section>
       <footer><span>Municipalidad de Retalhuleu</span><p>Pulsa el título de un mapa para configurar su imagen, iconos y decoraciones. Las rutas comparten la configuración con las versiones visuales existentes.</p></footer>
@@ -55,5 +57,13 @@
     </form>
   </dialog>
   <script type="module" src="/assets/js/dashboard2.js"></script>
+  <dialog id="deleteRouteDialog" class="section-dialog" aria-labelledby="deleteRouteTitle" aria-describedby="deleteRouteDescription">
+    <form id="deleteRouteForm">
+      <h2 id="deleteRouteTitle">Borrar ruta</h2>
+      <p id="deleteRouteDescription" class="dialog-description">Se eliminar&aacute; este recorrido de forma permanente. Los audios, assets y dem&aacute;s archivos de la biblioteca se conservar&aacute;n.</p>
+      <p id="deleteRouteStatus" class="form-status" role="status"></p>
+      <div class="dialog-actions"><button id="cancelDeleteRoute" class="secondary-action" type="button">Cancelar</button><button id="confirmDeleteRoute" class="primary-action destructive-action" type="submit">Borrar ruta</button></div>
+    </form>
+  </dialog>
 </body>
 </html>

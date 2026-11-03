@@ -1,6 +1,9 @@
 import { initRouteViewer } from "./shared/route-viewer.js";
+import { getMapKey } from "./shared/sections.js";
 
-const sectionKey = window.location.pathname.match(/^\/maps\/([^/]+)/)?.[1];
-initRouteViewer(sectionKey ? decodeURIComponent(sectionKey) : "terminal").catch((error) => {
-  document.body.innerHTML = `<main class="terminal-error">${error.message}</main>`;
+initRouteViewer(getMapKey()).catch((error) => {
+  const message = document.createElement("main");
+  message.className = "terminal-error";
+  message.textContent = error.message;
+  document.body.replaceChildren(message);
 });

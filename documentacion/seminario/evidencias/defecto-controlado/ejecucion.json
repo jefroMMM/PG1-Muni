@@ -1,0 +1,10 @@
+{
+  "date_guatemala": "20261030-103903-880280",
+  "base_url": "http://127.0.0.1:61525",
+  "isolated_server_stopped": true,
+  "python": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+  "aporte": "api",
+  "controlled_defect": true,
+  "cypress_exit_code": 1,
+  "original_data_unchanged": true
+}

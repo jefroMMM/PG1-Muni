@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Configuracion de rutas</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/css/editor.css">
   <link rel="stylesheet" href="/assets/css/route-preview.css">
-  <style>
-    .config-app [hidden] { display: none !important; }
-  </style>
 </head>
 <body>
   <main class="config-app">
@@ -32,6 +30,7 @@
           <g id="editorNodeLayer"></g>
           <g id="editorPlacedIconLayer"></g>
           <g id="editorPlacedDecorationLayer"></g>
+          <g id="editorAreaHandles"></g>
         </svg>
       </div>
 
@@ -52,6 +51,7 @@
           <button class="mode-card active" type="button" data-mode="routes">Rutas</button>
           <button class="mode-card" type="button" data-mode="nodes">Nodos</button>
           <button class="mode-card" type="button" data-mode="assets">Assets</button>
+          <button class="mode-card" type="button" data-mode="area">&Aacute;rea de destino</button>
           <button class="mode-card" type="button" data-mode="icons">Iconos</button>
           <button class="mode-card" type="button" data-mode="map">Mapa</button>
           <button class="mode-card" type="button" data-mode="decorations">Decoraciones</button>
@@ -83,10 +83,24 @@
         <div id="nodeList" class="node-list"></div>
       </section>
 
+      <section class="panel-section editor-panel-block" data-panel="area" hidden>
+        <div class="section-heading"><h2>&Aacute;rea de destino</h2></div>
+        <div class="form-grid">
+          <button id="drawAreaButton" class="small-button" type="button">Marcar 4 puntos</button>
+          <button id="cancelAreaButton" class="small-button" type="button" hidden>Cancelar</button>
+          <button id="removeAreaButton" class="small-button danger-button" type="button">Quitar &aacute;rea</button>
+        </div>
+        <p id="areaStatus" role="status" aria-live="polite"></p>
+        <div id="areaPointList" class="area-point-list"></div>
+      </section>
+
       <section class="panel-section editor-panel-block" data-panel="assets" hidden>
         <div class="section-heading">
           <h2>Assets de recorrido</h2>
         </div>
+        <label class="field-label">Biblioteca de assets
+          <select id="routeAssetScope"><option value="section">Esta sección y compartidos</option><option value="all">Todas las secciones</option></select>
+        </label>
         <label class="field-label">
           Tamano de assets
           <input id="routeAssetSizeInput" type="number" min="12" max="180" step="1">
@@ -117,6 +131,9 @@
           <h2>Iconos del mapa</h2>
           <button id="addIconButton" class="small-button" type="button">Colocar</button>
         </div>
+        <label class="field-label">Biblioteca de iconos
+          <select id="markerScope"><option value="section">Esta sección y compartidos</option><option value="all">Todas las secciones</option></select>
+        </label>
         <label class="field-label">
           Icono
           <select id="markerAssetSelect"></select>
@@ -133,6 +150,9 @@
           <h2>Decoraciones</h2>
           <button id="addDecorationButton" class="small-button" type="button">Colocar</button>
         </div>
+        <label class="field-label">Biblioteca de decoraciones
+          <select id="decorationScope"><option value="section">Esta sección y compartidos</option><option value="all">Todas las secciones</option></select>
+        </label>
         <label class="field-label">
           Decoracion
           <select id="decorationAssetSelect"></select>
@@ -157,8 +177,16 @@
           <input id="routeColorInput" type="color">
         </label>
         <label class="field-label">
-          Indicaciones
-          <textarea id="routeInstructionsInput" rows="6"></textarea>
+          Duraci&oacute;n total del recorrido (segundos)
+          <input id="routeDurationInput" type="number" min="3" max="3600" step="0.1" required>
+        </label>
+        <fieldset class="instruction-editor">
+          <legend>Indicaciones</legend>
+          <ol id="instructionStepList" class="instruction-step-list"></ol>
+          <button id="addInstructionStepButton" class="add-instruction-step" type="button" aria-label="Agregar paso" title="Agregar paso"><span aria-hidden="true">+</span> Agregar paso</button>
+        </fieldset>
+        <label class="field-label">Biblioteca de audios
+          <select id="audioScope"><option value="section">Esta sección y compartidos</option><option value="all">Todas las secciones</option></select>
         </label>
         <label class="field-label">
           Audio de esta ruta

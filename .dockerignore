@@ -5,3 +5,10 @@ node_modules
 dist
 build
 *.log
+descartados/
+documentacion/
+tools/
+tests/
+.venv-bdd/
+__pycache__/
+data/backups/

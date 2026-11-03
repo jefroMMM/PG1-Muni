@@ -1,16 +1,16 @@
-import { loadRouteConfig } from "./shared/config-api.js";
+import { loadRouteConfig, createMap } from "./shared/config-api.js";
+import { getSections } from "./shared/sections.js";
 import { sectionIcons, sectionIcon } from "./shared/section-icons.js";
+import { createDashboardActions } from "./dashboard-actions.js";
 
-let maps = [
-  { key: "terminal", title: "Mapa", description: "Recorridos internos · Oficinas de la terminal", editor: "/Conf", home: "/" },
-  { key: "mapar", title: "MapaR", description: "Recorridos urbanos · Dependencias de Retalhuleu", editor: "/MapaR/Conf", home: "/MapaR/" }
-];
+let maps = getSections();
 const groups = document.getElementById("mapGroups");
 const status = document.getElementById("dashboardStatus");
 const search = document.getElementById("routeSearch");
 const filter = document.getElementById("routeFilter");
 let config;
 let activeView = "inicio";
+const dashboardActions = createDashboardActions({ groups, refresh });
 const views = {
   inicio: { title: "Administración de rutas", description: "Consulta y configura los recorridos de las oficinas y las dependencias de Retalhuleu.", breadcrumb: "Rutas y mapas", note: "En ambos mapas" },
   terminal: { title: "Mapa de oficinas", description: "Administra únicamente los recorridos internos de las oficinas de la terminal.", breadcrumb: "Mapa de oficinas", note: "En el mapa de oficinas" },
@@ -78,7 +78,7 @@ function renderGroups() {
     shown += routes.length;
     const section = element("section", "map-group"); section.id = map.key;
     const heading = element("div", "map-heading");
-    const titleBlock = element("div");
+    const titleBlock = element("div", "map-title-block");
     const title = element("h3");
     title.append(sectionIcon(map.icon || (map.key === "mapar" ? "map" : "building")));
     const returnView = activeView === "inicio" ? "" : `&dashboardView=${activeView}`;
@@ -86,7 +86,9 @@ function renderGroups() {
     const mapLink = newTab(map.title, mapUrl, "map-title");
     mapLink.title = `Configurar imagen, iconos y decoraciones de ${map.title}`;
     title.append(mapLink, element("span", "map-count", `${allRoutes.length} rutas`));
-    titleBlock.append(title, element("p", "map-description", map.description));
+    const titleLine = element("div", "map-title-line");
+    titleLine.append(title, dashboardActions.uploadMenu(map));
+    titleBlock.append(titleLine, element("p", "map-description", map.description));
     const actions = element("div", "map-actions");
     actions.append(newTab("Ver mapa ↗", map.home, "view-map"), newTab("Configurar mapa ↗", mapUrl, "configure-map"), newTab("＋ Nueva ruta", `${map.editor}?scope=route&new=1&dashboard=2&dashboardView=${encodeURIComponent(map.key)}`, "primary-action new-route-link"));
     heading.append(titleBlock, actions);
@@ -100,6 +102,7 @@ function renderGroups() {
     const tbody = element("tbody");
     routes.forEach((route) => {
       const row = element("tr");
+      row.dataset.routeId = route.id;
       const name = element("td", "name-cell");
       const href = `${map.editor}?scope=route&route=${encodeURIComponent(route.id)}&dashboard=2${returnView}`;
       const link = newTab("", href, "route-link");
@@ -109,7 +112,10 @@ function renderGroups() {
       name.append(link, element("span", "mobile-meta", `${nodes} nodos · ${route.audio ? "Con audio" : "Sin audio"}`));
       const state = element("td"); state.append(element("span", `status-pill${route.archived ? " archived" : ""}`, route.archived ? "Archivada" : "Visible"));
       const action = element("td", "edit-cell");
-      const edit = newTab("Editar ↗", href, "edit-link"); edit.setAttribute("aria-label", `Editar ${route.name}`); action.append(edit);
+      const rowActions = element("div", "row-actions");
+      const edit = newTab("Editar ↗", href, "edit-link"); edit.setAttribute("aria-label", `Editar ${route.name}`);
+      rowActions.append(edit, ...dashboardActions.routeButtons(map, route));
+      action.append(rowActions);
       row.append(name, state, element("td", "desktop-column numeric", `${nodes} nodos`), element("td", "desktop-column", route.audio ? "Con audio" : "Sin audio"), action);
       tbody.append(row);
     });
@@ -127,13 +133,7 @@ function renderGroups() {
 async function refresh() {
   try {
     config = await loadRouteConfig();
-    const orderedKeys = ["terminal", "mapar", ...Object.keys(config.maps).filter((key) => !["terminal", "mapar"].includes(key))];
-    maps = orderedKeys.filter((key) => Object.hasOwn(config.maps, key)).map((key) => {
-      const map = config.maps[key];
-      if (key === "terminal") return { key, title: "Mapa", navTitle: "Mapa de oficinas", description: "Recorridos internos · Oficinas de la terminal", icon: "building", editor: "/Conf", home: "/" };
-      if (key === "mapar") return { key, title: "MapaR", navTitle: "Mapa de Retalhuleu", description: "Recorridos urbanos · Dependencias de Retalhuleu", icon: "map", editor: "/MapaR/Conf", home: "/MapaR/" };
-      return { key, title: map.sectionName || map.title, navTitle: map.sectionName || map.title, description: "Mapa y recorridos de la sección", icon: map.sectionIcon || "building", editor: `/maps/${encodeURIComponent(key)}/Conf`, home: `/maps/${encodeURIComponent(key)}` };
-    });
+    maps = getSections(config);
     const nav = document.querySelector(".sidebar nav");
     const summary = nav.querySelector('[href="#inicio"]');
     nav.replaceChildren(summary, ...maps.map((map) => {
@@ -180,9 +180,7 @@ document.getElementById("sectionForm").addEventListener("submit", async (event) 
   if (!name) { formStatus.textContent = "Escribe el nombre de la sección."; return; }
   const button = document.getElementById("createSectionButton"); button.disabled = true; formStatus.textContent = "Creando sección…";
   try {
-    const response = await fetch("/api/maps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, icon: document.querySelector('[name="sectionIcon"]:checked').value, template: document.getElementById("sectionTemplate").value }) });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "No se pudo crear la sección");
+    const result = await createMap({ name, icon: document.querySelector('[name="sectionIcon"]:checked').value, template: document.getElementById("sectionTemplate").value });
     await refresh(); sectionDialog.close(); window.location.hash = result.mapKey;
   } catch (error) { formStatus.textContent = error.message; }
   finally { button.disabled = false; }

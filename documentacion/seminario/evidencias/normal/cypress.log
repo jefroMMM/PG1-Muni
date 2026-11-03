@@ -1,0 +1,112 @@
+
+> seminario-pruebas-municipales@1.0.0 cypress:run
+> cypress run --headless --browser chrome
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.21.1                                                                        │
+  │ Browser:        Chrome 156 (headless)                                                          │
+  │ Node Version:   v22.23.2 (C:\nvm4w\nodejs\node.exe)                                            │
+  │ Specs:          2 found (e2e.cy.js, api.cy.js)                                                 │
+  │ Searched:       e2e.cy.js, api.cy.js                                                           │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  e2e.cy.js                                                                       (1 of 2)
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="10.980" tests="2" failures="0">
+  <testsuite name="Root Suite" timestamp="2026-10-30T16:37:04" tests="0" file="e2e.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="E2E — configuración municipal desde el navegador" timestamp="2026-10-30T16:37:04" tests="2" time="10.979" failures="0">
+    <testcase name="E2E — configuración municipal desde el navegador E2E01 crea sección, carga croquis y audio, dibuja ruta y conserva su configuración" time="8.560" classname="E2E01 crea sección, carga croquis y audio, dibuja ruta y conserva su configuración">
+    </testcase>
+    <testcase name="E2E — configuración municipal desde el navegador E2E02 rechaza nombre vacío, conserva lo guardado y permite corregir" time="2.370" classname="E2E02 rechaza nombre vacío, conserva lo guardado y permite corregir">
+    </testcase>
+  </testsuite>
+</testsuites>
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        2                                                                                │
+  │ Passing:      2                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  4                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 seconds                                                                       │
+  │ Spec Ran:     e2e.cy.js                                                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\masje\OneDrive\Desktop\PG1-Muni\tests\seminario\results\20261030-103650    (1440x1000)
+     -408937-normal\screenshots\e2e.cy.js\E2E01-fondo-guardado.png                                  
+  -  C:\Users\masje\OneDrive\Desktop\PG1-Muni\tests\seminario\results\20261030-103650    (1440x1000)
+     -408937-normal\screenshots\e2e.cy.js\E2E01-recorrido-guardado.png                              
+  -  C:\Users\masje\OneDrive\Desktop\PG1-Muni\tests\seminario\results\20261030-103650    (1440x1000)
+     -408937-normal\screenshots\e2e.cy.js\E2E01-vista-publica.png                                   
+  -  C:\Users\masje\OneDrive\Desktop\PG1-Muni\tests\seminario\results\20261030-103650    (1440x1000)
+     -408937-normal\screenshots\e2e.cy.js\E2E02-rechazo-visible.png                                 
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  api.cy.js                                                                       (2 of 2)
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.608" tests="6" failures="0">
+  <testsuite name="Root Suite" timestamp="2026-10-30T16:37:17" tests="0" file="api.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="API Testing — contratos y persistencia de rutas" timestamp="2026-10-30T16:37:17" tests="6" time="0.606" failures="0">
+    <testcase name="API Testing — contratos y persistencia de rutas API01 crea una ruta en los límites, consulta su contenido y rechaza ID duplicado" time="0.129" classname="API01 crea una ruta en los límites, consulta su contenido y rechaza ID duplicado">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API02 edita una ruta y conserva las otras rutas y mapas" time="0.084" classname="API02 edita una ruta y conserva las otras rutas y mapas">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API03 rechaza nombre vacío, pocos nodos, coordenadas y duración inválidas sin escrituras" time="0.138" classname="API03 rechaza nombre vacío, pocos nodos, coordenadas y duración inválidas sin escrituras">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API04 devuelve 404 para mapa o ruta ausentes sin crearlos" time="0.049" classname="API04 devuelve 404 para mapa o ruta ausentes sin crearlos">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API05 crea sección con nombre de 80 caracteres y rechaza 81" time="0.079" classname="API05 crea sección con nombre de 80 caracteres y rechaza 81">
+    </testcase>
+    <testcase name="API Testing — contratos y persistencia de rutas API06 rechaza cargas sin archivo y catálogos malformados" time="0.041" classname="API06 rechaza cargas sin archivo y catálogos malformados">
+    </testcase>
+  </testsuite>
+</testsuites>
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        6                                                                                │
+  │ Passing:      6                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     0 seconds                                                                        │
+  │ Spec Ran:     api.cy.js                                                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ √  e2e.cy.js                                00:10        2        2        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ √  api.cy.js                                611ms        6        6        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    √  All specs passed!                        00:11        8        8        -        -        -  
+

@@ -1,0 +1,2 @@
+# Conserva los logs seleccionados como evidencia, aunque la raíz ignore *.log.
+!evidencias/**/cypress.log

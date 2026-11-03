@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="516" height="390" preserveAspectRatio="xMinYMin meet" viewBox="0 0 516 390" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="516" height="390"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-390)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="2" y="353" width="84" height="28" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="17.740478515624996" y="367.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,734) scale(1,-1)">Cypress E2E</text>
+			<path d="M 44,14 L 44,350 Z" style="stroke: rgb(63%,67%,70%); stroke-linecap: butt; stroke-width: 1; stroke-dasharray: 3, 3;"/>
+			<rect x="109" y="353" width="84" height="28" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="135.99267578125" y="367.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,734) scale(1,-1)">Interfaz</text>
+			<path d="M 151,14 L 151,350 Z" style="stroke: rgb(63%,67%,70%); stroke-linecap: butt; stroke-width: 1; stroke-dasharray: 3, 3;"/>
+			<rect x="216" y="353" width="84" height="28" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="238.745361328125" y="367.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,734) scale(1,-1)">Flask API</text>
+			<path d="M 258,14 L 258,350 Z" style="stroke: rgb(63%,67%,70%); stroke-linecap: butt; stroke-width: 1; stroke-dasharray: 3, 3;"/>
+			<rect x="323" y="353" width="84" height="28" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="345.99365234375" y="367.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,734) scale(1,-1)">Temporal</text>
+			<path d="M 365,14 L 365,350 Z" style="stroke: rgb(63%,67%,70%); stroke-linecap: butt; stroke-width: 1; stroke-dasharray: 3, 3;"/>
+			<rect x="430" y="353" width="84" height="28" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="448.73974609375" y="367.0" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,734) scale(1,-1)">API Testing</text>
+			<path d="M 472,14 L 472,350 Z" style="stroke: rgb(63%,67%,70%); stroke-linecap: butt; stroke-width: 1; stroke-dasharray: 3, 3;"/>
+			<path d="M 44,328 L 151,328 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="151 328, 146.4978 330.1748, 146.4978 325.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="72.82421875" y="334" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,668) scale(1,-1)">Crear sección</text>
+			<path d="M 151,303 L 258,303 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="258 303, 253.4978 305.1748, 253.4978 300.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="175.15625" y="309" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,618) scale(1,-1)">POST /api/maps</text>
+			<path d="M 258,278 L 365,278 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="365 278, 360.4978 280.1748, 360.4978 275.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="282.15234375" y="284" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,568) scale(1,-1)">Guardar sección</text>
+			<path d="M 44,253 L 151,253 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="151 253, 146.4978 255.1748, 146.4978 250.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="60.15234375" y="259" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,518) scale(1,-1)">Cargar croquis y ruta</text>
+			<path d="M 151,228 L 258,228 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="258 228, 253.4978 230.1748, 253.4978 225.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="173.814453125" y="234" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,468) scale(1,-1)">Upload y guardar</text>
+			<path d="M 258,203 L 365,203 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="365 203, 360.4978 205.1748, 360.4978 200.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="280.82421875" y="209" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,418) scale(1,-1)">Validar y persistir</text>
+			<path d="M 44,178 L 151,178 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="151 178, 146.4978 180.1748, 146.4978 175.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="71.26953125" y="184" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,368) scale(1,-1)">Recargar y ver</text>
+			<path d="M 151,153 L 258,153 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="258 153, 253.4978 155.1748, 253.4978 150.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="167.375" y="159" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,318) scale(1,-1)">GET config y medios</text>
+			<path d="M 472,110 L 258,110 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="258 110, 262.5022 107.8252, 262.5022 112.1748" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="335.205078125" y="116" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,232) scale(1,-1)">Solicitud inválida</text>
+			<path d="M 258,79 L 472,79 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="472 79, 467.4978 81.17483, 467.4978 76.82517" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="341.208984375" y="85" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,170) scale(1,-1)">400 con error</text>
+			<path d="M 472,42 L 365,42 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="365 42, 369.5022 39.82517, 369.5022 44.17483" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="376.26171875" y="48" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,96) scale(1,-1)">Comprobar sin cambios</text>
+		</g>
+	</g>
+</svg>

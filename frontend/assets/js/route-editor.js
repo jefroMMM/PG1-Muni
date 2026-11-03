@@ -1,4 +1,14 @@
+import { createPlacedItemsEditor } from "./editor/placed-items-editor.js";
+import { bindCatalogUploads } from "./editor/catalog-uploads.js";
+import { createInstructionEditor } from "./editor/instruction-editor.js";
+import { createAreaEditor } from "./editor/area-editor.js";
+import { createPreviewController } from "./editor/preview-controller.js";
 import { loadRouteConfig, saveRouteConfig, saveEditorScope } from "./shared/config-api.js";
+import { getInstructionSteps } from "./shared/instructions.js";
+import { getRouteTiming } from "./shared/route-timing.js";
+import { serializeHighlight } from "./shared/highlight-area.js";
+import { getMapKey, getMapLinks } from "./shared/sections.js";
+import { filterResources, renderResourceOptions } from "./shared/resource-catalog.js";
 import {
   clampPoint,
   createSvgElement,
@@ -12,9 +22,8 @@ import {
   routePathFromNodes
 } from "./shared/map-utils.js";
 
-const sectionPath = window.location.pathname.match(/^\/maps\/([^/]+)/);
-const mapKey = sectionPath ? decodeURIComponent(sectionPath[1]) : window.location.pathname.toLowerCase().startsWith("/mapar") ? "mapar" : "terminal";
-const mapHome = sectionPath ? `/maps/${encodeURIComponent(mapKey)}` : mapKey === "mapar" ? "/MapaR/" : "/";
+const mapKey = getMapKey();
+const mapHome = getMapLinks(mapKey).home;
 const editorParams = new URLSearchParams(window.location.search);
 const editorScope = editorParams.get("scope");
 let selectedRouteId = editorParams.get("route");
@@ -23,7 +32,7 @@ const isRouteEditor = editorScope === "route";
 const isMapEditor = editorScope === "map";
 const isScopedEditor = isRouteEditor || isMapEditor;
 const allowedModes = isRouteEditor
-  ? ["nodes", "assets", "text-audio"]
+  ? ["nodes", "assets", "area", "text-audio"]
   : isMapEditor ? ["map", "icons", "decorations"] : null;
 
 const elements = {
@@ -34,6 +43,12 @@ const elements = {
   mapImage: document.getElementById("editorMapImage"),
   layer: document.getElementById("editorLayer"),
   highlightLayer: document.getElementById("editorHighlightLayer"),
+  areaHandles: document.getElementById("editorAreaHandles"),
+  drawAreaButton: document.getElementById("drawAreaButton"),
+  cancelAreaButton: document.getElementById("cancelAreaButton"),
+  removeAreaButton: document.getElementById("removeAreaButton"),
+  areaStatus: document.getElementById("areaStatus"),
+  areaPointList: document.getElementById("areaPointList"),
   routePath: document.getElementById("editorRoutePath"),
   footprints: document.getElementById("editorFootprints"),
   markerLayer: document.getElementById("editorMarkerLayer"),
@@ -48,8 +63,14 @@ const elements = {
   decorationList: document.getElementById("decorationList"),
   routeNameInput: document.getElementById("routeNameInput"),
   routeColorInput: document.getElementById("routeColorInput"),
-  routeInstructionsInput: document.getElementById("routeInstructionsInput"),
+  routeDurationInput: document.getElementById("routeDurationInput"),
+  instructionStepList: document.getElementById("instructionStepList"),
+  addInstructionStepButton: document.getElementById("addInstructionStepButton"),
   routeAudioSelect: document.getElementById("routeAudioSelect"),
+  audioScope: document.getElementById("audioScope"),
+  routeAssetScope: document.getElementById("routeAssetScope"),
+  markerScope: document.getElementById("markerScope"),
+  decorationScope: document.getElementById("decorationScope"),
   routeAssetSizeInput: document.getElementById("routeAssetSizeInput"),
   markerAssetSelect: document.getElementById("markerAssetSelect"),
   decorationAssetSelect: document.getElementById("decorationAssetSelect"),
@@ -71,25 +92,7 @@ const elements = {
   iconToolButton: document.getElementById("iconToolButton"),
   saveButton: document.getElementById("saveButton")
 };
-const previewDialog = document.getElementById("previewDialog");
-const previewFrame = document.getElementById("previewFrame");
-let previewSnapshot = null;
-
-document.getElementById("previewButton").addEventListener("click", () => {
-  const route = activeRoute();
-  if (!route) return;
-  previewSnapshot = structuredClone(config);
-  // The visitor view receives only this draft. No write request or saved configuration is needed.
-  previewSnapshot.maps[mapKey].routes = [{ ...structuredClone(route), archived: false }];
-  previewFrame.src = "/preview";
-  previewDialog.showModal();
-});
-document.getElementById("closePreviewButton").addEventListener("click", () => previewDialog.close());
-previewDialog.addEventListener("close", () => { previewFrame.src = "about:blank"; previewSnapshot = null; });
-window.addEventListener("message", (event) => {
-  if (event.origin !== window.location.origin || event.source !== previewFrame.contentWindow || event.data?.type !== "route-preview-ready" || !previewSnapshot) return;
-  previewFrame.contentWindow.postMessage({ type: "route-preview-data", config: previewSnapshot, mapKey, routeId: activeRoute()?.id }, window.location.origin);
-});
+createPreviewController({ getConfig: () => config, getRoute: activeRoute, mapKey });
 
 let config;
 let mapConfig;
@@ -100,7 +103,35 @@ let pendingNodeClick = false;
 let pendingIconClick = false;
 let pendingDecorationClick = false;
 let dragState = null;
+let dragFrame = null;
+let latestDragEvent = null;
 let hasUnsavedChanges = false;
+const instructionEditor = createInstructionEditor({
+  list: elements.instructionStepList,
+  addButton: elements.addInstructionStepButton,
+  getRoute: activeRoute,
+  onChange: syncActiveRouteFromInputs
+});
+const areaEditor = createAreaEditor({
+  elements, getRoute: activeRoute, getMode: () => activeMode,
+  onChange: setDirty, redraw: renderRouteGraphics,
+  onStart: () => { pendingNodeClick = pendingIconClick = pendingDecorationClick = false; }
+});
+
+const markerEditor = createPlacedItemsEditor({
+  mapKey, getMaps: () => config.maps, scopeSelect: elements.markerScope,
+  getMap: () => mapConfig, getCatalog: () => config.catalog,
+  group: "markers", catalogGroup: "markerIcons", kind: "marker",
+  select: elements.markerAssetSelect, list: elements.markerList,
+  defaultSize: 50, maxSize: 180, onChange: setDirty, renderGraphics: renderMarkers
+});
+const decorationEditor = createPlacedItemsEditor({
+  mapKey, getMaps: () => config.maps, scopeSelect: elements.decorationScope,
+  getMap: () => mapConfig, getCatalog: () => config.catalog,
+  group: "decorations", catalogGroup: "decorations", kind: "decoration",
+  select: elements.decorationAssetSelect, list: elements.decorationList,
+  defaultSize: 80, maxSize: 260, onChange: setDirty, renderGraphics: renderDecorationsLayer
+});
 
 function activeRoute() {
   if (isMapEditor) return undefined;
@@ -124,23 +155,6 @@ function setSaved() {
   elements.saveStatus.classList.remove("dirty");
 }
 
-async function uploadFile(file, kind) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("kind", kind);
-
-  const response = await fetch("/api/upload", {
-    method: "POST",
-    body: formData
-  });
-
-  if (!response.ok) {
-    throw new Error("No se pudo subir el archivo");
-  }
-
-  return response.json();
-}
-
 function syncActiveRouteFromInputs() {
   const route = activeRoute();
   if (!route) {
@@ -149,7 +163,8 @@ function syncActiveRouteFromInputs() {
 
   route.name = elements.routeNameInput.value.trim();
   route.buttonColor = elements.routeColorInput.value || "#147a69";
-  route.instructions = elements.routeInstructionsInput.value.trim();
+  route.instructionSteps = instructionEditor.read().map((value) => value.trim());
+  route.instructions = route.instructionSteps.filter(Boolean).join("\n");
   setDirty();
   renderRouteList();
 }
@@ -181,6 +196,7 @@ function rotate45(value = 0) {
 
 function setMode(mode) {
   if (allowedModes && !allowedModes.includes(mode)) return;
+  areaEditor.cancel(false);
   activeMode = mode;
   document.querySelectorAll("[data-mode]").forEach((button) => {
     button.classList.toggle("active", button.dataset.mode === mode);
@@ -188,6 +204,7 @@ function setMode(mode) {
   document.querySelectorAll("[data-panel]").forEach((panel) => {
     panel.hidden = panel.dataset.panel !== mode;
   });
+  renderRouteGraphics();
 }
 
 function renderRouteList() {
@@ -202,6 +219,7 @@ function renderRouteList() {
     status.textContent = route.archived ? "Archivada" : "Visible";
     button.append(name, status);
     button.addEventListener("click", () => {
+      areaEditor.cancel(false);
       activeRouteId = route.id;
       renderAll();
     });
@@ -271,8 +289,10 @@ function renderRouteInspector() {
 function renderForm() {
   const route = activeRoute();
   const hasRoute = Boolean(route);
+  elements.routeDurationInput.disabled = !hasRoute;
+  elements.routeDurationInput.value = route ? getRouteTiming(route, mapConfig).total / 1000 : "";
 
-  [elements.routeNameInput, elements.routeColorInput, elements.routeInstructionsInput, elements.routeAudioSelect, elements.routeAssetSizeInput, elements.archiveRouteButton, elements.duplicateRouteButton, elements.deleteRouteButton, elements.addNodeButton, elements.deleteNodeButton]
+  [elements.routeNameInput, elements.routeColorInput, elements.addInstructionStepButton, elements.routeAudioSelect, elements.routeAssetSizeInput, elements.archiveRouteButton, elements.duplicateRouteButton, elements.deleteRouteButton, elements.addNodeButton, elements.deleteNodeButton]
     .forEach((control) => {
       control.disabled = !hasRoute;
     });
@@ -280,7 +300,7 @@ function renderForm() {
   if (!route) {
     elements.routeNameInput.value = "";
     elements.routeColorInput.value = "#147a69";
-    elements.routeInstructionsInput.value = "";
+    elements.instructionStepList.replaceChildren();
     elements.routeAssetSizeInput.value = mapConfig.routeAssetSize;
     return;
   }
@@ -288,31 +308,24 @@ function renderForm() {
   normalizeSegmentAssets(route, fallbackRouteAssetId());
   elements.routeNameInput.value = route.name || "";
   elements.routeColorInput.value = route.buttonColor || "#147a69";
-  elements.routeInstructionsInput.value = route.instructions || "";
+  instructionEditor.render(route.instructionSteps || getInstructionSteps(route));
   elements.routeAssetSizeInput.value = route.assetSize || mapConfig.routeAssetSize;
   elements.archiveRouteButton.textContent = route.archived ? "Desarchivar" : "Archivar";
   renderAudioSelect(route);
 }
 
 function renderAudioSelect(route) {
-  const audios = config.catalog.audios || [];
+  if (!route) return;
   const currentAudio = route.audio || "";
-  const options = [
-    { name: "Sin audio", src: "" },
-    ...audios
-  ];
+  const options = filterResources(config.catalog.audios || [], mapKey, elements.audioScope.value, [currentAudio], "src");
 
   if (currentAudio && !options.some((audio) => audio.src === currentAudio)) {
     options.push({ name: "Audio actual", src: currentAudio });
   }
 
-  elements.routeAudioSelect.replaceChildren(...options.map((audio) => {
-    const option = document.createElement("option");
-    option.value = audio.src;
-    option.textContent = audio.name;
-    option.selected = audio.src === currentAudio;
-    return option;
-  }));
+  renderResourceOptions(elements.routeAudioSelect, options, {
+    maps: config.maps, mapKey, scope: elements.audioScope.value, value: currentAudio, valueField: "src", emptyLabel: "Sin audio"
+  });
 }
 
 function renderNodes() {
@@ -352,7 +365,6 @@ function renderSegments() {
   const route = activeRoute();
   const segments = route?.segmentAssets || [];
   const segmentOptions = route?.segmentOptions || [];
-  const routeAssets = config.catalog.routeAssets || [];
   const rows = segments.map((assetId, index) => {
     const row = document.createElement("div");
     row.className = "asset-row";
@@ -361,13 +373,8 @@ function renderSegments() {
     const select = document.createElement("select");
     select.dataset.segmentIndex = String(index);
 
-    routeAssets.forEach((asset) => {
-      const option = document.createElement("option");
-      option.value = asset.id;
-      option.textContent = asset.name;
-      option.selected = asset.id === assetId;
-      select.appendChild(option);
-    });
+    const assets = filterResources(config.catalog.routeAssets || [], mapKey, elements.routeAssetScope.value, [assetId]);
+    renderResourceOptions(select, assets, { maps: config.maps, mapKey, scope: elements.routeAssetScope.value, value: assetId });
 
     label.append(`Tramo ${index + 1}`, select);
     const options = segmentOptions[index] || {};
@@ -395,6 +402,7 @@ function renderRouteGraphics() {
   elements.routePath.removeAttribute("d");
   elements.footprints.replaceChildren();
   elements.highlightLayer.replaceChildren();
+  areaEditor.render();
 
   if (!route) {
     return;
@@ -420,60 +428,11 @@ function renderRouteGraphics() {
       points: route.highlightPolygon
     }));
   }
-}
-
-function renderMarkerControls() {
-  const markerAssets = config.catalog.markerIcons || [];
-  elements.markerAssetSelect.replaceChildren(...markerAssets.map((asset) => {
-    const option = document.createElement("option");
-    option.value = asset.id;
-    option.textContent = asset.name;
-    return option;
-  }));
-
-  const rows = (mapConfig.markers || []).map((marker) => {
-    const asset = findAsset(config.catalog, marker.assetId);
-    const row = document.createElement("div");
-    row.className = "marker-row";
-    row.innerHTML = `
-      <img src="${asset?.src || ""}" alt="">
-      <input type="text" value="${marker.label || ""}" data-marker-id="${marker.id}" data-field="label">
-      <input type="number" min="16" max="180" value="${marker.width || 50}" data-marker-id="${marker.id}" data-field="width" title="Tamano">
-      <button type="button" data-marker-mirror="${marker.id}">${marker.mirrored ? "Sin espejo" : "Espejo"}</button>
-      <button type="button" data-marker-rotate="${marker.id}">${Number(marker.rotation) || 0} deg</button>
-      <button type="button" data-delete-marker="${marker.id}">Borrar</button>
-    `;
-    return row;
-  });
-
-  elements.markerList.replaceChildren(...rows);
-}
-
-function renderDecorationControls() {
-  const decorationAssets = config.catalog.decorations || [];
-  elements.decorationAssetSelect.replaceChildren(...decorationAssets.map((asset) => {
-    const option = document.createElement("option");
-    option.value = asset.id;
-    option.textContent = asset.name;
-    return option;
-  }));
-
-  const rows = (mapConfig.decorations || []).map((decoration) => {
-    const asset = findAsset(config.catalog, decoration.assetId);
-    const row = document.createElement("div");
-    row.className = "marker-row decoration-row";
-    row.innerHTML = `
-      <img src="${asset?.src || ""}" alt="">
-      <input type="text" value="${decoration.label || ""}" data-decoration-id="${decoration.id}" data-field="label">
-      <input type="number" min="16" max="260" value="${decoration.width || 80}" data-decoration-id="${decoration.id}" data-field="width" title="Tamano">
-      <button type="button" data-decoration-mirror="${decoration.id}">${decoration.mirrored ? "Sin espejo" : "Espejo"}</button>
-      <button type="button" data-decoration-rotate="${decoration.id}">${Number(decoration.rotation) || 0} deg</button>
-      <button type="button" data-delete-decoration="${decoration.id}">Borrar</button>
-    `;
-    return row;
-  });
-
-  elements.decorationList.replaceChildren(...rows);
+  if (areaEditor.draft?.length) {
+    elements.highlightLayer.replaceChildren(createSvgElement("polyline", {
+      class: "area-draft", points: serializeHighlight(areaEditor.draft)
+    }));
+  }
 }
 
 function renderBackgroundControls() {
@@ -519,7 +478,6 @@ function renderPlacedDecorationHandles() {
 function renderMarkers() {
   renderMapMarkers({ parent: elements.markerLayer, catalog: config.catalog, markers: mapConfig.markers || [] });
   renderPlacedIconHandles();
-  renderMarkerControls();
 }
 
 function renderDecorationsLayer() {
@@ -529,7 +487,6 @@ function renderDecorationsLayer() {
     decorations: mapConfig.decorations || []
   });
   renderPlacedDecorationHandles();
-  renderDecorationControls();
 }
 
 function renderAll() {
@@ -541,6 +498,8 @@ function renderAll() {
   renderSegments();
   renderMarkers();
   renderDecorationsLayer();
+  markerEditor.renderControls();
+  decorationEditor.renderControls();
   renderBackgroundControls();
 }
 
@@ -654,6 +613,7 @@ function addIconAt(point) {
   elements.addIconButton.classList.remove("active");
   setDirty();
   renderMarkers();
+  markerEditor.renderControls();
 }
 
 function addDecorationAt(point) {
@@ -680,112 +640,13 @@ function addDecorationAt(point) {
   elements.addDecorationButton.classList.remove("active");
   setDirty();
   renderDecorationsLayer();
+  decorationEditor.renderControls();
 }
 
 function setTool(tool) {
   activeTool = tool;
   elements.nodeToolButton.classList.toggle("active", tool === "node");
   elements.iconToolButton.classList.toggle("active", tool === "icon");
-}
-
-async function handleRouteAssetUpload(event) {
-  const file = event.target.files?.[0];
-  if (!file) {
-    return;
-  }
-
-  elements.saveStatus.textContent = "Subiendo asset...";
-  const uploaded = await uploadFile(file, "route-asset");
-  config.catalog.routeAssets = config.catalog.routeAssets || [];
-  config.catalog.routeAssets.push({
-    id: generateId("asset"),
-    name: uploaded.name,
-    type: "single",
-    src: uploaded.src
-  });
-  event.target.value = "";
-  setDirty();
-  renderSegments();
-}
-
-async function handleBackgroundUpload(event) {
-  const file = event.target.files?.[0];
-  if (!file) {
-    return;
-  }
-
-  elements.saveStatus.textContent = "Subiendo mapa...";
-  const uploaded = await uploadFile(file, "map");
-  config.catalog.backgrounds = config.catalog.backgrounds || [];
-  config.catalog.backgrounds.push({
-    id: generateId("mapa"),
-    name: uploaded.name,
-    src: uploaded.src
-  });
-  mapConfig.background = uploaded.src;
-  elements.mapImage.src = mapConfig.background;
-  event.target.value = "";
-  setDirty();
-  renderBackgroundControls();
-}
-
-async function handleIconUpload(event) {
-  const file = event.target.files?.[0];
-  if (!file) {
-    return;
-  }
-
-  elements.saveStatus.textContent = "Subiendo icono...";
-  const uploaded = await uploadFile(file, "icon");
-  config.catalog.markerIcons = config.catalog.markerIcons || [];
-  config.catalog.markerIcons.push({
-    id: generateId("icono-asset"),
-    name: uploaded.name,
-    src: uploaded.src
-  });
-  event.target.value = "";
-  setDirty();
-  renderMarkerControls();
-}
-
-async function handleDecorationUpload(event) {
-  const file = event.target.files?.[0];
-  if (!file) {
-    return;
-  }
-
-  elements.saveStatus.textContent = "Subiendo decoracion...";
-  const uploaded = await uploadFile(file, "decoration");
-  config.catalog.decorations = config.catalog.decorations || [];
-  config.catalog.decorations.push({
-    id: generateId("decoracion-asset"),
-    name: uploaded.name,
-    src: uploaded.src
-  });
-  event.target.value = "";
-  setDirty();
-  renderDecorationControls();
-}
-
-async function handleAudioUpload(event) {
-  const file = event.target.files?.[0];
-  const route = activeRoute();
-  if (!file || !route) {
-    return;
-  }
-
-  elements.saveStatus.textContent = "Subiendo audio...";
-  const uploaded = await uploadFile(file, "audio");
-  config.catalog.audios = config.catalog.audios || [];
-  config.catalog.audios.push({
-    id: generateId("audio"),
-    name: uploaded.name,
-    src: uploaded.src
-  });
-  route.audio = uploaded.src;
-  event.target.value = "";
-  setDirty();
-  renderAudioSelect(route);
 }
 
 function updateNodeInput(event) {
@@ -846,117 +707,15 @@ function updateSegmentTransform(event) {
   renderRouteGraphics();
 }
 
-function updateMarkerField(event) {
-  const input = event.target.closest("[data-marker-id]");
-  if (!input) {
-    return;
-  }
-
-  const marker = mapConfig.markers.find((item) => item.id === input.dataset.markerId);
-  if (!marker) {
-    return;
-  }
-
-  if (input.dataset.field === "width") {
-    marker.width = Math.max(16, Number(input.value) || 50);
-    marker.height = marker.width;
-  } else {
-    marker[input.dataset.field] = input.value;
-  }
-
-  setDirty();
-  renderMarkers();
-}
-
-function deleteMarkerFromEvent(event) {
-  const deleteButton = event.target.closest("[data-delete-marker]");
-  const mirrorButton = event.target.closest("[data-marker-mirror]");
-  const rotateButton = event.target.closest("[data-marker-rotate]");
-
-  if (deleteButton) {
-    mapConfig.markers = mapConfig.markers.filter((marker) => marker.id !== deleteButton.dataset.deleteMarker);
-    setDirty();
-    renderMarkers();
-    renderMarkerControls();
-    return;
-  }
-
-  const markerId = mirrorButton?.dataset.markerMirror || rotateButton?.dataset.markerRotate;
-  const marker = mapConfig.markers.find((item) => item.id === markerId);
-
-  if (!marker) {
-    return;
-  }
-
-  if (mirrorButton) {
-    marker.mirrored = !marker.mirrored;
-  }
-
-  if (rotateButton) {
-    marker.rotation = rotate45(marker.rotation);
-  }
-
-  setDirty();
-  renderMarkers();
-  renderMarkerControls();
-}
-
-function handleDecorationListClick(event) {
-  const deleteButton = event.target.closest("[data-delete-decoration]");
-  const mirrorButton = event.target.closest("[data-decoration-mirror]");
-  const rotateButton = event.target.closest("[data-decoration-rotate]");
-
-  if (deleteButton) {
-    mapConfig.decorations = (mapConfig.decorations || []).filter((item) => item.id !== deleteButton.dataset.deleteDecoration);
-    setDirty();
-    renderDecorationsLayer();
-    renderDecorationControls();
-    return;
-  }
-
-  const decorationId = mirrorButton?.dataset.decorationMirror || rotateButton?.dataset.decorationRotate;
-  const decoration = (mapConfig.decorations || []).find((item) => item.id === decorationId);
-
-  if (!decoration) {
-    return;
-  }
-
-  if (mirrorButton) {
-    decoration.mirrored = !decoration.mirrored;
-  }
-
-  if (rotateButton) {
-    decoration.rotation = rotate45(decoration.rotation);
-  }
-
-  setDirty();
-  renderDecorationsLayer();
-  renderDecorationControls();
-}
-
-function updateDecorationField(event) {
-  const input = event.target.closest("[data-decoration-id]");
-  if (!input) {
-    return;
-  }
-
-  const decoration = (mapConfig.decorations || []).find((item) => item.id === input.dataset.decorationId);
-  if (!decoration) {
-    return;
-  }
-
-  if (input.dataset.field === "width") {
-    decoration.width = Math.max(16, Number(input.value) || 80);
-    decoration.height = decoration.width;
-  } else {
-    decoration[input.dataset.field] = input.value;
-  }
-
-  setDirty();
-  renderDecorationsLayer();
-}
-
 function startDrag(event) {
+  if (activeMode === "area") {
+    const handle = event.target.closest(".editor-area-handle");
+    if (!handle || areaEditor.draft !== null) return;
+    dragState = { type: "area", index: Number(handle.dataset.index) };
+    elements.layer.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    return;
+  }
   const node = event.target.closest(".editor-node");
   const icon = event.target.closest(".editor-icon-handle");
   const decorationHandle = event.target.closest(".editor-decoration-handle");
@@ -1009,6 +768,11 @@ function moveDrag(event) {
 
   const point = getSvgPoint(elements.layer, event);
 
+  if (dragState.type === "area") {
+    areaEditor.updatePoint(dragState.index, clampPoint(point));
+    return;
+  }
+
   if (dragState.type === "node") {
     const route = activeRoute();
     route.nodes[dragState.index] = clampPoint({
@@ -1037,11 +801,36 @@ function moveDrag(event) {
   setDirty();
 }
 
+function queueDragMove(event) {
+  if (!dragState) return;
+  latestDragEvent = event;
+  if (dragFrame !== null) return;
+  dragFrame = requestAnimationFrame(() => {
+    dragFrame = null;
+    const next = latestDragEvent;
+    latestDragEvent = null;
+    if (next) moveDrag(next);
+  });
+}
+
 function endDrag() {
+  if (dragFrame !== null) cancelAnimationFrame(dragFrame);
+  dragFrame = null;
+  if (latestDragEvent) moveDrag(latestDragEvent);
+  latestDragEvent = null;
   dragState = null;
 }
 
 async function saveAll() {
+  if (areaEditor.draft !== null) {
+    elements.areaStatus.textContent = "Completa los cuatro puntos o cancela el marcado antes de guardar.";
+    return;
+  }
+  if (!elements.routeDurationInput.disabled && !elements.routeDurationInput.checkValidity()) {
+    setMode("text-audio");
+    elements.routeDurationInput.reportValidity();
+    return;
+  }
   elements.saveButton.disabled = true;
   elements.saveStatus.textContent = "Guardando...";
 
@@ -1121,43 +910,28 @@ async function init() {
 
   elements.routeNameInput.addEventListener("input", syncActiveRouteFromInputs);
   elements.routeColorInput.addEventListener("input", syncActiveRouteFromInputs);
-  elements.routeInstructionsInput.addEventListener("input", syncActiveRouteFromInputs);
-  elements.routeAudioSelect.addEventListener("change", syncRouteAudio);
-  elements.routeAssetSizeInput.addEventListener("input", syncRouteAssetSize);
-  elements.routeAssetUploadInput.addEventListener("change", (event) => {
-    handleRouteAssetUpload(event).catch((error) => {
-      elements.saveStatus.textContent = error.message;
-      elements.saveStatus.classList.add("dirty");
-    });
+  elements.routeDurationInput.addEventListener("input", () => {
+    const route = activeRoute();
+    if (!route) return;
+    setDirty();
+    if (elements.routeDurationInput.checkValidity()) {
+      route.durationSeconds = elements.routeDurationInput.valueAsNumber;
+    }
   });
+  elements.routeAudioSelect.addEventListener("change", syncRouteAudio);
+  elements.audioScope.addEventListener("change", () => renderAudioSelect(activeRoute()));
+  elements.routeAssetScope.addEventListener("change", renderSegments);
+  elements.routeAssetSizeInput.addEventListener("input", syncRouteAssetSize);
   elements.backgroundSelect.addEventListener("change", () => {
     mapConfig.background = elements.backgroundSelect.value;
     elements.mapImage.src = mapConfig.background;
     setDirty();
   });
-  elements.backgroundUploadInput.addEventListener("change", (event) => {
-    handleBackgroundUpload(event).catch((error) => {
-      elements.saveStatus.textContent = error.message;
-      elements.saveStatus.classList.add("dirty");
-    });
-  });
-  elements.iconUploadInput.addEventListener("change", (event) => {
-    handleIconUpload(event).catch((error) => {
-      elements.saveStatus.textContent = error.message;
-      elements.saveStatus.classList.add("dirty");
-    });
-  });
-  elements.decorationUploadInput.addEventListener("change", (event) => {
-    handleDecorationUpload(event).catch((error) => {
-      elements.saveStatus.textContent = error.message;
-      elements.saveStatus.classList.add("dirty");
-    });
-  });
-  elements.audioUploadInput.addEventListener("change", (event) => {
-    handleAudioUpload(event).catch((error) => {
-      elements.saveStatus.textContent = error.message;
-      elements.saveStatus.classList.add("dirty");
-    });
+  bindCatalogUploads({
+    elements, mapKey, getCatalog: () => config.catalog, getMap: () => mapConfig,
+    getRoute: activeRoute, onChange: setDirty,
+    renderers: { segments: renderSegments, background: renderBackgroundControls,
+      markers: markerEditor.renderControls, decorations: decorationEditor.renderControls, audio: renderAudioSelect }
   });
   document.querySelectorAll("[data-mode]").forEach((button) => {
     button.addEventListener("click", () => setMode(button.dataset.mode));
@@ -1205,15 +979,12 @@ async function init() {
   elements.nodeList.addEventListener("change", updateNodeInput);
   elements.segmentAssetList.addEventListener("change", updateSegmentAsset);
   elements.segmentAssetList.addEventListener("click", updateSegmentTransform);
-  elements.markerList.addEventListener("change", updateMarkerField);
-  elements.markerList.addEventListener("click", deleteMarkerFromEvent);
-  elements.decorationList.addEventListener("change", updateDecorationField);
-  elements.decorationList.addEventListener("click", handleDecorationListClick);
   elements.layer.addEventListener("pointerdown", startDrag);
-  elements.layer.addEventListener("pointermove", moveDrag);
+  elements.layer.addEventListener("pointermove", queueDragMove);
   elements.layer.addEventListener("pointerup", endDrag);
   elements.layer.addEventListener("pointercancel", endDrag);
   elements.layer.addEventListener("click", (event) => {
+    if (activeMode === "area") { areaEditor.handleClick(event); return; }
     if (dragState || event.target.closest(".editor-node, .editor-icon-handle")) {
       return;
     }

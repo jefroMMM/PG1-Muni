@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="516" height="330" preserveAspectRatio="xMinYMin meet" viewBox="0 0 516 330" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="516" height="330"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-330)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="4" y="260" width="150" height="57" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="51.233154296875" y="294.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,589) scale(1,-1)">Configuración</text>
+			<text x="49.486328125" y="282.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,565) scale(1,-1)">maps · catalog</text>
+			<rect x="184" y="260" width="150" height="57" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="242.99072265625" y="300.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,601) scale(1,-1)">Sección</text>
+			<text x="221.736572265625" y="288.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,577) scale(1,-1)">key · sectionName</text>
+			<text x="218.976806640625" y="276.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,553) scale(1,-1)">background · routes</text>
+			<rect x="364" y="260" width="150" height="57" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="422.24365234375" y="300.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,601) scale(1,-1)">Recurso</text>
+			<text x="410.244384765625" y="288.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,577) scale(1,-1)">id · src · name</text>
+			<text x="420.989013671875" y="276.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,553) scale(1,-1)">sectionId</text>
+			<rect x="184" y="135" width="150" height="77" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="249.49462890625" y="191.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,383) scale(1,-1)">Ruta</text>
+			<text x="219.23388671875" y="179.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,359) scale(1,-1)">id · name · archived</text>
+			<text x="220.725830078125" y="167.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,335) scale(1,-1)">buttonColor · audio</text>
+			<text x="225.225830078125" y="155.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,311) scale(1,-1)">durationSeconds</text>
+			<rect x="4" y="28" width="150" height="61" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="47.974609375" y="70.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,141) scale(1,-1)">Nodo ordenado</text>
+			<text x="51.7275390625" y="58.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,117) scale(1,-1)">x de 0 a 2000</text>
+			<text x="51.7275390625" y="46.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,93) scale(1,-1)">y de 0 a 1000</text>
+			<rect x="364" y="28" width="150" height="61" style="stroke: rgb(45%,53%,60%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(94%,96%,97%); fill-rule: evenodd;"/>
+			<text x="401.224609375" y="64.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,129) scale(1,-1)">Paso de indicación</text>
+			<text x="408.73486328125" y="52.5" style="font-family: Arial; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,105) scale(1,-1)">posición · texto</text>
+			<path d="M 154,288 L 184,288 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="184 288, 179.4978 290.1748, 179.4978 285.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 259,260 L 259,212 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="259 212, 261.1748 216.5022, 256.8252 216.5022" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 334,288 L 364,288 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="364 288, 359.4978 290.1748, 359.4978 285.8252" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 334,178 L 439,260 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="439 260, 434.113 258.9429, 436.7902 255.5148" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 214,135 L 79,89 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="79 89, 83.96308 88.39351, 82.56018 92.51071" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<path d="M 304,135 L 439,89 Z" style="stroke: rgb(32%,39%,46%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="439 89, 435.4398 92.51071, 434.0369 88.39351" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(32%,39%,46%); fill-rule: evenodd;"/>
+			<text x="272" y="230" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,460) scale(1,-1)">1 sección / N rutas</text>
+			<text x="58" y="105" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,210) scale(1,-1)">Mínimo 2 nodos</text>
+			<text x="348" y="160" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,320) scale(1,-1)">audio y assets opcionales</text>
+			<text x="4" y="5" style="font-family: Arial; font-size: 8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,10) scale(1,-1)">Relaciones lógicas en JSON; no representan claves foráneas verificadas por una base SQL.</text>
+		</g>
+	</g>
+</svg>

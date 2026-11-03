@@ -1,0 +1,5 @@
+# Solo se versionan pruebas, configuración y fixtures; nunca dependencias ni ejecuciones.
+node_modules/
+.venv/
+results/
+__pycache__/

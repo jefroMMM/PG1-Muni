@@ -1,4 +1,6 @@
 import { loadRouteConfig } from "./config-api.js";
+import { getInstructionSteps } from "./instructions.js";
+import { getRouteTiming } from "./route-timing.js";
 import {
   createSvgElement,
   renderDecorations,
@@ -41,17 +43,6 @@ export async function initRouteViewer(mapKey, options = {}) {
       .replaceAll('"', "&quot;");
   }
 
-  function getInstructionSteps(instructions = "") {
-    const cleaned = instructions
-      .replace(/\r/g, "\n")
-      .split(/\n+|(?<=\.)\s+|(?<=;)\s+/)
-      .map((step) => step.replace(/^\s*\d+[\).\-\s]+/, "").trim())
-      .map((step) => step.replace(/\.$/, ""))
-      .filter(Boolean);
-
-    return cleaned.length ? cleaned : ["Ruta sin indicaciones escritas"];
-  }
-
   function stopAudio() {
     if (!activeAudio) {
       return;
@@ -75,7 +66,8 @@ export async function initRouteViewer(mapKey, options = {}) {
   }
 
   function showRoutePanel(route) {
-    const steps = getInstructionSteps(route.instructions);
+    const instructions = getInstructionSteps(route);
+    const steps = instructions.length ? instructions : ["Ruta sin indicaciones escritas"];
     const density = steps.length >= 8 ? "dense" : steps.length >= 5 ? "compact" : "normal";
     terminal?.classList.add("route-active");
     panelContent.className = `welcome-content route-content route-steps-${density}`;
@@ -112,36 +104,39 @@ export async function initRouteViewer(mapKey, options = {}) {
     stopAudio();
   }
 
-  function hideRouteGradually() {
+  function hideRouteGradually(timing) {
     const footprints = [...routeFootprints.querySelectorAll(".route-footprint")];
 
     if (routePath.getAttribute("d")) {
       const length = routePath.getTotalLength();
       routePath.classList.add("leaving");
-      routePath.style.transition = `stroke-dashoffset ${mapConfig.routeExitDuration}ms ease-in-out, opacity ${mapConfig.routeExitDuration}ms ease-in-out`;
+      routePath.style.transition = `stroke-dashoffset ${timing.exit}ms ease-in-out, opacity ${timing.exit}ms ease-in-out`;
       routePath.style.strokeDasharray = length;
       routePath.style.strokeDashoffset = length;
     }
 
     footprints.forEach((footprint, index) => {
       const reverseIndex = footprints.length - 1 - index;
-      const delay = footprints.length <= 1 ? 0 : (mapConfig.routeExitDuration / (footprints.length - 1)) * reverseIndex;
+      const delay = footprints.length <= 1 ? 0 : ((timing.exit - 280) / (footprints.length - 1)) * reverseIndex;
       footprint.style.opacity = "0.95";
       footprint.style.transform = "scale(1)";
       footprint.style.animation = `routeFootprintHide 280ms ease-in ${Math.round(delay)}ms both`;
     });
 
-    highlightLayer.querySelectorAll(".office-highlight").forEach((highlight) => highlight.classList.add("leaving"));
+    highlightLayer.querySelectorAll(".office-highlight").forEach((highlight) => {
+      highlight.style.transitionDuration = `${timing.exit}ms`;
+      highlight.classList.add("leaving");
+    });
     controls.querySelectorAll("button").forEach((button) => button.classList.remove("active"));
 
-    window.clearTimeout(resetTimer);
-    resetTimer = window.setTimeout(clearRouteDisplay, mapConfig.routeExitDuration);
   }
 
-  function scheduleRouteReset() {
+  function scheduleRouteReset(timing, startedAt) {
     window.clearTimeout(exitTimer);
     window.clearTimeout(resetTimer);
-    exitTimer = window.setTimeout(hideRouteGradually, mapConfig.routeVisibleTime);
+    const elapsed = performance.now() - startedAt;
+    exitTimer = window.setTimeout(() => hideRouteGradually(timing), Math.max(0, timing.exitAt - elapsed));
+    resetTimer = window.setTimeout(clearRouteDisplay, Math.max(0, timing.resetAt - elapsed));
   }
 
   function playRouteAudio(route) {
@@ -159,6 +154,9 @@ export async function initRouteViewer(mapKey, options = {}) {
   }
 
   function selectRoute(route) {
+    const startedAt = performance.now();
+    const timing = getRouteTiming(route, mapConfig);
+    terminal?.style.setProperty("--panel-return-duration", `${timing.panelReturn}ms`);
     window.clearTimeout(exitTimer);
     window.clearTimeout(resetTimer);
     stopAudio();
@@ -173,7 +171,7 @@ export async function initRouteViewer(mapKey, options = {}) {
       routePath.style.strokeDasharray = "12 12";
       routePath.style.strokeDashoffset = length;
       routePath.getBoundingClientRect();
-      routePath.style.transition = "stroke-dashoffset 1.25s ease-in-out";
+      routePath.style.transition = `stroke-dashoffset ${Math.min(1250, timing.reveal)}ms ease-in-out`;
       routePath.style.strokeDashoffset = "0";
     } else {
       routePath.removeAttribute("d");
@@ -185,7 +183,7 @@ export async function initRouteViewer(mapKey, options = {}) {
       route,
       assetSize: route.assetSize || mapConfig.routeAssetSize,
       stepDistance: mapConfig.routeStepDistance,
-      revealTime: mapConfig.routeRevealTime,
+      revealTime: timing.reveal,
       className: "route-footprint"
     });
 
@@ -195,7 +193,7 @@ export async function initRouteViewer(mapKey, options = {}) {
     });
     showRoutePanel(route);
     playRouteAudio(route);
-    scheduleRouteReset();
+    scheduleRouteReset(timing, startedAt);
   }
 
   function renderButtons() {

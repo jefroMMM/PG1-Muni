@@ -1,0 +1,497 @@
+{
+  "version": 1,
+  "catalog": {
+    "backgrounds": [
+      {
+        "id": "terminal-map",
+        "name": "Croquis terminal",
+        "src": "/assets/images/croquis-terminal-2000x1000.png"
+      },
+      {
+        "id": "retalhuleu-map",
+        "name": "Mapa Retalhuleu",
+        "src": "/MapaR/Imagenes-MapaR/Mapa-R-2000x1000.png"
+      }
+    ],
+    "routeAssets": [
+      {
+        "id": "footprints-auto",
+        "name": "Huellas segun direccion",
+        "type": "directional",
+        "directions": {
+          "up": "/assets/images/huellas%20sin%20fondo%20hacia%20arriba.png",
+          "down": "/assets/images/huellas%20sin%20fondo%20abajo.png",
+          "right": "/assets/images/huellas%20sin%20fondo%20derecha.png",
+          "left": "/assets/images/huellas%20sin%20fondo%20izquierda.png"
+        }
+      },
+      {
+        "id": "mapr-footprints-auto",
+        "name": "Huellas MapaR",
+        "type": "directional",
+        "directions": {
+          "up": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20hacia%20arriba.png",
+          "down": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20abajo.png",
+          "right": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20derecha.png",
+          "left": "/MapaR/Imagenes-MapaR/huellas%20sin%20fondo%20izquierda.png"
+        }
+      },
+      {
+        "id": "tuc-up-left",
+        "name": "Tuc tuc arriba izquierda",
+        "type": "single",
+        "src": "/MapaR/Imagenes-MapaR/tuc%20tuc%20mirando%20arriba%20izquierda.png"
+      },
+      {
+        "id": "tuc-left",
+        "name": "Tuc tuc izquierda",
+        "type": "single",
+        "src": "/MapaR/Imagenes-MapaR/tuc%20tuc%20izquierda.png"
+      },
+      {
+        "id": "tuc-up-right",
+        "name": "Tuc tuc derecha arriba",
+        "type": "single",
+        "src": "/MapaR/Imagenes-MapaR/tuctuc%20derecha%20arriba.png"
+      },
+      {
+        "id": "tuc-right",
+        "name": "Tuc tuc derecha",
+        "type": "single",
+        "src": "/MapaR/Imagenes-MapaR/tuctuc%20derecha.png"
+      }
+    ],
+    "markerIcons": [
+      {
+        "id": "muni-logo",
+        "name": "Logo Municipalidad",
+        "src": "/assets/images/Logo%20Muni%20Reu.png"
+      },
+      {
+        "id": "renap-logo",
+        "name": "Icono RENAP",
+        "src": "/MapaR/Imagenes-MapaR/Icono%20Renap.png"
+      },
+      {
+        "id": "pnc-logo",
+        "name": "Logo PNC",
+        "src": "/MapaR/Imagenes-MapaR/PNC%20logo.png"
+      }
+    ],
+    "audios": [
+      {
+        "id": "audio-contaduria",
+        "name": "Audio Contaduria",
+        "src": "/assets/Audios/AudioContaduria.mp3"
+      },
+      {
+        "id": "audio-administracion",
+        "name": "Audio Administracion",
+        "src": "/assets/Audios/Audio%20Administraci%C3%B3n.mp3"
+      },
+      {
+        "id": "audio-sala",
+        "name": "Audio Sala de Reuniones",
+        "src": "/assets/Audios/Sala%20de%20reuniones.mp3"
+      },
+      {
+        "id": "audio-rrhh",
+        "name": "Audio Recursos Humanos",
+        "src": "/assets/Audios/Recursos%20humanos.mp3"
+      },
+      {
+        "id": "audio-gerencia",
+        "name": "Audio Gerencia",
+        "src": "/assets/Audios/Audio%20gerencia.mp3"
+      },
+      {
+        "id": "audio-municipalidad",
+        "name": "Audio Municipalidad",
+        "src": "/MapaR/Audios/Audio%20municipalidad.mp3"
+      },
+      {
+        "id": "audio-pnc",
+        "name": "Audio Policia Nacional Civil",
+        "src": "/MapaR/Audios/Audio%20Policia%20Nacional%20Civil.mp3"
+      },
+      {
+        "id": "audio-renap",
+        "name": "Audio Renap",
+        "src": "/MapaR/Audios/Audio%20Renap.mp3"
+      }
+    ],
+    "decorations": []
+  },
+  "maps": {
+    "terminal": {
+      "title": "Terminal de localizacion de oficinas",
+      "viewBox": "0 0 2000 1000",
+      "background": "/assets/images/croquis-terminal-2000x1000.png",
+      "logo": "/assets/images/Logo%20Muni%20Reu.png",
+      "routeStyle": "line-and-assets",
+      "routeAssetSize": 68,
+      "routeStepDistance": 46,
+      "routeVisibleTime": 15000,
+      "routeRevealTime": 5000,
+      "routeExitDuration": 4000,
+      "defaultPanel": {
+        "kicker": "Municipalidad de Retalhuleu",
+        "title": "Bienvenido",
+        "text": "¿Necesitas ayuda para encontrar una oficina?",
+        "hint": "Selecciona una oficina en el panel inferior y sigue la ruta marcada."
+      },
+      "routes": [
+        {
+          "id": "contaduria",
+          "name": "Contaduria",
+          "archived": false,
+          "buttonColor": "#75982b",
+          "instructions": "Gira a la izquierda, continua hasta el final del pasillo. Luego, gira a la derecha. La oficina de Contaduria se encuentra en la segunda puerta, a mano izquierda.",
+          "nodes": [
+            {
+              "x": 1024,
+              "y": 714
+            },
+            {
+              "x": 652,
+              "y": 714
+            },
+            {
+              "x": 658,
+              "y": 332
+            },
+            {
+              "x": 565,
+              "y": 331
+            }
+          ],
+          "segmentAssets": [
+            "footprints-auto",
+            "footprints-auto",
+            "footprints-auto"
+          ],
+          "highlightPolygon": "145,67 570,57 553,336 139,332",
+          "audio": "/assets/Audios/AudioContaduria.mp3"
+        },
+        {
+          "id": "administracion",
+          "name": "Administracion",
+          "archived": false,
+          "buttonColor": "#158b8f",
+          "instructions": "Gira a la izquierda, continua hasta el final del pasillo. Luego, gira a la derecha. La oficina de Administracion se encuentra en la primera puerta, a mano izquierda.",
+          "nodes": [
+            {
+              "x": 1024,
+              "y": 714
+            },
+            {
+              "x": 652,
+              "y": 714
+            },
+            {
+              "x": 656,
+              "y": 448
+            },
+            {
+              "x": 549,
+              "y": 447
+            }
+          ],
+          "segmentAssets": [
+            "footprints-auto",
+            "footprints-auto",
+            "footprints-auto"
+          ],
+          "highlightPolygon": "133,391 525,392 519,724 115,718",
+          "audio": "/assets/Audios/Audio%20Administraci%C3%B3n.mp3"
+        },
+        {
+          "id": "sala",
+          "name": "Sala de Reuniones",
+          "archived": false,
+          "buttonColor": "#1f4d68",
+          "instructions": "Gira a la izquierda, continua hasta el final del pasillo. Luego, gira a la derecha. La sala de reuniones se encuentra hasta el final del pasillo, en la puerta del fondo.",
+          "nodes": [
+            {
+              "x": 1024,
+              "y": 714
+            },
+            {
+              "x": 675,
+              "y": 714
+            },
+            {
+              "x": 680,
+              "y": 287
+            }
+          ],
+          "segmentAssets": [
+            "footprints-auto",
+            "footprints-auto"
+          ],
+          "highlightPolygon": "610,57 1441,60 1445,233 606,231",
+          "audio": "/assets/Audios/Sala%20de%20reuniones.mp3"
+        },
+        {
+          "id": "rrhh",
+          "name": "Recursos Humanos",
+          "archived": false,
+          "buttonColor": "#664099",
+          "instructions": "Gira a la derecha, continua hasta el final del pasillo. Luego, gira a la izquierda. La oficina de Recursos Humanos se encuentra en la segunda puerta, a mano derecha.",
+          "nodes": [
+            {
+              "x": 1024,
+              "y": 714
+            },
+            {
+              "x": 1394,
+              "y": 714
+            },
+            {
+              "x": 1386,
+              "y": 329
+            },
+            {
+              "x": 1490,
+              "y": 329
+            }
+          ],
+          "segmentAssets": [
+            "footprints-auto",
+            "footprints-auto",
+            "footprints-auto"
+          ],
+          "highlightPolygon": "1495,57 1856,55 1864,332 1503,341",
+          "audio": "/assets/Audios/Recursos%20humanos.mp3"
+        },
+        {
+          "id": "gerencia",
+          "name": "Gerencia",
+          "archived": false,
+          "buttonColor": "#c18a14",
+          "instructions": "Gira a la derecha, continua hasta el final del pasillo. Luego, gira a la izquierda. La oficina de Gerencia se encuentra en la primera puerta, a mano derecha.",
+          "nodes": [
+            {
+              "x": 1024,
+              "y": 714
+            },
+            {
+              "x": 1394,
+              "y": 714
+            },
+            {
+              "x": 1390,
+              "y": 449
+            },
+            {
+              "x": 1482,
+              "y": 447
+            }
+          ],
+          "segmentAssets": [
+            "footprints-auto",
+            "footprints-auto",
+            "footprints-auto"
+          ],
+          "highlightPolygon": "1511,381 1875,382 1896,718 1520,717",
+          "audio": "/assets/Audios/Audio%20gerencia.mp3"
+        }
+      ],
+      "markers": [],
+      "decorations": []
+    },
+    "mapar": {
+      "title": "Mapa Retalhuleu",
+      "viewBox": "0 0 2000 1000",
+      "background": "/MapaR/Imagenes-MapaR/Mapa-R-2000x1000.png",
+      "logo": "/assets/images/Logo%20Muni%20Reu.png",
+      "routeStyle": "assets-only",
+      "routeAssetSize": 40,
+      "routeStepDistance": 40,
+      "routeVisibleTime": 21500,
+      "routeRevealTime": 7000,
+      "routeExitDuration": 7000,
+      "defaultPanel": {
+        "kicker": "Municipalidad de Retalhuleu",
+        "title": "¿A donde quieres ir?",
+        "text": "Selecciona una opcion y te mostramos el recorrido paso a paso.",
+        "hint": ""
+      },
+      "routes": [
+        {
+          "id": "municipalidad",
+          "name": "Municipalidad de Retalhuleu",
+          "archived": false,
+          "buttonColor": "#cfe3d2",
+          "instructions": "Saliendo del Palacio, gira a la izquierda. Continua hasta la primera esquina y gira a la izquierda. A mitad de la calle, a mano derecha, encontraras la Municipalidad de Retalhuleu. Que tengas un buen dia.",
+          "nodes": [
+            {
+              "x": 1521,
+              "y": 676
+            },
+            {
+              "x": 1468,
+              "y": 732
+            },
+            {
+              "x": 1541,
+              "y": 808
+            }
+          ],
+          "segmentAssets": [
+            "mapr-footprints-auto",
+            "mapr-footprints-auto"
+          ],
+          "audio": "/MapaR/Audios/Audio%20municipalidad.mp3"
+        },
+        {
+          "id": "policiaNacionalCivil",
+          "name": "Policia Nacional Civil",
+          "archived": false,
+          "buttonColor": "#c9e1e6",
+          "instructions": "Saliendo del Palacio, gira a la derecha. Continua hasta el semaforo y gira a la izquierda sobre la Quinta Avenida. Avanza hasta la primera calle, a mano derecha. Continua por toda la Quinta Calle hasta llegar al Estadio Doctor Oscar Monterroso. Luego, gira a la derecha en la primera esquina. Encontraras la comisaria de la Policia Nacional Civil. Que tengas un buen dia.",
+          "nodes": [
+            {
+              "x": 1521,
+              "y": 676
+            },
+            {
+              "x": 1580,
+              "y": 605
+            },
+            {
+              "x": 1515,
+              "y": 508
+            },
+            {
+              "x": 1446,
+              "y": 560
+            },
+            {
+              "x": 1327,
+              "y": 412
+            },
+            {
+              "x": 1284,
+              "y": 325
+            },
+            {
+              "x": 1258,
+              "y": 234
+            },
+            {
+              "x": 1218,
+              "y": 107
+            },
+            {
+              "x": 1321,
+              "y": 72
+            }
+          ],
+          "segmentAssets": [
+            "mapr-footprints-auto",
+            "tuc-up-left",
+            "tuc-left",
+            "tuc-up-right",
+            "tuc-up-right",
+            "tuc-up-right",
+            "tuc-up-right",
+            "tuc-right"
+          ],
+          "audio": "/MapaR/Audios/Audio%20Policia%20Nacional%20Civil.mp3"
+        },
+        {
+          "id": "renap",
+          "name": "Registro Nacional de las Personas",
+          "archived": false,
+          "buttonColor": "#d7ead7",
+          "instructions": "Saliendo del Palacio, gira a la derecha. Continua hasta el semaforo y gira a la izquierda sobre la Quinta Avenida. Avanza hasta la primera calle, a mano derecha, y sigue derecho. En la segunda calle, gira a la izquierda. Continua por toda la Tercera Avenida hasta llegar al kiosco. Al lado derecho encontraras la sede del RENAP. Que tengas un buen dia.",
+          "nodes": [
+            {
+              "x": 1525,
+              "y": 671
+            },
+            {
+              "x": 1584,
+              "y": 603
+            },
+            {
+              "x": 1519,
+              "y": 506
+            },
+            {
+              "x": 1448,
+              "y": 557
+            },
+            {
+              "x": 1329,
+              "y": 409
+            },
+            {
+              "x": 1286,
+              "y": 324
+            },
+            {
+              "x": 1205,
+              "y": 342
+            },
+            {
+              "x": 730,
+              "y": 398
+            },
+            {
+              "x": 635,
+              "y": 443
+            },
+            {
+              "x": 573,
+              "y": 497
+            }
+          ],
+          "segmentAssets": [
+            "mapr-footprints-auto",
+            "tuc-up-left",
+            "tuc-left",
+            "tuc-up-right",
+            "tuc-up-right",
+            "tuc-left",
+            "tuc-left",
+            "tuc-left",
+            "tuc-left"
+          ],
+          "audio": "/MapaR/Audios/Audio%20Renap.mp3"
+        }
+      ],
+      "markers": [
+        {
+          "id": "renap-marker",
+          "assetId": "renap-logo",
+          "x": 525,
+          "y": 446,
+          "width": 60,
+          "height": 60,
+          "label": "RENAP"
+        },
+        {
+          "id": "pnc-marker",
+          "assetId": "pnc-logo",
+          "x": 1300,
+          "y": 78,
+          "width": 50,
+          "height": 50,
+          "label": "PNC"
+        },
+        {
+          "id": "muni-marker",
+          "assetId": "muni-logo",
+          "x": 1492,
+          "y": 800,
+          "width": 50,
+          "height": 50,
+          "label": "Municipalidad"
+        }
+      ],
+      "decorations": []
+    }
+  }
+}
